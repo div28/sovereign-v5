@@ -6,11 +6,14 @@ FastAPI backend for regulatory compliance scanning.
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse, Response
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 import logging
+import uuid
+from datetime import datetime
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -66,6 +69,9 @@ _judges = None
 
 # Thread pool for parallel judge execution
 _executor = ThreadPoolExecutor(max_workers=9)
+
+# Store analysis results temporarily (in production, use Redis or database)
+_analysis_cache: Dict[str, Dict[str, Any]] = {}
 
 
 def get_rag_engine():
@@ -173,6 +179,35 @@ def run_judge(
     except Exception as e:
         logger.error(f"Judge {judge.judge_id} failed: {e}")
         return (judge.judge_id, None)
+
+
+def store_analysis_result(
+    violations: List[Dict[str, Any]],
+    risk_score: int,
+    frameworks: List[str],
+    description: str
+) -> str:
+    """
+    Store analysis result for later export.
+
+    Args:
+        violations: Detected violations.
+        risk_score: Risk score.
+        frameworks: Frameworks analyzed.
+        description: Original submission.
+
+    Returns:
+        Analysis ID.
+    """
+    analysis_id = str(uuid.uuid4())
+    _analysis_cache[analysis_id] = {
+        "violations": violations,
+        "risk_score": risk_score,
+        "frameworks": frameworks,
+        "description": description,
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    return analysis_id
 
 
 @app.get("/")
@@ -299,12 +334,23 @@ async def analyze_compliance(request: AnalyzeRequest):
             f"risk score: {risk_score}"
         )
 
-        return AnalyzeResponse(
+        # Store result for export
+        analysis_id = store_analysis_result(
             violations=violations,
             risk_score=risk_score,
-            frameworks_analyzed=frameworks,
-            chunks_retrieved=len(retrieved_chunks)
+            frameworks=frameworks,
+            description=request.description
         )
+
+        response_data = {
+            "violations": violations,
+            "risk_score": risk_score,
+            "frameworks_analyzed": frameworks,
+            "chunks_retrieved": len(retrieved_chunks),
+            "analysis_id": analysis_id
+        }
+
+        return response_data
 
     except HTTPException:
         raise
@@ -350,6 +396,243 @@ async def list_frameworks():
             }
         ]
     }
+
+
+# ============================================================================
+# EXPORT ENDPOINTS
+# ============================================================================
+
+@app.get("/api/export/pdf/{analysis_id}")
+async def export_pdf(analysis_id: str):
+    """
+    Export compliance analysis as PDF report.
+
+    Args:
+        analysis_id: Analysis identifier from /api/analyze response.
+
+    Returns:
+        PDF file download.
+    """
+    try:
+        # Retrieve analysis from cache
+        if analysis_id not in _analysis_cache:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Analysis {analysis_id} not found"
+            )
+
+        analysis = _analysis_cache[analysis_id]
+
+        # Generate PDF
+        from backend.exports.pdf_generator import generate_compliance_pdf
+
+        pdf_buffer = generate_compliance_pdf(
+            violations=analysis['violations'],
+            risk_score=analysis['risk_score'],
+            frameworks=analysis['frameworks'],
+            submission_preview=analysis['description'][:500],
+            analysis_id=analysis_id
+        )
+
+        # Return as streaming response
+        return StreamingResponse(
+            pdf_buffer,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename=compliance_report_{analysis_id[:8]}.pdf"
+            }
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"PDF export failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/export/csv/{analysis_id}")
+async def export_csv(analysis_id: str):
+    """
+    Export compliance violations as CSV.
+
+    Args:
+        analysis_id: Analysis identifier from /api/analyze response.
+
+    Returns:
+        CSV file download.
+    """
+    try:
+        # Retrieve analysis from cache
+        if analysis_id not in _analysis_cache:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Analysis {analysis_id} not found"
+            )
+
+        analysis = _analysis_cache[analysis_id]
+
+        # Generate CSV
+        from backend.exports.csv_generator import generate_compliance_csv
+
+        csv_content = generate_compliance_csv(analysis['violations'])
+
+        # Return as response
+        return Response(
+            content=csv_content,
+            media_type="text/csv",
+            headers={
+                "Content-Disposition": f"attachment; filename=violations_{analysis_id[:8]}.csv"
+            }
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"CSV export failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================================
+# MODEL ROUTING ENDPOINTS
+# ============================================================================
+
+@app.get("/api/routing/cost-summary")
+async def get_cost_summary():
+    """
+    Get cost summary showing intelligent routing savings.
+
+    Returns:
+        Cost analysis with savings vs all-Sonnet baseline.
+    """
+    try:
+        from backend.routing.model_router import get_model_router
+
+        router = get_model_router()
+        summary = router.get_cost_summary()
+
+        return {
+            "status": "success",
+            "timestamp": datetime.utcnow().isoformat(),
+            "cost_summary": summary
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to get cost summary: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================================
+# EVALUATION ENDPOINTS
+# ============================================================================
+
+@app.get("/api/evals/dashboard")
+async def get_evals_dashboard():
+    """
+    Get evaluation dashboard with metrics for all judges.
+
+    Runs all judges against golden dataset and returns performance metrics.
+    Target thresholds: TPR≥90%, TNR≥90%, Critical TPR≥95%
+
+    Returns:
+        Evaluation metrics dashboard.
+    """
+    try:
+        from backend.evals.eval_runner import get_evaluation_runner
+
+        runner = get_evaluation_runner()
+        results = runner.evaluate_all_judges(use_parallel=True)
+
+        return results
+
+    except Exception as e:
+        logger.error(f"Evaluation dashboard failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/evals/judge/{judge_id}")
+async def get_judge_evaluation(judge_id: str):
+    """
+    Get evaluation metrics for a specific judge.
+
+    Args:
+        judge_id: Judge identifier.
+
+    Returns:
+        Judge-specific evaluation results.
+    """
+    try:
+        from backend.evals.eval_runner import get_evaluation_runner
+
+        runner = get_evaluation_runner()
+        results = runner.evaluate_single_judge(judge_id)
+
+        return results
+
+    except Exception as e:
+        logger.error(f"Judge evaluation failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================================
+# SELF-IMPROVEMENT ENDPOINTS
+# ============================================================================
+
+@app.post("/api/improvement/trigger")
+async def trigger_improvement(
+    judge_id: Optional[str] = None,
+    force: bool = False
+):
+    """
+    Trigger self-improvement cycle.
+
+    Flow:
+    1. Analyze error patterns (requires ≥5 errors)
+    2. Generate refined prompts using Claude Sonnet
+    3. Recommend improvements
+    4. A/B test and deploy if ≥90% pass rate
+
+    Args:
+        judge_id: Optional judge to improve. If None, analyzes all judges.
+        force: If True, bypasses minimum error requirement.
+
+    Returns:
+        Improvement cycle results with recommendations.
+    """
+    try:
+        from backend.improvement.self_improvement_agent import get_self_improvement_agent
+
+        agent = get_self_improvement_agent()
+        results = agent.trigger_improvement_cycle(
+            judge_id=judge_id,
+            force=force
+        )
+
+        return results
+
+    except Exception as e:
+        logger.error(f"Self-improvement trigger failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/improvement/status")
+async def get_improvement_status():
+    """
+    Get current status of self-improvement system.
+
+    Returns:
+        Status including error counts and readiness for improvement.
+    """
+    try:
+        from backend.improvement.self_improvement_agent import get_self_improvement_agent
+
+        agent = get_self_improvement_agent()
+        status = agent.get_improvement_status()
+
+        return status
+
+    except Exception as e:
+        logger.error(f"Failed to get improvement status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":

@@ -16,6 +16,12 @@ from anthropic import Anthropic
 logger = logging.getLogger(__name__)
 
 
+def get_model_router():
+    """Import and return model router (deferred to avoid circular imports)."""
+    from backend.routing.model_router import get_model_router as _get_router
+    return _get_router()
+
+
 class Severity(Enum):
     """Violation severity levels."""
     CRITICAL = "CRITICAL"  # Immediate legal/regulatory risk
@@ -80,8 +86,9 @@ class BaseComplianceJudge(ABC):
         self,
         framework: str,
         focus_area: str,
-        model: str = "claude-3-5-haiku-20241022",
-        api_key: Optional[str] = None
+        model: str = None,
+        api_key: Optional[str] = None,
+        use_router: bool = True
     ):
         """
         Initialize the compliance judge.
@@ -89,12 +96,23 @@ class BaseComplianceJudge(ABC):
         Args:
             framework: Regulatory framework (e.g., "GDPR", "SOX", "EU-AI").
             focus_area: Specific area of focus (e.g., "automated decision-making").
-            model: Anthropic model to use for evaluation.
+            model: Anthropic model to use. If None and use_router=True, uses ModelRouter.
             api_key: Anthropic API key.
+            use_router: If True, use ModelRouter for intelligent model selection.
         """
         self.framework = framework
         self.focus_area = focus_area
-        self.model = model
+        self.use_router = use_router
+
+        # Determine model to use
+        if model:
+            self.model = model
+        elif use_router:
+            router = get_model_router()
+            self.model = router.get_model_for_framework(framework.lower())
+            logger.info(f"ModelRouter selected {self.model} for {framework}")
+        else:
+            self.model = "claude-3-5-haiku-20241022"
 
         self.api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
         if not self.api_key:
@@ -198,6 +216,19 @@ class BaseComplianceJudge(ABC):
                 }],
                 tool_choice={"type": "tool", "name": "report_violation"}
             )
+
+            # Record usage in ModelRouter if enabled
+            if self.use_router:
+                try:
+                    router = get_model_router()
+                    usage = response.usage
+                    router.record_usage(
+                        model=self.model,
+                        input_tokens=usage.input_tokens,
+                        output_tokens=usage.output_tokens
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to record usage in ModelRouter: {e}")
 
             # Extract structured result from tool use
             for block in response.content:

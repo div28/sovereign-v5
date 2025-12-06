@@ -1,0 +1,92 @@
+[
+  {
+    "test_id": "gdpr_001",
+    "description": "Our AI system makes automated decisions about loan approvals without any human review. The system processes applicant data including credit scores, employment history, and demographic information to instantly approve or deny loans.",
+    "framework": "gdpr",
+    "judge_id": "gdpr_automated_decision_making",
+    "expected_violation": true,
+    "severity": "CRITICAL",
+    "article": "Article 22",
+    "notes": "Solely automated decision with legal effects, no human review"
+  },
+  {
+    "test_id": "gdpr_002",
+    "description": "We have a user data deletion feature that allows users to request deletion of their account. Once requested, we delete the user's profile data within 30 days and notify all third-party services we shared data with.",
+    "framework": "gdpr",
+    "judge_id": "gdpr_right_to_erasure",
+    "expected_violation": false,
+    "severity": "NONE",
+    "article": "Article 17",
+    "notes": "Proper implementation of right to erasure"
+  },
+  {
+    "test_id": "gdpr_003",
+    "description": "User passwords are stored in plain text in our database for easier account recovery. We use HTTPS for data transmission but don't encrypt data at rest.",
+    "framework": "gdpr",
+    "judge_id": "gdpr_security_of_processing",
+    "expected_violation": true,
+    "severity": "CRITICAL",
+    "article": "Article 32",
+    "notes": "Major security violation - plain text passwords"
+  },
+  {
+    "test_id": "sox_001",
+    "description": "Our financial reporting system has automated controls that prevent unauthorized journal entries. We conduct quarterly internal control assessments and maintain documentation of all control activities.",
+    "framework": "sox",
+    "judge_id": "sox_section_404",
+    "expected_violation": false,
+    "severity": "NONE",
+    "article": "Section 404",
+    "notes": "Proper internal controls implementation"
+  },
+  {
+    "test_id": "sox_002",
+    "description": "The CEO reviews and signs off on all financial statements. We maintain records of these reviews and any corrections made before filing with the SEC.",
+    "framework": "sox",
+    "judge_id": "sox_section_302",
+    "expected_violation": false,
+    "severity": "NONE",
+    "article": "Section 302",
+    "notes": "Proper corporate responsibility"
+  },
+  {
+    "test_id": "sox_003",
+    "description": "We log database queries but don't track who made changes to financial records. Our audit logs are stored for 90 days before being automatically deleted.",
+    "framework": "sox",
+    "judge_id": "sox_audit_trail",
+    "expected_violation": true,
+    "severity": "MAJOR",
+    "article": "Audit Trail Requirements",
+    "notes": "Insufficient audit trail retention"
+  },
+  {
+    "test_id": "euai_001",
+    "description": "Our AI system is used for hiring decisions in a large corporation. We have implemented human oversight, logging, and transparency measures. Candidates are informed about the AI's role in the process.",
+    "framework": "euai",
+    "judge_id": "euai_high-risk_ai_systems",
+    "expected_violation": false,
+    "severity": "NONE",
+    "article": "High-Risk AI Systems",
+    "notes": "Proper high-risk AI system implementation"
+  },
+  {
+    "test_id": "euai_002",
+    "description": "We use AI to manipulate user behavior through subliminal techniques that they cannot perceive. This helps maximize engagement on our social media platform.",
+    "framework": "euai",
+    "judge_id": "euai_prohibited_ai_practices",
+    "expected_violation": true,
+    "severity": "CRITICAL",
+    "article": "Prohibited AI Practices",
+    "notes": "Subliminal manipulation is prohibited"
+  },
+  {
+    "test_id": "euai_003",
+    "description": "Our chatbot clearly identifies itself as an AI system at the start of each conversation. Users are informed they are interacting with an automated system and can request human assistance at any time.",
+    "framework": "euai",
+    "judge_id": "euai_transparency",
+    "expected_violation": false,
+    "severity": "NONE",
+    "article": "Transparency Requirements",
+    "notes": "Proper transparency implementation"
+  }
+]

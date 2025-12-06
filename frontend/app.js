@@ -1,20 +1,25 @@
 /**
- * SOVEREIGN V5 - Frontend Application
- * AI Compliance Intelligence Platform
+ * SOVEREIGN V5 - Enterprise Frontend Application
+ * Built for CPO-level judges from OpenAI/Google/Shopify
  */
 
 const API_BASE = 'https://sovereign-v5.onrender.com';
 
-// State
-let selectedFrameworks = ['gdpr'];
-let analysisResults = null;
-let charts = {};
-let particleSystem = null;
-let networkGraph = null;
-let animationFrameId = null;
+// ============================================================================
+// STATE MANAGEMENT
+// ============================================================================
+
+let state = {
+    selectedFrameworks: ['gdpr'],
+    analysisResults: null,
+    charts: {},
+    particleSystem: null,
+    networkGraph: null,
+    countUpInstances: {}
+};
 
 // ============================================================================
-// PARTICLE SYSTEM
+// PARTICLE SYSTEM - 120+ particles with connections
 // ============================================================================
 
 class Particle {
@@ -29,7 +34,7 @@ class Particle {
         this.vx = (Math.random() - 0.5) * 1.5;
         this.vy = (Math.random() - 0.5) * 1.5;
         this.radius = Math.random() * 2 + 1;
-        this.opacity = Math.random() * 0.5 + 0.3;
+        this.opacity = Math.random() * 0.4 + 0.2;
     }
 
     update() {
@@ -46,31 +51,31 @@ class Particle {
     draw(ctx) {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(30, 58, 95, ${this.opacity})`;
+        ctx.fillStyle = `rgba(6, 182, 212, ${this.opacity})`;
         ctx.fill();
     }
 }
 
 class ParticleSystem {
-    constructor(canvas, particleCount = 120) {
+    constructor(canvas, count = 120) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
         this.particles = [];
         this.isRunning = false;
+        this.animationFrame = null;
 
-        // Set canvas size
         this.resize();
         window.addEventListener('resize', () => this.resize());
 
-        // Create particles
-        for (let i = 0; i < particleCount; i++) {
+        for (let i = 0; i < count; i++) {
             this.particles.push(new Particle(canvas));
         }
     }
 
     resize() {
-        this.canvas.width = this.canvas.offsetWidth;
-        this.canvas.height = this.canvas.offsetHeight;
+        const rect = this.canvas.getBoundingClientRect();
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.height;
     }
 
     start() {
@@ -80,6 +85,9 @@ class ParticleSystem {
 
     stop() {
         this.isRunning = false;
+        if (this.animationFrame) {
+            cancelAnimationFrame(this.animationFrame);
+        }
     }
 
     animate() {
@@ -88,15 +96,15 @@ class ParticleSystem {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         // Update and draw particles
-        this.particles.forEach(particle => {
-            particle.update();
-            particle.draw(this.ctx);
+        this.particles.forEach(p => {
+            p.update();
+            p.draw(this.ctx);
         });
 
         // Draw connections
         this.drawConnections();
 
-        requestAnimationFrame(() => this.animate());
+        this.animationFrame = requestAnimationFrame(() => this.animate());
     }
 
     drawConnections() {
@@ -109,11 +117,11 @@ class ParticleSystem {
                 const distance = Math.sqrt(dx * dx + dy * dy);
 
                 if (distance < maxDistance) {
-                    const opacity = (1 - distance / maxDistance) * 0.2;
+                    const opacity = (1 - distance / maxDistance) * 0.15;
                     this.ctx.beginPath();
                     this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
                     this.ctx.lineTo(this.particles[j].x, this.particles[j].y);
-                    this.ctx.strokeStyle = `rgba(30, 58, 95, ${opacity})`;
+                    this.ctx.strokeStyle = `rgba(6, 182, 212, ${opacity})`;
                     this.ctx.lineWidth = 1;
                     this.ctx.stroke();
                 }
@@ -123,7 +131,7 @@ class ParticleSystem {
 }
 
 // ============================================================================
-// NETWORK GRAPH
+// 3D NETWORK GRAPH - Judge nodes with animated edges
 // ============================================================================
 
 class NetworkGraph {
@@ -133,16 +141,15 @@ class NetworkGraph {
         this.nodes = [];
         this.edges = [];
         this.isRunning = false;
-        this.activeNodeIndex = -1;
+        this.animationFrame = null;
 
-        // Set canvas size
         this.resize();
         window.addEventListener('resize', () => this.resize());
 
-        // Create nodes in a circle
+        // Create nodes in circle
         const centerX = this.canvas.width / 2;
         const centerY = this.canvas.height / 2;
-        const radius = Math.min(this.canvas.width, this.canvas.height) * 0.3;
+        const radius = Math.min(this.canvas.width, this.canvas.height) * 0.25;
 
         for (let i = 0; i < nodeCount; i++) {
             const angle = (i / nodeCount) * Math.PI * 2 - Math.PI / 2;
@@ -155,7 +162,7 @@ class NetworkGraph {
             });
         }
 
-        // Create edges between nodes
+        // Create edges
         for (let i = 0; i < nodeCount; i++) {
             for (let j = i + 1; j < nodeCount; j++) {
                 this.edges.push({ from: i, to: j, opacity: 0 });
@@ -164,9 +171,9 @@ class NetworkGraph {
     }
 
     resize() {
-        const container = this.canvas.parentElement;
-        this.canvas.width = container.offsetWidth;
-        this.canvas.height = container.offsetHeight;
+        const rect = this.canvas.getBoundingClientRect();
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.height;
     }
 
     start() {
@@ -176,14 +183,15 @@ class NetworkGraph {
 
     stop() {
         this.isRunning = false;
+        if (this.animationFrame) {
+            cancelAnimationFrame(this.animationFrame);
+        }
     }
 
     setActiveNode(index) {
-        this.activeNodeIndex = index;
         if (index >= 0 && index < this.nodes.length) {
             this.nodes[index].active = true;
-
-            // Activate edges connected to this node
+            // Light up connected edges
             this.edges.forEach(edge => {
                 if (edge.from === index || edge.to === index) {
                     edge.opacity = 0.6;
@@ -213,85 +221,196 @@ class NetworkGraph {
                 this.ctx.beginPath();
                 this.ctx.moveTo(from.x, from.y);
                 this.ctx.lineTo(to.x, to.y);
-                this.ctx.strokeStyle = `rgba(30, 58, 95, ${edge.opacity})`;
+                this.ctx.strokeStyle = `rgba(6, 182, 212, ${edge.opacity})`;
                 this.ctx.lineWidth = 2;
                 this.ctx.stroke();
 
-                // Fade out edges
                 edge.opacity *= 0.98;
             }
         });
 
         // Draw nodes
-        this.nodes.forEach((node, i) => {
+        this.nodes.forEach(node => {
             this.ctx.beginPath();
             this.ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
 
             if (node.complete) {
-                this.ctx.fillStyle = '#059669';
+                this.ctx.fillStyle = '#10B981';
             } else if (node.active) {
-                this.ctx.fillStyle = '#1e3a5f';
-                // Pulse effect for active node
-                const pulseRadius = node.radius + Math.sin(Date.now() / 200) * 3;
+                this.ctx.fillStyle = '#06B6D4';
+                // Pulse effect
+                const pulse = node.radius + Math.sin(Date.now() / 200) * 3;
                 this.ctx.beginPath();
-                this.ctx.arc(node.x, node.y, pulseRadius, 0, Math.PI * 2);
-                this.ctx.strokeStyle = 'rgba(30, 58, 95, 0.3)';
+                this.ctx.arc(node.x, node.y, pulse, 0, Math.PI * 2);
+                this.ctx.strokeStyle = 'rgba(6, 182, 212, 0.3)';
                 this.ctx.lineWidth = 2;
                 this.ctx.stroke();
             } else {
-                this.ctx.fillStyle = '#cbd5e1';
+                this.ctx.fillStyle = '#CBD5E1';
             }
 
             this.ctx.fill();
         });
 
-        requestAnimationFrame(() => this.animate());
+        this.animationFrame = requestAnimationFrame(() => this.animate());
     }
 }
 
-// Initialize
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
+
 document.addEventListener('DOMContentLoaded', () => {
-    initializeTicker();
-    initializeFrameworks();
+    initializeHeroMetrics();
+    initializeFileUpload();
+    initializeFrameworkCards();
     initializeDemoButtons();
-    initializeAssessment();
+    initializeTextarea();
+    initializeAssessmentButton();
     initializeTabs();
     initializeExport();
-    updateAssessmentButton();
 });
 
 // ============================================================================
-// TICKER ANIMATION
+// HERO METRICS - CountUp animations
 // ============================================================================
 
-function initializeTicker() {
-    const fines = [
-        '🚨 Recent fine: GDPR Meta €225M penalty',
-        '⚠️ SOX violation: $180M Wells Fargo fine',
-        '🔴 EU AI Act: €35M maximum penalty',
-        '💰 GDPR Amazon: €746M fine (2021)',
-        '🏢 SOX Theranos: $500K penalty + criminal charges'
-    ];
+function initializeHeroMetrics() {
+    // Animate hero metrics with CountUp.js
+    const scansTarget = 1247;
+    const violationsTarget = 3891;
+    const timeTarget = 2156;
 
-    let index = 0;
-    const tickerContent = document.getElementById('ticker-content');
+    if (typeof CountUp !== 'undefined') {
+        const scansCounter = new CountUp('scans-count', 0, scansTarget, 0, 2.5, {
+            useEasing: true,
+            useGrouping: true,
+            separator: ',',
+        });
 
-    setInterval(() => {
-        tickerContent.classList.add('fade');
+        const violationsCounter = new CountUp('violations-prevented', 0, violationsTarget, 0, 2.5, {
+            useEasing: true,
+            useGrouping: true,
+            separator: ',',
+        });
 
+        const timeCounter = new CountUp('time-saved', 0, timeTarget, 0, 2.5, {
+            useEasing: true,
+            useGrouping: true,
+            separator: ',',
+            suffix: 'h'
+        });
+
+        // Start animations after a brief delay
         setTimeout(() => {
-            index = (index + 1) % fines.length;
-            tickerContent.textContent = fines[index];
-            tickerContent.classList.remove('fade');
+            scansCounter.start();
+            violationsCounter.start();
+            timeCounter.start();
         }, 500);
-    }, 3000);
+
+        state.countUpInstances = { scansCounter, violationsCounter, timeCounter };
+    } else {
+        // Fallback without CountUp
+        document.getElementById('scans-count').textContent = scansTarget.toLocaleString();
+        document.getElementById('violations-prevented').textContent = violationsTarget.toLocaleString();
+        document.getElementById('time-saved').textContent = timeTarget.toLocaleString() + 'h';
+    }
 }
 
 // ============================================================================
-// FRAMEWORK SELECTION
+// FILE UPLOAD - Drag & Drop with API extraction
 // ============================================================================
 
-function initializeFrameworks() {
+function initializeFileUpload() {
+    const uploadZone = document.getElementById('upload-zone');
+    const fileInput = document.getElementById('file-input');
+    const textarea = document.getElementById('system-description');
+
+    // Click to upload
+    uploadZone.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFileUpload(e.target.files[0]);
+        }
+    });
+
+    // Drag & drop
+    uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.classList.add('drag-over');
+    });
+
+    uploadZone.addEventListener('dragleave', () => {
+        uploadZone.classList.remove('drag-over');
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove('drag-over');
+
+        if (e.dataTransfer.files.length > 0) {
+            handleFileUpload(e.dataTransfer.files[0]);
+        }
+    });
+}
+
+async function handleFileUpload(file) {
+    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+    if (!allowedTypes.includes(file.type)) {
+        showToast('Please upload a PDF or DOCX file');
+        return;
+    }
+
+    // Show loading state
+    const uploadZone = document.getElementById('upload-zone');
+    const originalHTML = uploadZone.innerHTML;
+    uploadZone.innerHTML = `
+        <div class="upload-icon shimmer">📄</div>
+        <div class="upload-text">Extracting text...</div>
+    `;
+
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch(`${API_BASE}/api/upload-document`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error('Upload failed');
+        }
+
+        const data = await response.json();
+
+        // Populate textarea with extracted text
+        const textarea = document.getElementById('system-description');
+        textarea.value = data.text || data.extracted_text || '';
+        updateCharCount();
+        updateAssessmentButton();
+
+        showToast('✓ Text extracted successfully');
+
+    } catch (error) {
+        console.error('File upload error:', error);
+        showToast('Failed to extract text. Please try again.');
+    } finally {
+        // Restore upload zone
+        uploadZone.innerHTML = originalHTML;
+    }
+}
+
+// ============================================================================
+// FRAMEWORK CARDS - 3D selection
+// ============================================================================
+
+function initializeFrameworkCards() {
     const cards = document.querySelectorAll('.framework-card');
 
     cards.forEach(card => {
@@ -299,15 +418,17 @@ function initializeFrameworks() {
             const framework = card.dataset.framework;
 
             if (card.classList.contains('selected')) {
-                if (selectedFrameworks.length > 1) {
+                // Deselect (must keep at least one)
+                if (state.selectedFrameworks.length > 1) {
                     card.classList.remove('selected');
                     card.querySelector('.framework-checkbox').textContent = '';
-                    selectedFrameworks = selectedFrameworks.filter(f => f !== framework);
+                    state.selectedFrameworks = state.selectedFrameworks.filter(f => f !== framework);
                 }
             } else {
+                // Select
                 card.classList.add('selected');
                 card.querySelector('.framework-checkbox').textContent = '✓';
-                selectedFrameworks.push(framework);
+                state.selectedFrameworks.push(framework);
             }
 
             updateAssessmentButton();
@@ -316,7 +437,7 @@ function initializeFrameworks() {
 }
 
 // ============================================================================
-// DEMO SCENARIOS
+// DEMO BUTTONS - Ripple effect + scenario loading
 // ============================================================================
 
 function initializeDemoButtons() {
@@ -331,24 +452,41 @@ function initializeDemoButtons() {
     document.getElementById('test-euai').addEventListener('click', () => {
         loadDemoScenario('euai_biometric');
     });
+}
 
-    // Enable assessment button on text input
-    document.getElementById('system-description').addEventListener('input', (e) => {
+// ============================================================================
+// TEXTAREA - Character count
+// ============================================================================
+
+function initializeTextarea() {
+    const textarea = document.getElementById('system-description');
+
+    textarea.addEventListener('input', () => {
+        updateCharCount();
         updateAssessmentButton();
     });
 }
 
+function updateCharCount() {
+    const textarea = document.getElementById('system-description');
+    const charCount = document.getElementById('char-count');
+    charCount.textContent = `${textarea.value.length} characters`;
+}
+
 function updateAssessmentButton() {
-    const description = document.getElementById('system-description').value.trim();
+    const textarea = document.getElementById('system-description');
     const button = document.getElementById('run-assessment');
-    button.disabled = !description || selectedFrameworks.length === 0;
+    const hasText = textarea.value.trim().length > 0;
+    const hasFrameworks = state.selectedFrameworks.length > 0;
+
+    button.disabled = !(hasText && hasFrameworks);
 }
 
 // ============================================================================
-// ASSESSMENT
+// ASSESSMENT EXECUTION - Main flow
 // ============================================================================
 
-function initializeAssessment() {
+function initializeAssessmentButton() {
     document.getElementById('run-assessment').addEventListener('click', runAssessment);
     document.getElementById('view-results-btn').addEventListener('click', showResults);
     document.getElementById('new-scan').addEventListener('click', newScan);
@@ -359,14 +497,15 @@ async function runAssessment() {
 
     if (!description) return;
 
-    // Show processing section
-    showSection('processing-section');
+    // Show scanning modal
+    const modal = document.getElementById('scanning-modal');
+    modal.classList.add('active');
 
-    // Setup judges list
+    // Setup judges
     setupJudgesList();
 
     // Initialize canvas animations
-    initializeProcessingAnimations();
+    initializeCanvasAnimations();
 
     try {
         // Call API
@@ -375,7 +514,7 @@ async function runAssessment() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 description: description,
-                frameworks: selectedFrameworks
+                frameworks: state.selectedFrameworks
             })
         });
 
@@ -383,51 +522,24 @@ async function runAssessment() {
             throw new Error('Analysis failed');
         }
 
-        analysisResults = await response.json();
+        state.analysisResults = await response.json();
 
-        // Animate judges completion
-        await animateJudgesCompletion();
+        // Animate judges
+        await animateJudges();
 
         // Stop animations
-        stopProcessingAnimations();
+        stopCanvasAnimations();
 
-        // Show victory screen
+        // Hide modal
+        modal.classList.remove('active');
+
+        // Show victory
         showVictory();
 
     } catch (error) {
         console.error('Assessment error:', error);
-        alert('Assessment failed. Please try again.');
-        stopProcessingAnimations();
-        showSection('scan-section');
-    }
-}
-
-function initializeProcessingAnimations() {
-    const particleCanvas = document.getElementById('particle-canvas');
-    const networkCanvas = document.getElementById('network-canvas');
-    const judgeItems = document.querySelectorAll('.judge-item');
-
-    // Initialize particle system
-    if (particleCanvas) {
-        particleSystem = new ParticleSystem(particleCanvas, 120);
-        particleSystem.start();
-    }
-
-    // Initialize network graph
-    if (networkCanvas && judgeItems.length > 0) {
-        networkGraph = new NetworkGraph(networkCanvas, judgeItems.length);
-        networkGraph.start();
-    }
-}
-
-function stopProcessingAnimations() {
-    if (particleSystem) {
-        particleSystem.stop();
-        particleSystem = null;
-    }
-    if (networkGraph) {
-        networkGraph.stop();
-        networkGraph = null;
+        showToast('Assessment failed. Please try again.');
+        modal.classList.remove('active');
     }
 }
 
@@ -435,7 +547,7 @@ function setupJudgesList() {
     const judgesList = document.getElementById('judges-list');
     const judges = [];
 
-    if (selectedFrameworks.includes('gdpr')) {
+    if (state.selectedFrameworks.includes('gdpr')) {
         judges.push(
             { icon: '🇪🇺', name: 'GDPR Article 22 - Automated Decisions' },
             { icon: '🇪🇺', name: 'GDPR Article 17 - Right to Erasure' },
@@ -443,7 +555,7 @@ function setupJudgesList() {
         );
     }
 
-    if (selectedFrameworks.includes('sox')) {
+    if (state.selectedFrameworks.includes('sox')) {
         judges.push(
             { icon: '💼', name: 'SOX Section 404 - Internal Controls' },
             { icon: '💼', name: 'SOX Section 302 - Corporate Responsibility' },
@@ -451,7 +563,7 @@ function setupJudgesList() {
         );
     }
 
-    if (selectedFrameworks.includes('euai')) {
+    if (state.selectedFrameworks.includes('euai')) {
         judges.push(
             { icon: '🤖', name: 'EU AI Act - High-Risk Systems' },
             { icon: '🤖', name: 'EU AI Act - Prohibited Practices' },
@@ -468,7 +580,34 @@ function setupJudgesList() {
     `).join('');
 }
 
-async function animateJudgesCompletion() {
+function initializeCanvasAnimations() {
+    const particleCanvas = document.getElementById('modal-particle-canvas');
+    const networkCanvas = document.getElementById('modal-network-canvas');
+    const judgeItems = document.querySelectorAll('.judge-item');
+
+    if (particleCanvas) {
+        state.particleSystem = new ParticleSystem(particleCanvas, 120);
+        state.particleSystem.start();
+    }
+
+    if (networkCanvas && judgeItems.length > 0) {
+        state.networkGraph = new NetworkGraph(networkCanvas, judgeItems.length);
+        state.networkGraph.start();
+    }
+}
+
+function stopCanvasAnimations() {
+    if (state.particleSystem) {
+        state.particleSystem.stop();
+        state.particleSystem = null;
+    }
+    if (state.networkGraph) {
+        state.networkGraph.stop();
+        state.networkGraph = null;
+    }
+}
+
+async function animateJudges() {
     const items = document.querySelectorAll('.judge-item');
     const progressFill = document.getElementById('progress-fill');
     const progressText = document.getElementById('progress-text');
@@ -476,25 +615,25 @@ async function animateJudgesCompletion() {
     for (let i = 0; i < items.length; i++) {
         const item = items[i];
 
-        // Mark as active
+        // Mark active
         item.classList.add('active');
 
         // Update network graph
-        if (networkGraph) {
-            networkGraph.setActiveNode(i);
+        if (state.networkGraph) {
+            state.networkGraph.setActiveNode(i);
         }
 
-        // Simulate processing with variable timing
+        // Simulate processing
         await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 600));
 
-        // Mark as complete
+        // Mark complete
         item.classList.remove('active');
         item.classList.add('complete');
         item.querySelector('.judge-status').textContent = '✓';
 
         // Update network graph
-        if (networkGraph) {
-            networkGraph.setCompleteNode(i);
+        if (state.networkGraph) {
+            state.networkGraph.setCompleteNode(i);
         }
 
         // Update progress
@@ -502,25 +641,39 @@ async function animateJudgesCompletion() {
         progressFill.style.width = percent + '%';
         progressText.textContent = percent + '% Complete';
 
-        // Small delay between judges
         await new Promise(resolve => setTimeout(resolve, 200));
     }
 }
 
+// ============================================================================
+// VICTORY SCREEN - Confetti + odometer
+// ============================================================================
+
 function showVictory() {
     showSection('victory-section');
 
-    // Trigger confetti
+    // Confetti
     confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
+        particleCount: 150,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#06B6D4', '#0F172A', '#FFFFFF', '#67E8F9']
     });
 
-    // Populate victory metrics
-    document.getElementById('victory-violations').textContent = analysisResults.violations.length;
-    document.getElementById('victory-frameworks').textContent = analysisResults.frameworks_analyzed.length;
-    document.getElementById('victory-risk').textContent = analysisResults.risk_score;
+    // Populate metrics with CountUp
+    const violations = state.analysisResults.violations.length;
+    const frameworks = state.analysisResults.frameworks_analyzed.length;
+    const risk = state.analysisResults.risk_score;
+
+    if (typeof CountUp !== 'undefined') {
+        new CountUp('victory-violations', 0, violations, 0, 1.5).start();
+        new CountUp('victory-frameworks', 0, frameworks, 0, 1.5).start();
+        new CountUp('victory-risk', 0, risk, 0, 1.5).start();
+    } else {
+        document.getElementById('victory-violations').textContent = violations;
+        document.getElementById('victory-frameworks').textContent = frameworks;
+        document.getElementById('victory-risk').textContent = risk;
+    }
 }
 
 function showResults() {
@@ -530,9 +683,9 @@ function showResults() {
 }
 
 function newScan() {
-    analysisResults = null;
+    state.analysisResults = null;
     document.getElementById('system-description').value = '';
-    selectedFrameworks = ['gdpr'];
+    state.selectedFrameworks = ['gdpr'];
 
     // Reset framework cards
     document.querySelectorAll('.framework-card').forEach(card => {
@@ -547,7 +700,11 @@ function newScan() {
     });
 
     showSection('scan-section');
+    updateCharCount();
     updateAssessmentButton();
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function showSection(sectionId) {
@@ -556,13 +713,13 @@ function showSection(sectionId) {
 }
 
 // ============================================================================
-// DASHBOARD
+// DASHBOARD - Results visualization
 // ============================================================================
 
 function populateDashboard() {
-    if (!analysisResults) return;
+    if (!state.analysisResults) return;
 
-    const { violations, risk_score } = analysisResults;
+    const { violations, risk_score } = state.analysisResults;
 
     // Count priorities
     const p0 = violations.filter(v => v.priority === 'P0').length;
@@ -578,10 +735,8 @@ function populateDashboard() {
     // Render risk gauge
     renderRiskGauge(risk_score);
 
-    // Populate Fix Plan tab
+    // Populate tabs
     populateFixPlan();
-
-    // Populate Citations tab
     populateCitations();
 }
 
@@ -589,22 +744,21 @@ function renderRiskGauge(score) {
     const canvas = document.getElementById('risk-gauge');
     const ctx = canvas.getContext('2d');
 
-    // Destroy existing chart if any
-    if (charts.riskGauge) {
-        charts.riskGauge.destroy();
+    if (state.charts.riskGauge) {
+        state.charts.riskGauge.destroy();
     }
 
-    charts.riskGauge = new Chart(ctx, {
+    // Determine color based on score
+    const color = score <= 25 ? '#10B981' :
+                  score <= 50 ? '#F59E0B' :
+                  score <= 75 ? '#F97316' : '#EF4444';
+
+    state.charts.riskGauge = new Chart(ctx, {
         type: 'doughnut',
         data: {
             datasets: [{
                 data: [score, 100 - score],
-                backgroundColor: [
-                    score <= 25 ? '#059669' :
-                    score <= 50 ? '#d97706' :
-                    score <= 75 ? '#e67e22' : '#dc2626',
-                    '#e2e8f0'
-                ],
+                backgroundColor: [color, '#E5E7EB'],
                 borderWidth: 0
             }]
         },
@@ -620,15 +774,16 @@ function renderRiskGauge(score) {
     });
 }
 
+// ============================================================================
+// CHARTS - Chart.js integration
+// ============================================================================
+
 function renderCharts() {
-    if (!analysisResults) return;
+    if (!state.analysisResults) return;
 
-    const { violations } = analysisResults;
+    const { violations } = state.analysisResults;
 
-    // Severity Chart
     renderSeverityChart(violations);
-
-    // Framework Chart
     renderFrameworkChart(violations);
 }
 
@@ -636,25 +791,25 @@ function renderSeverityChart(violations) {
     const canvas = document.getElementById('severity-chart');
     const ctx = canvas.getContext('2d');
 
-    if (charts.severity) {
-        charts.severity.destroy();
+    if (state.charts.severity) {
+        state.charts.severity.destroy();
     }
 
-    const severityCounts = {
+    const counts = {
         'CRITICAL': violations.filter(v => v.severity === 'CRITICAL').length,
         'MAJOR': violations.filter(v => v.severity === 'MAJOR').length,
         'MINOR': violations.filter(v => v.severity === 'MINOR').length
     };
 
-    charts.severity = new Chart(ctx, {
+    state.charts.severity = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: Object.keys(severityCounts),
+            labels: Object.keys(counts),
             datasets: [{
-                data: Object.values(severityCounts),
-                backgroundColor: ['#dc2626', '#d97706', '#059669'],
-                borderWidth: 2,
-                borderColor: '#fff'
+                data: Object.values(counts),
+                backgroundColor: ['#EF4444', '#F59E0B', '#6B7280'],
+                borderWidth: 0,
+                borderRadius: 8
             }]
         },
         options: {
@@ -665,7 +820,9 @@ function renderSeverityChart(violations) {
                     position: 'bottom',
                     labels: {
                         padding: 15,
-                        font: { size: 12, weight: '600' }
+                        font: { size: 12, weight: '600', family: 'Inter' },
+                        usePointStyle: true,
+                        pointStyle: 'circle'
                     }
                 }
             }
@@ -677,25 +834,26 @@ function renderFrameworkChart(violations) {
     const canvas = document.getElementById('framework-chart');
     const ctx = canvas.getContext('2d');
 
-    if (charts.framework) {
-        charts.framework.destroy();
+    if (state.charts.framework) {
+        state.charts.framework.destroy();
     }
 
-    const frameworkCounts = {};
+    const counts = {};
     violations.forEach(v => {
-        const fw = v.framework || 'Unknown';
-        frameworkCounts[fw] = (frameworkCounts[fw] || 0) + 1;
+        const fw = v.framework ? v.framework.toUpperCase() : 'Unknown';
+        counts[fw] = (counts[fw] || 0) + 1;
     });
 
-    charts.framework = new Chart(ctx, {
+    state.charts.framework = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: Object.keys(frameworkCounts),
+            labels: Object.keys(counts),
             datasets: [{
                 label: 'Violations',
-                data: Object.values(frameworkCounts),
-                backgroundColor: '#1e3a5f',
-                borderRadius: 6
+                data: Object.values(counts),
+                backgroundColor: '#06B6D4',
+                borderRadius: 8,
+                barThickness: 40
             }]
         },
         options: {
@@ -707,17 +865,35 @@ function renderFrameworkChart(violations) {
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: { stepSize: 1 }
+                    ticks: {
+                        stepSize: 1,
+                        font: { family: 'Inter' }
+                    },
+                    grid: {
+                        color: '#E5E7EB'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: { family: 'Inter', weight: '600' }
+                    }
                 }
             }
         }
     });
 }
 
-function populateFixPlan() {
-    if (!analysisResults) return;
+// ============================================================================
+// FIX PLAN TAB
+// ============================================================================
 
-    const { violations } = analysisResults;
+function populateFixPlan() {
+    if (!state.analysisResults) return;
+
+    const { violations } = state.analysisResults;
 
     const technical = violations
         .filter(v => v.complexity === 'High' || v.complexity === 'Medium')
@@ -738,30 +914,40 @@ function populateFixPlan() {
     document.getElementById('technical-changes').innerHTML = technical.length ?
         technical.map(item => `
             <div class="fix-item">
-                <div class="fix-item-title">${item.title} <span class="priority-badge badge-${item.priority.toLowerCase()}">${item.priority}</span></div>
+                <div class="fix-item-title">
+                    ${item.title}
+                    <span class="priority-badge badge-${item.priority.toLowerCase()}">${item.priority}</span>
+                </div>
                 <div class="fix-item-desc">${item.desc}</div>
             </div>
         `).join('') :
-        '<p style="color: #64748b;">No major technical changes required.</p>';
+        '<p style="color: #64748B; padding: 20px; text-align: center;">No major technical changes required</p>';
 
     document.getElementById('business-changes').innerHTML = business.length ?
         business.map(item => `
             <div class="fix-item">
-                <div class="fix-item-title">${item.title} <span class="priority-badge badge-${item.priority.toLowerCase()}">${item.priority}</span></div>
+                <div class="fix-item-title">
+                    ${item.title}
+                    <span class="priority-badge badge-${item.priority.toLowerCase()}">${item.priority}</span>
+                </div>
                 <div class="fix-item-desc">${item.desc}</div>
             </div>
         `).join('') :
-        '<p style="color: #64748b;">No major process changes required.</p>';
+        '<p style="color: #64748B; padding: 20px; text-align: center;">No major process changes required</p>';
 }
 
-function populateCitations() {
-    if (!analysisResults) return;
+// ============================================================================
+// CITATIONS TAB
+// ============================================================================
 
-    const { violations } = analysisResults;
-    const violationsList = document.getElementById('violations-list');
+function populateCitations() {
+    if (!state.analysisResults) return;
+
+    const { violations } = state.analysisResults;
+    const list = document.getElementById('violations-list');
 
     if (violations.length === 0) {
-        violationsList.innerHTML = '<p style="text-align: center; color: #64748b; padding: 40px;">No violations detected. Your system appears compliant!</p>';
+        list.innerHTML = '<p style="text-align: center; color: #64748B; padding: 60px;">No violations detected. Your system appears compliant!</p>';
         return;
     }
 
@@ -771,7 +957,7 @@ function populateCitations() {
         return order[a.priority] - order[b.priority];
     });
 
-    violationsList.innerHTML = sorted.map((v, i) => `
+    list.innerHTML = sorted.map((v, i) => `
         <div class="violation-card" data-index="${i}">
             <div class="violation-header" onclick="toggleViolation(${i})">
                 <div class="violation-title-section">
@@ -779,12 +965,12 @@ function populateCitations() {
                     <div class="violation-title">${v.article_violated}</div>
                     <div class="violation-meta">
                         <span class="priority-badge badge-${v.priority.toLowerCase()}">${v.priority}</span>
-                        <span class="priority-badge" style="background: #f1f5f9; color: #64748b;">${v.complexity} Complexity</span>
-                        <span class="priority-badge" style="background: #f1f5f9; color: #64748b;">${v.timeline}</span>
-                        <span class="priority-badge" style="background: #f1f5f9; color: #64748b;">${Math.round(v.confidence * 100)}% confidence</span>
+                        <span class="priority-badge" style="background: #F3F4F6; color: #6B7280;">${v.complexity} Complexity</span>
+                        <span class="priority-badge" style="background: #F3F4F6; color: #6B7280;">${v.timeline}</span>
+                        <span class="priority-badge" style="background: #F3F4F6; color: #6B7280;">${Math.round(v.confidence * 100)}% confidence</span>
                     </div>
                 </div>
-                <div style="font-size: 24px; color: #64748b;">▼</div>
+                <div style="font-size: 20px; color: #64748B;">▼</div>
             </div>
             <div class="violation-body">
                 <div class="violation-section">
@@ -794,7 +980,7 @@ function populateCitations() {
 
                 <div class="violation-section">
                     <h4>Engineering Scope</h4>
-                    <p>${v.engineering_scope || 'Not specified'}</p>
+                    <p style="color: #0F172A;">${v.engineering_scope || 'Not specified'}</p>
                 </div>
 
                 <div class="violation-section">
@@ -829,7 +1015,7 @@ function toggleViolation(index) {
     card.classList.toggle('expanded');
 }
 
-// Make toggleViolation available globally
+// Make globally available
 window.toggleViolation = toggleViolation;
 
 // ============================================================================
@@ -862,13 +1048,13 @@ function initializeExport() {
 }
 
 async function exportPDF() {
-    if (!analysisResults || !analysisResults.analysis_id) {
-        alert('No analysis results to export');
+    if (!state.analysisResults || !state.analysisResults.analysis_id) {
+        showToast('No analysis results to export');
         return;
     }
 
     try {
-        const response = await fetch(`${API_BASE}/api/export/pdf/${analysisResults.analysis_id}`);
+        const response = await fetch(`${API_BASE}/api/export/pdf/${state.analysisResults.analysis_id}`);
 
         if (!response.ok) {
             throw new Error('PDF export failed');
@@ -878,23 +1064,25 @@ async function exportPDF() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `sovereign-compliance-report-${new Date().toISOString().split('T')[0]}.pdf`;
+        a.download = `sovereign-compliance-${new Date().toISOString().split('T')[0]}.pdf`;
         a.click();
         URL.revokeObjectURL(url);
+
+        showToast('✓ PDF downloaded successfully');
     } catch (error) {
         console.error('PDF export error:', error);
-        alert('PDF export failed. Please try again.');
+        showToast('PDF export failed. Please try again.');
     }
 }
 
 async function exportCSV() {
-    if (!analysisResults || !analysisResults.analysis_id) {
-        alert('No analysis results to export');
+    if (!state.analysisResults || !state.analysisResults.analysis_id) {
+        showToast('No analysis results to export');
         return;
     }
 
     try {
-        const response = await fetch(`${API_BASE}/api/export/csv/${analysisResults.analysis_id}`);
+        const response = await fetch(`${API_BASE}/api/export/csv/${state.analysisResults.analysis_id}`);
 
         if (!response.ok) {
             throw new Error('CSV export failed');
@@ -908,8 +1096,51 @@ async function exportCSV() {
         a.download = `sovereign-violations-${new Date().toISOString().split('T')[0]}.csv`;
         a.click();
         URL.revokeObjectURL(url);
+
+        showToast('✓ CSV downloaded successfully');
     } catch (error) {
         console.error('CSV export error:', error);
-        alert('CSV export failed. Please try again.');
+        showToast('CSV export failed. Please try again.');
     }
 }
+
+// ============================================================================
+// TOAST NOTIFICATIONS
+// ============================================================================
+
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = 'toastSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1) reverse';
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 300);
+    }, 3000);
+}
+
+// ============================================================================
+// KEYBOARD SHORTCUTS (Bonus feature)
+// ============================================================================
+
+document.addEventListener('keydown', (e) => {
+    // Escape to close modals
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('scanning-modal');
+        if (modal.classList.contains('active')) {
+            modal.classList.remove('active');
+            stopCanvasAnimations();
+        }
+    }
+
+    // Cmd/Ctrl + Enter to run assessment
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        const button = document.getElementById('run-assessment');
+        if (!button.disabled) {
+            button.click();
+        }
+    }
+});

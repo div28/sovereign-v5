@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeFileUpload();
     initializeAnalysis();
     initializeExports();
+    initializeDemoScenarios();
     updateAnalyzeButton();
 });
 
@@ -389,4 +390,29 @@ function exportToCsv() {
     a.download = `sovereign-compliance-report-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+}
+
+// Demo Scenarios
+function initializeDemoScenarios() {
+    const testGdprBtn = document.getElementById('test-gdpr-btn');
+    const testSoxBtn = document.getElementById('test-sox-btn');
+    const testEuaiBtn = document.getElementById('test-euai-btn');
+
+    if (testGdprBtn) {
+        testGdprBtn.addEventListener('click', () => {
+            loadDemoScenario('gdpr_hiring');
+        });
+    }
+
+    if (testSoxBtn) {
+        testSoxBtn.addEventListener('click', () => {
+            loadDemoScenario('sox_financial');
+        });
+    }
+
+    if (testEuaiBtn) {
+        testEuaiBtn.addEventListener('click', () => {
+            loadDemoScenario('euai_biometric');
+        });
+    }
 }

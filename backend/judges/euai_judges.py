@@ -64,10 +64,20 @@ Analyze for EU AI Act High-Risk violations:
 5. **No Human Oversight**: No mechanism for human intervention
 6. **Transparency Failure**: Users not informed they're interacting with AI
 
-Severity:
-- CRITICAL: Deploying unclassified high-risk AI or no human oversight
-- MAJOR: Missing risk management or documentation
-- MINOR: Incomplete transparency measures"""
+## Severity Scoring Guidelines
+- **CRITICAL (8-10/10, P0)**: Deploying unclassified high-risk AI or no human oversight
+- **MAJOR (5-7/10, P1)**: Missing risk management or documentation
+- **MINOR (1-4/10, P2)**: Incomplete transparency measures
+
+## Required Fields
+You must provide:
+- **severity_score**: Numeric score 1-10
+- **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
+- **complexity**: Low (add disclosures), Medium (risk framework), High (complete conformity assessment)
+- **timeline**: Immediate (P0, 0-14 days), Short-term (P1, 15-30 days), Long-term (P2, 30-90 days)
+- **engineering_scope**: Technical implementation requirements
+- **risk_factors**: EU fines up to €35M, market access restrictions, reputational damage
+- **dependencies**: Conformity assessment bodies, legal review, risk management frameworks"""
 
     def __init__(self, api_key: str = None):
         """Initialize the EU AI High Risk judge."""
@@ -139,10 +149,20 @@ Analyze for PROHIBITED AI practices:
 5. **Emotion Recognition**: Inappropriate emotion detection use
 6. **Discriminatory Categorization**: Inferring sensitive attributes from biometrics
 
-Severity:
-- CRITICAL: Any prohibited practice detected (these are BANNED, not just regulated)
-- MAJOR: Borderline practices that may constitute prohibition
-- MINOR: Practices that could evolve into prohibited territory"""
+## Severity Scoring Guidelines
+- **CRITICAL (9-10/10, P0)**: Any prohibited practice detected (these are BANNED, not just regulated)
+- **MAJOR (6-8/10, P1)**: Borderline practices that may constitute prohibition
+- **MINOR (3-5/10, P2)**: Practices that could evolve into prohibited territory
+
+## Required Fields
+You must provide:
+- **severity_score**: Numeric score 1-10
+- **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
+- **complexity**: Low (disable feature), Medium (redesign system), High (complete pivot)
+- **timeline**: Immediate (P0, 0-14 days for prohibited), Short-term (P1, 15-30 days), Long-term (P2, 30-90 days)
+- **engineering_scope**: Work to eliminate prohibited practices
+- **risk_factors**: Market ban, €35M fines, criminal liability for violations
+- **dependencies**: Legal assessment, ethics board review, alternative solutions"""
 
     def __init__(self, api_key: str = None):
         """Initialize the EU AI Prohibited Practices judge."""
@@ -209,10 +229,20 @@ Analyze for EU AI Act Transparency violations:
 4. **Missing AI Markers**: Generated content lacks machine-readable AI markers
 5. **Deceptive Presentation**: AI outputs presented as human-created
 
-Severity:
-- CRITICAL: Deliberate deception or hidden AI in sensitive contexts
-- MAJOR: Missing transparency disclosures for user-facing AI
-- MINOR: Incomplete labeling or disclosure mechanisms"""
+## Severity Scoring Guidelines
+- **CRITICAL (8-10/10, P0)**: Deliberate deception or hidden AI in sensitive contexts
+- **MAJOR (5-7/10, P1)**: Missing transparency disclosures for user-facing AI
+- **MINOR (1-4/10, P2)**: Incomplete labeling or disclosure mechanisms
+
+## Required Fields
+You must provide:
+- **severity_score**: Numeric score 1-10
+- **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
+- **complexity**: Low (add AI disclosure), Medium (watermarking system), High (provenance infrastructure)
+- **timeline**: Immediate (P0, 0-14 days), Short-term (P1, 15-30 days), Long-term (P2, 30-90 days)
+- **engineering_scope**: Transparency mechanism implementation
+- **risk_factors**: Regulatory fines, user trust erosion, misinformation concerns
+- **dependencies**: UI/UX changes, watermarking standards, machine-readable markers"""
 
     def __init__(self, api_key: str = None):
         """Initialize the EU AI Transparency judge."""

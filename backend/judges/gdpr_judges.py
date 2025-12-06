@@ -53,10 +53,21 @@ Analyze the submission for GDPR Article 22 violations. Look specifically for:
 5. **Lack of Transparency**: Is there no explanation of decision logic to data subjects?
 
 Be thorough but precise. Only report a violation if the submission clearly indicates non-compliance.
-If violation detected, severity should be:
-- CRITICAL: Automated decisions affecting employment/credit/legal status with no human review
-- MAJOR: Missing human review mechanism or transparency requirements
-- MINOR: Incomplete documentation or partial compliance gaps"""
+
+## Severity Scoring Guidelines
+- **CRITICAL (8-10/10, P0)**: Automated decisions affecting employment/credit/legal status with no human review
+- **MAJOR (5-7/10, P1)**: Missing human review mechanism or transparency requirements
+- **MINOR (1-4/10, P2)**: Incomplete documentation or partial compliance gaps
+
+## Required Fields
+You must provide:
+- **severity_score**: Numeric score 1-10
+- **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
+- **complexity**: Low (config changes), Medium (feature additions), High (architectural changes)
+- **timeline**: Immediate (P0, 0-14 days), Short-term (P1, 15-30 days), Long-term (P2, 30-90 days)
+- **engineering_scope**: Detailed technical work description
+- **risk_factors**: Legal, regulatory, reputational risks
+- **dependencies**: Prerequisites like vendor integrations, data migrations, etc."""
 
     def __init__(self, api_key: str = None):
         """Initialize the GDPR Article 22 judge."""
@@ -130,10 +141,20 @@ Analyze for Article 17 violations:
 3. **Third Party Notification**: Failure to propagate deletion to data recipients
 4. **Timing**: No process to ensure deletion within required timeframe
 
-Severity:
-- CRITICAL: No deletion mechanism or explicit retention against requests
-- MAJOR: Incomplete erasure or missing third-party notification
-- MINOR: Documentation gaps or unclear procedures"""
+## Severity Scoring Guidelines
+- **CRITICAL (8-10/10, P0)**: No deletion mechanism or explicit retention against requests
+- **MAJOR (5-7/10, P1)**: Incomplete erasure or missing third-party notification
+- **MINOR (1-4/10, P2)**: Documentation gaps or unclear procedures
+
+## Required Fields
+You must provide:
+- **severity_score**: Numeric score 1-10
+- **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
+- **complexity**: Low (add delete endpoint), Medium (cascade deletions), High (data lake cleanup)
+- **timeline**: Immediate (P0, 0-14 days), Short-term (P1, 15-30 days), Long-term (P2, 30-90 days)
+- **engineering_scope**: Technical implementation details
+- **risk_factors**: GDPR fines, user trust issues, regulatory scrutiny
+- **dependencies**: Database access, third-party API integrations, backup systems"""
 
     def __init__(self, api_key: str = None):
         """Initialize the GDPR Article 17 judge."""
@@ -196,10 +217,20 @@ Analyze for Article 32 violations:
 4. **Security Testing**: No regular security assessments or penetration testing
 5. **Risk Assessment**: No documented risk analysis for data processing
 
-Severity:
-- CRITICAL: No encryption for sensitive data or major security gaps
-- MAJOR: Missing access controls or backup procedures
-- MINOR: Documentation gaps or incomplete testing procedures"""
+## Severity Scoring Guidelines
+- **CRITICAL (8-10/10, P0)**: No encryption for sensitive data or major security gaps
+- **MAJOR (5-7/10, P1)**: Missing access controls or backup procedures
+- **MINOR (1-4/10, P2)**: Documentation gaps or incomplete testing procedures
+
+## Required Fields
+You must provide:
+- **severity_score**: Numeric score 1-10
+- **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
+- **complexity**: Low (enable TLS), Medium (implement encryption), High (zero-trust architecture)
+- **timeline**: Immediate (P0, 0-14 days), Short-term (P1, 15-30 days), Long-term (P2, 30-90 days)
+- **engineering_scope**: Security measures to implement
+- **risk_factors**: Data breaches, GDPR fines, security incidents
+- **dependencies**: Key management systems, security tools, compliance frameworks"""
 
     def __init__(self, api_key: str = None):
         """Initialize the GDPR Article 32 judge."""

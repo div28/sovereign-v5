@@ -43,6 +43,27 @@ VIOLATION_SCHEMA = {
             "enum": ["CRITICAL", "MAJOR", "MINOR", "NONE"],
             "description": "Severity level of the violation"
         },
+        "severity_score": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10,
+            "description": "Numeric severity score from 1-10 (1=lowest, 10=highest)"
+        },
+        "priority": {
+            "type": "string",
+            "enum": ["P0", "P1", "P2"],
+            "description": "Priority level: P0 (Critical, severity 8-10), P1 (High, severity 5-7), P2 (Medium, severity 1-4)"
+        },
+        "complexity": {
+            "type": "string",
+            "enum": ["Low", "Medium", "High"],
+            "description": "Implementation complexity to fix the violation"
+        },
+        "timeline": {
+            "type": "string",
+            "enum": ["Immediate", "Short-term", "Long-term"],
+            "description": "Recommended timeline: Immediate (0-14 days), Short-term (15-30 days), Long-term (30-90 days)"
+        },
         "article_violated": {
             "type": "string",
             "description": "Specific article or section violated (e.g., 'GDPR Article 22')"
@@ -56,6 +77,20 @@ VIOLATION_SCHEMA = {
             "items": {"type": "string"},
             "description": "Specific steps to remediate the violation"
         },
+        "engineering_scope": {
+            "type": "string",
+            "description": "Detailed engineering scope describing the technical work required"
+        },
+        "risk_factors": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Key risk factors if violation is not addressed"
+        },
+        "dependencies": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Dependencies or prerequisites for implementing the fix"
+        },
         "confidence": {
             "type": "number",
             "minimum": 0,
@@ -66,9 +101,16 @@ VIOLATION_SCHEMA = {
     "required": [
         "violation_detected",
         "severity",
+        "severity_score",
+        "priority",
+        "complexity",
+        "timeline",
         "article_violated",
         "evidence_quote",
         "remediation_steps",
+        "engineering_scope",
+        "risk_factors",
+        "dependencies",
         "confidence"
     ]
 }

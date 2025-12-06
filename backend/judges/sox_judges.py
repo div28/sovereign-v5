@@ -57,10 +57,20 @@ Analyze for SOX Section 404 violations:
 4. **Segregation Issues**: Same person can initiate, approve, and record transactions
 5. **Access Control Gaps**: Unrestricted access to financial systems/data
 
-Severity:
-- CRITICAL: No internal controls or complete lack of segregation of duties
-- MAJOR: Missing documentation or testing procedures
-- MINOR: Incomplete documentation or infrequent testing"""
+## Severity Scoring Guidelines
+- **CRITICAL (8-10/10, P0)**: No internal controls or complete lack of segregation of duties
+- **MAJOR (5-7/10, P1)**: Missing documentation or testing procedures
+- **MINOR (1-4/10, P2)**: Incomplete documentation or infrequent testing
+
+## Required Fields
+You must provide:
+- **severity_score**: Numeric score 1-10
+- **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
+- **complexity**: Low (policy updates), Medium (workflow automation), High (system redesign)
+- **timeline**: Immediate (P0, 0-14 days), Short-term (P1, 15-30 days), Long-term (P2, 30-90 days)
+- **engineering_scope**: Technical implementation details
+- **risk_factors**: Audit failures, SEC penalties, financial misstatement
+- **dependencies**: ERP system access, audit firm coordination, policy approvals"""
 
     def __init__(self, api_key: str = None):
         """Initialize the SOX Section 404 judge."""
@@ -123,10 +133,20 @@ Analyze for SOX Section 302 violations:
 4. **No Change Tracking**: No mechanism to detect/report control changes
 5. **Accuracy Issues**: Systems that could produce inaccurate financial data
 
-Severity:
-- CRITICAL: No certification process or systems enabling fraud concealment
-- MAJOR: Missing disclosure controls or change tracking
-- MINOR: Incomplete disclosure procedures"""
+## Severity Scoring Guidelines
+- **CRITICAL (8-10/10, P0)**: No certification process or systems enabling fraud concealment
+- **MAJOR (5-7/10, P1)**: Missing disclosure controls or change tracking
+- **MINOR (1-4/10, P2)**: Incomplete disclosure procedures
+
+## Required Fields
+You must provide:
+- **severity_score**: Numeric score 1-10
+- **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
+- **complexity**: Low (add certifications), Medium (disclosure system), High (fraud detection AI)
+- **timeline**: Immediate (P0, 0-14 days), Short-term (P1, 15-30 days), Long-term (P2, 30-90 days)
+- **engineering_scope**: Technical work required
+- **risk_factors**: SEC enforcement, executive liability, investor lawsuits
+- **dependencies**: Legal review, executive approval, board oversight"""
 
     def __init__(self, api_key: str = None):
         """Initialize the SOX Section 302 judge."""
@@ -195,10 +215,20 @@ Analyze for SOX Audit Trail violations:
 4. **Retention Issues**: Records not retained for required period
 5. **No Change Tracking**: Modifications to financial data not recorded
 
-Severity:
-- CRITICAL: No audit logging or tamperable audit records
-- MAJOR: Incomplete logging or inadequate retention
-- MINOR: Missing some audit details or inconsistent logging"""
+## Severity Scoring Guidelines
+- **CRITICAL (8-10/10, P0)**: No audit logging or tamperable audit records
+- **MAJOR (5-7/10, P1)**: Incomplete logging or inadequate retention
+- **MINOR (1-4/10, P2)**: Missing some audit details or inconsistent logging
+
+## Required Fields
+You must provide:
+- **severity_score**: Numeric score 1-10
+- **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
+- **complexity**: Low (enable logging), Medium (immutable logs), High (centralized audit system)
+- **timeline**: Immediate (P0, 0-14 days), Short-term (P1, 15-30 days), Long-term (P2, 30-90 days)
+- **engineering_scope**: Logging infrastructure implementation
+- **risk_factors**: Forensic gaps, compliance failures, fraud undetectability
+- **dependencies**: Log aggregation tools, storage infrastructure, retention policies"""
 
     def __init__(self, api_key: str = None):
         """Initialize the SOX Audit Trail judge."""

@@ -4,111 +4,715 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sovereign | AI Compliance Intelligence</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1e3a5f;
-            --primary-light: #2c5282;
+            --navy: #1e3a5f;
+            --navy-light: #2c5282;
+            --navy-dark: #1a365d;
             --bg-primary: #ffffff;
-            --bg-secondary: #f7fafc;
-            --text-primary: #1a202c;
-            --border-medium: #cbd5e0;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --border-dark: #cbd5e1;
+            --success: #059669;
+            --success-bg: #ecfdf5;
+            --warning: #d97706;
+            --warning-bg: #fffbeb;
+            --error: #dc2626;
+            --error-bg: #fef2f2;
+            --critical: #991b1b;
+            --critical-bg: #fee2e2;
+            --major: #c2410c;
+            --major-bg: #fff7ed;
+            --minor: #a16207;
+            --minor-bg: #fefce8;
         }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-secondary);
             color: var(--text-primary);
+            line-height: 1.6;
         }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            font-size: 12px;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #34d399;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        /* Cards */
         .card {
             background: var(--bg-primary);
-            border: 1px solid var(--border-medium);
-            border-radius: 8px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
             padding: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
         }
-        .stat-box {
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--navy);
+        }
+
+        /* File Upload */
+        .upload-zone {
+            border: 2px dashed var(--border-dark);
+            border-radius: 12px;
+            padding: 48px;
             text-align: center;
-            padding: 20px;
-            background: #f7fafc;
-            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--bg-tertiary);
         }
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary);
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--navy);
+            background: rgba(30, 58, 95, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            color: var(--text-secondary);
             margin-bottom: 8px;
         }
-        .stat-label {
-            font-size: 0.875rem;
-            color: #4a5568;
+
+        .upload-hint {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-preview {
+            display: none;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .file-preview.active {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-icon {
+            font-size: 24px;
+        }
+
+        .file-name {
+            font-weight: 500;
+        }
+
+        .file-size {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .remove-file {
+            background: none;
+            border: none;
+            color: var(--error);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Text Input */
+        .text-input {
+            width: 100%;
+            min-height: 150px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            margin-top: 16px;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+        }
+
+        /* Framework Selection */
+        .frameworks-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .framework-card {
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .framework-card:hover {
+            border-color: var(--navy-light);
+        }
+
+        .framework-card.selected {
+            border-color: var(--navy);
+            background: rgba(30, 58, 95, 0.03);
+        }
+
+        .framework-checkbox {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-dark);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .framework-card.selected .framework-checkbox {
+            background: var(--navy);
+            border-color: var(--navy);
+            color: white;
+        }
+
+        .framework-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .framework-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .framework-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--navy);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--navy-dark);
+        }
+
+        .btn-primary:disabled {
+            background: var(--border-dark);
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        /* Progress */
+        .progress-container {
+            display: none;
+            margin-top: 24px;
+        }
+
+        .progress-container.active {
+            display: block;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--navy) 0%, var(--navy-light) 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            animation: progress-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes progress-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .progress-text {
+            margin-top: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Results Dashboard */
+        .results-section {
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        /* Executive Summary */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 4px;
+        }
+
+        .summary-value.risk-low { color: var(--success); }
+        .summary-value.risk-medium { color: var(--warning); }
+        .summary-value.risk-high { color: var(--major); }
+        .summary-value.risk-critical { color: var(--critical); }
+
+        .summary-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Risk Meter */
+        .risk-meter {
+            height: 12px;
+            background: linear-gradient(90deg, #059669 0%, #d97706 50%, #dc2626 100%);
+            border-radius: 6px;
+            position: relative;
+            margin: 16px 0;
+        }
+
+        .risk-indicator {
+            position: absolute;
+            top: -4px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 3px solid var(--navy);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            transition: left 0.5s ease;
+        }
+
+        /* Violation Cards */
+        .violations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .violation-card {
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid;
+        }
+
+        .violation-card.critical {
+            background: var(--critical-bg);
+            border-color: var(--critical);
+        }
+
+        .violation-card.major {
+            background: var(--major-bg);
+            border-color: var(--major);
+        }
+
+        .violation-card.minor {
+            background: var(--minor-bg);
+            border-color: var(--minor);
+        }
+
+        .violation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .violation-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .violation-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .violation-badge.critical {
+            background: var(--critical);
+            color: white;
+        }
+
+        .violation-badge.major {
+            background: var(--major);
+            color: white;
+        }
+
+        .violation-badge.minor {
+            background: var(--minor);
+            color: white;
+        }
+
+        .violation-meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .violation-evidence {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+
+        .violation-remediation {
+            margin-top: 12px;
+        }
+
+        .violation-remediation h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .violation-remediation ul {
+            padding-left: 20px;
+            font-size: 14px;
+        }
+
+        .violation-remediation li {
+            margin-bottom: 4px;
+        }
+
+        /* Export Buttons */
+        .export-group {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* No Violations */
+        .no-violations {
+            text-align: center;
+            padding: 48px;
+            color: var(--text-secondary);
+        }
+
+        .no-violations-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .frameworks-grid {
+                grid-template-columns: 1fr;
+            }
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container mx-auto px-4 py-12 max-w-5xl">
-        <!-- Header -->
-        <header class="text-center mb-12">
-            <h1 class="text-5xl font-bold mb-3" style="color: var(--primary);">
-                Sovereign
-            </h1>
-            <p class="text-xl text-gray-600">
-                AI Compliance Intelligence Platform
-            </p>
-            <p class="text-sm text-gray-500 mt-2">
-                Pre-deployment regulatory violation scanner
-            </p>
-        </header>
-
-        <!-- Status Card -->
-        <div class="card mb-6">
-            <h2 class="text-2xl font-semibold mb-6" style="color: var(--primary);">
-                System Status
-            </h2>
-            <div class="grid grid-cols-3 gap-4">
-                <div class="stat-box">
-                    <div class="stat-value">v4.0.0</div>
-                    <div class="stat-label">Version</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" style="color: #047857;">Operational</div>
-                    <div class="stat-label">Status</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value">3</div>
-                    <div class="stat-label">Frameworks</div>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">⚖️</div>
+                <div>
+                    <h1>Sovereign</h1>
+                    <span>AI Compliance Intelligence</span>
                 </div>
             </div>
-        </div>
-
-        <!-- Info Card -->
-        <div class="card">
-            <h3 class="text-lg font-semibold mb-3" style="color: var(--primary);">
-                🚀 Coming Soon
-            </h3>
-            <p class="text-gray-700 mb-4">
-                Sovereign V4 is currently in development. The platform will scan AI systems 
-                for regulatory violations across GDPR, SOX, and EU AI Act before deployment.
-            </p>
-            <div class="grid grid-cols-3 gap-4 mt-6">
-                <div class="text-center">
-                    <div class="text-3xl mb-2">⚖️</div>
-                    <div class="text-sm font-medium">GDPR</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-3xl mb-2">💼</div>
-                    <div class="text-sm font-medium">SOX</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-3xl mb-2">🤖</div>
-                    <div class="text-sm font-medium">EU AI Act</div>
-                </div>
+            <div class="header-status">
+                <span class="status-dot"></span>
+                <span>System Operational</span>
             </div>
         </div>
+    </header>
 
-        <!-- Footer -->
-        <footer class="text-center mt-8 text-sm text-gray-500">
-            <p>Demo Day: January 11, 2026</p>
-        </footer>
-    </div>
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Input Section -->
+        <section id="input-section">
+            <!-- File Upload Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Upload System Documentation</h2>
+                </div>
+                <div class="upload-zone" id="upload-zone">
+                    <div class="upload-icon">📄</div>
+                    <div class="upload-text">Drag and drop your file here, or click to browse</div>
+                    <div class="upload-hint">Supports PDF, TXT, DOCX (Max 10MB)</div>
+                    <input type="file" class="file-input" id="file-input" accept=".pdf,.txt,.docx,.doc">
+                </div>
+                <div class="file-preview" id="file-preview">
+                    <div class="file-info">
+                        <span class="file-icon">📄</span>
+                        <div>
+                            <div class="file-name" id="file-name"></div>
+                            <div class="file-size" id="file-size"></div>
+                        </div>
+                    </div>
+                    <button class="remove-file" id="remove-file">✕</button>
+                </div>
+                <div style="text-align: center; margin: 16px 0; color: var(--text-secondary);">— or —</div>
+                <textarea class="text-input" id="text-input" placeholder="Paste your AI system description here...&#10;&#10;Example: Our recommendation engine uses machine learning to suggest products based on user browsing history and purchase patterns. The system automatically profiles users and makes personalized pricing decisions."></textarea>
+            </div>
+
+            <!-- Framework Selection Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Select Regulatory Frameworks</h2>
+                </div>
+                <div class="frameworks-grid">
+                    <div class="framework-card selected" data-framework="gdpr">
+                        <div class="framework-checkbox">✓</div>
+                        <div class="framework-icon">🇪🇺</div>
+                        <div class="framework-name">GDPR</div>
+                        <div class="framework-desc">General Data Protection Regulation - EU data privacy and protection</div>
+                    </div>
+                    <div class="framework-card" data-framework="sox">
+                        <div class="framework-checkbox"></div>
+                        <div class="framework-icon">💼</div>
+                        <div class="framework-name">SOX</div>
+                        <div class="framework-desc">Sarbanes-Oxley Act - Financial reporting and internal controls</div>
+                    </div>
+                    <div class="framework-card" data-framework="euai">
+                        <div class="framework-checkbox"></div>
+                        <div class="framework-icon">🤖</div>
+                        <div class="framework-name">EU AI Act</div>
+                        <div class="framework-desc">EU Artificial Intelligence Act - AI system risk classification</div>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="analyze-btn" disabled>
+                        <span>🔍</span> Analyze Compliance
+                    </button>
+                </div>
+                <div class="progress-container" id="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-text" id="progress-text">Initializing analysis...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results-section" class="results-section">
+            <!-- Executive Summary -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Executive Summary</h2>
+                    <div class="export-group">
+                        <button class="btn btn-secondary" id="export-pdf">
+                            <span>📄</span> Export PDF
+                        </button>
+                        <button class="btn btn-secondary" id="export-csv">
+                            <span>📊</span> Export CSV
+                        </button>
+                    </div>
+                </div>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="summary-value" id="risk-score">0</div>
+                        <div class="summary-label">Risk Score</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-value" id="violation-count">0</div>
+                        <div class="summary-label">Violations Found</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-value" id="critical-count">0</div>
+                        <div class="summary-label">Critical Issues</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-value" id="frameworks-count">0</div>
+                        <div class="summary-label">Frameworks Analyzed</div>
+                    </div>
+                </div>
+                <div class="risk-meter">
+                    <div class="risk-indicator" id="risk-indicator" style="left: 0%"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary);">
+                    <span>Low Risk</span>
+                    <span>Medium Risk</span>
+                    <span>High Risk</span>
+                    <span>Critical Risk</span>
+                </div>
+            </div>
+
+            <!-- Violations List -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Compliance Violations</h2>
+                    <button class="btn btn-secondary" id="new-analysis-btn">
+                        <span>+</span> New Analysis
+                    </button>
+                </div>
+                <div class="violations-list" id="violations-list">
+                    <!-- Violations will be rendered here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
 </body>
 </html>

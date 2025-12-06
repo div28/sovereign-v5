@@ -1,0 +1,237 @@
+"""
+EU AI Act Compliance Judges for Sovereign V5
+
+Specialized judges for detecting EU AI Act violations.
+Each judge focuses on specific risk categories and requirements.
+Uses Claude Sonnet for more nuanced AI regulation analysis.
+"""
+
+import logging
+from typing import Dict, List, Any
+
+from .base_judge import BaseComplianceJudge
+
+logger = logging.getLogger(__name__)
+
+
+class EUAIHighRiskJudge(BaseComplianceJudge):
+    """
+    Judge for EU AI Act High-Risk AI Systems (Article 6, Annex III).
+
+    Detects violations related to:
+    - Unclassified high-risk AI systems
+    - Missing conformity assessments
+    - Inadequate risk management
+    - Missing technical documentation
+    """
+
+    EVALUATION_PROMPT = """You are an EU AI Act compliance expert specializing in High-Risk AI Systems.
+
+## EU AI Act High-Risk Requirements (Article 6, Annex III)
+
+High-risk AI systems include those used in:
+1. **Biometric identification** and categorization
+2. **Critical infrastructure** management (energy, water, transport)
+3. **Education and vocational training** (access, assessment)
+4. **Employment** (recruitment, task allocation, termination decisions)
+5. **Essential services** (credit scoring, emergency services)
+6. **Law enforcement** (risk assessment, evidence evaluation)
+7. **Migration and border control** (document verification, risk assessment)
+8. **Justice administration** (legal research, sentencing assistance)
+
+Requirements for high-risk systems:
+- Risk management system throughout lifecycle
+- Data governance and quality requirements
+- Technical documentation
+- Record-keeping and logging
+- Transparency and user information
+- Human oversight measures
+- Accuracy, robustness, and cybersecurity
+
+## Regulatory Context
+{regulatory_context}
+
+## Submission to Evaluate
+{submission}
+
+## Your Task
+
+Analyze for EU AI Act High-Risk violations:
+1. **Unclassified System**: High-risk AI not identified as such
+2. **Missing Risk Management**: No systematic risk assessment
+3. **Data Quality Issues**: Training data not properly governed
+4. **Documentation Gaps**: Missing technical documentation
+5. **No Human Oversight**: No mechanism for human intervention
+6. **Transparency Failure**: Users not informed they're interacting with AI
+
+Severity:
+- CRITICAL: Deploying unclassified high-risk AI or no human oversight
+- MAJOR: Missing risk management or documentation
+- MINOR: Incomplete transparency measures"""
+
+    def __init__(self, api_key: str = None):
+        """Initialize the EU AI High Risk judge."""
+        super().__init__(
+            framework="EU-AI",
+            focus_area="high-risk AI systems",
+            model="claude-sonnet-4-20250514",  # Sonnet for nuanced analysis
+            api_key=api_key
+        )
+
+    def build_prompt(
+        self,
+        submission: str,
+        retrieved_chunks: List[Dict[str, Any]]
+    ) -> str:
+        """Build the High-Risk evaluation prompt."""
+        regulatory_context = self._format_chunks_for_prompt(retrieved_chunks)
+
+        return self.EVALUATION_PROMPT.format(
+            regulatory_context=regulatory_context,
+            submission=submission
+        )
+
+
+class EUAIProhibitedPracticesJudge(BaseComplianceJudge):
+    """
+    Judge for EU AI Act Prohibited Practices (Article 5).
+
+    Detects violations related to:
+    - Subliminal manipulation
+    - Exploitation of vulnerabilities
+    - Social scoring
+    - Real-time biometric identification
+    """
+
+    EVALUATION_PROMPT = """You are an EU AI Act compliance expert specializing in Prohibited AI Practices.
+
+## EU AI Act Prohibited Practices (Article 5)
+
+The following AI practices are PROHIBITED:
+
+1. **Subliminal Manipulation**: AI that deploys subliminal techniques beyond a person's consciousness to materially distort behavior, causing harm
+
+2. **Exploitation of Vulnerabilities**: AI that exploits vulnerabilities of specific groups (age, disability, social/economic situation) to materially distort behavior
+
+3. **Social Scoring**: AI systems by public authorities for general-purpose social scoring that leads to detrimental treatment based on social behavior or personal characteristics
+
+4. **Real-time Remote Biometric Identification**: Use in publicly accessible spaces for law enforcement (with limited exceptions)
+
+5. **Emotion Recognition**: In workplace and educational settings (with exceptions)
+
+6. **Biometric Categorization**: Categorizing individuals based on biometric data to infer sensitive attributes (race, political opinions, etc.)
+
+7. **Facial Recognition Databases**: Untargeted scraping of facial images from internet/CCTV to create databases
+
+## Regulatory Context
+{regulatory_context}
+
+## Submission to Evaluate
+{submission}
+
+## Your Task
+
+Analyze for PROHIBITED AI practices:
+1. **Subliminal Techniques**: Hidden manipulation of user behavior
+2. **Vulnerability Exploitation**: Targeting vulnerable groups
+3. **Social Scoring**: Scoring individuals based on social behavior
+4. **Unauthorized Biometrics**: Real-time biometric ID without authorization
+5. **Emotion Recognition**: Inappropriate emotion detection use
+6. **Discriminatory Categorization**: Inferring sensitive attributes from biometrics
+
+Severity:
+- CRITICAL: Any prohibited practice detected (these are BANNED, not just regulated)
+- MAJOR: Borderline practices that may constitute prohibition
+- MINOR: Practices that could evolve into prohibited territory"""
+
+    def __init__(self, api_key: str = None):
+        """Initialize the EU AI Prohibited Practices judge."""
+        super().__init__(
+            framework="EU-AI",
+            focus_area="prohibited AI practices",
+            model="claude-sonnet-4-20250514",  # Sonnet for nuanced analysis
+            api_key=api_key
+        )
+
+    def build_prompt(
+        self,
+        submission: str,
+        retrieved_chunks: List[Dict[str, Any]]
+    ) -> str:
+        """Build the Prohibited Practices evaluation prompt."""
+        regulatory_context = self._format_chunks_for_prompt(retrieved_chunks)
+
+        return self.EVALUATION_PROMPT.format(
+            regulatory_context=regulatory_context,
+            submission=submission
+        )
+
+
+class EUAITransparencyJudge(BaseComplianceJudge):
+    """
+    Judge for EU AI Act Transparency Requirements (Article 52).
+
+    Detects violations related to:
+    - AI interaction disclosure
+    - Deepfake labeling
+    - Emotion recognition disclosure
+    - Content generation transparency
+    """
+
+    EVALUATION_PROMPT = """You are an EU AI Act compliance expert specializing in Transparency Requirements.
+
+## EU AI Act Transparency Requirements (Article 52)
+
+Transparency obligations apply to:
+
+1. **AI Interaction Disclosure**: Users must be informed when interacting with an AI system (chatbots, virtual assistants) unless obvious from circumstances
+
+2. **Emotion Recognition**: Persons exposed to emotion recognition or biometric categorization systems must be informed
+
+3. **Deepfake Disclosure**: AI-generated or manipulated content (deepfakes) must be disclosed as artificially generated/manipulated
+
+4. **Content Labeling**: AI-generated text published to inform the public on matters of public interest must be labeled as AI-generated (unless human review occurred)
+
+5. **General Purpose AI**: Providers of general-purpose AI must ensure outputs are marked as AI-generated in machine-readable format
+
+## Regulatory Context
+{regulatory_context}
+
+## Submission to Evaluate
+{submission}
+
+## Your Task
+
+Analyze for EU AI Act Transparency violations:
+1. **Undisclosed AI Interaction**: Users not informed they're talking to AI
+2. **Hidden Emotion Recognition**: Analyzing emotions without informing subjects
+3. **Unlabeled Synthetic Content**: AI-generated content not disclosed
+4. **Missing AI Markers**: Generated content lacks machine-readable AI markers
+5. **Deceptive Presentation**: AI outputs presented as human-created
+
+Severity:
+- CRITICAL: Deliberate deception or hidden AI in sensitive contexts
+- MAJOR: Missing transparency disclosures for user-facing AI
+- MINOR: Incomplete labeling or disclosure mechanisms"""
+
+    def __init__(self, api_key: str = None):
+        """Initialize the EU AI Transparency judge."""
+        super().__init__(
+            framework="EU-AI",
+            focus_area="transparency requirements",
+            model="claude-sonnet-4-20250514",  # Sonnet for nuanced analysis
+            api_key=api_key
+        )
+
+    def build_prompt(
+        self,
+        submission: str,
+        retrieved_chunks: List[Dict[str, Any]]
+    ) -> str:
+        """Build the Transparency evaluation prompt."""
+        regulatory_context = self._format_chunks_for_prompt(retrieved_chunks)
+
+        return self.EVALUATION_PROMPT.format(
+            regulatory_context=regulatory_context,
+            submission=submission
+        )

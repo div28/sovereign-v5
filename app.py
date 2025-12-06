@@ -7,7 +7,8 @@ FastAPI backend for regulatory compliance scanning.
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 import logging
 
@@ -63,6 +64,9 @@ class AnalyzeResponse(BaseModel):
 _rag_engine = None
 _judges = None
 
+# Thread pool for parallel judge execution
+_executor = ThreadPoolExecutor(max_workers=9)
+
 
 def get_rag_engine():
     """Lazy load RAG engine."""
@@ -75,18 +79,41 @@ def get_rag_engine():
 
 
 def get_judges():
-    """Lazy load compliance judges."""
+    """Lazy load all 9 compliance judges."""
     global _judges
     if _judges is None:
-        from backend.judges import GDPRArticle22Judge, GDPRArticle17Judge, GDPRArticle32Judge
+        from backend.judges import (
+            # GDPR Judges
+            GDPRArticle22Judge,
+            GDPRArticle17Judge,
+            GDPRArticle32Judge,
+            # SOX Judges
+            SOXSection404Judge,
+            SOXSection302Judge,
+            SOXAuditTrailJudge,
+            # EU AI Act Judges
+            EUAIHighRiskJudge,
+            EUAIProhibitedPracticesJudge,
+            EUAITransparencyJudge,
+        )
         _judges = {
             "gdpr": [
                 GDPRArticle22Judge(),
                 GDPRArticle17Judge(),
                 GDPRArticle32Judge(),
-            ]
+            ],
+            "sox": [
+                SOXSection404Judge(),
+                SOXSection302Judge(),
+                SOXAuditTrailJudge(),
+            ],
+            "euai": [
+                EUAIHighRiskJudge(),
+                EUAIProhibitedPracticesJudge(),
+                EUAITransparencyJudge(),
+            ],
         }
-        logger.info("Compliance judges initialized")
+        logger.info("All 9 compliance judges initialized")
     return _judges
 
 
@@ -121,6 +148,33 @@ def calculate_risk_score(violations: List[Dict[str, Any]]) -> int:
     return min(int(total_score), 100)
 
 
+def run_judge(
+    judge,
+    submission: str,
+    chunks: List[Dict[str, Any]]
+) -> Tuple[str, Optional[Dict[str, Any]]]:
+    """
+    Run a single judge evaluation.
+
+    Args:
+        judge: The compliance judge to run.
+        submission: Text to evaluate.
+        chunks: Retrieved regulatory context.
+
+    Returns:
+        Tuple of (judge_id, violation_result or None)
+    """
+    try:
+        result = judge.evaluate(
+            submission=submission,
+            retrieved_chunks=chunks
+        )
+        return (judge.judge_id, result)
+    except Exception as e:
+        logger.error(f"Judge {judge.judge_id} failed: {e}")
+        return (judge.judge_id, None)
+
+
 @app.get("/")
 async def root():
     """Root endpoint."""
@@ -129,6 +183,7 @@ async def root():
         "version": "5.0.0",
         "status": "operational",
         "frameworks": ["GDPR", "SOX", "EU AI Act"],
+        "judges": 9,
         "documentation": "/docs"
     }
 
@@ -152,6 +207,11 @@ async def health_check():
             "gdpr": "sovereign-gdpr-regulation",
             "sox": "sovereign-sox-regulation",
             "euai": "sovereign-euai-regulation"
+        },
+        "judges": {
+            "gdpr": ["Article 22", "Article 17", "Article 32"],
+            "sox": ["Section 404", "Section 302", "Audit Trail"],
+            "euai": ["High-Risk", "Prohibited Practices", "Transparency"]
         }
     }
 
@@ -163,7 +223,7 @@ async def analyze_compliance(request: AnalyzeRequest):
 
     Flow:
     1. Retrieve relevant regulatory context via RAG
-    2. Run applicable compliance judges
+    2. Run applicable compliance judges in parallel
     3. Aggregate violations and calculate risk score
     """
     try:
@@ -197,31 +257,39 @@ async def analyze_compliance(request: AnalyzeRequest):
 
         logger.info(f"Retrieved {len(retrieved_chunks)} chunks")
 
-        # Get judges and evaluate
+        # Get judges and prepare for parallel execution
         judges = get_judges()
         violations = []
 
+        # Collect all judges to run based on selected frameworks
+        judges_to_run = []
         for framework in frameworks:
             framework_judges = judges.get(framework, [])
+            # Filter chunks for this framework
+            framework_chunks = [
+                c for c in retrieved_chunks
+                if c.get("framework", "").lower() == framework
+            ]
             for judge in framework_judges:
-                try:
-                    # Filter chunks for this framework
-                    framework_chunks = [
-                        c for c in retrieved_chunks
-                        if c.get("framework", "").lower() == framework
-                    ]
+                judges_to_run.append((judge, request.description, framework_chunks))
 
-                    result = judge.evaluate(
-                        submission=request.description,
-                        retrieved_chunks=framework_chunks
-                    )
+        logger.info(f"Running {len(judges_to_run)} judges in parallel")
 
-                    if result and result.get("violation_detected"):
-                        violations.append(result)
+        # Execute judges in parallel using ThreadPoolExecutor
+        futures = []
+        for judge, submission, chunks in judges_to_run:
+            future = _executor.submit(run_judge, judge, submission, chunks)
+            futures.append(future)
 
-                except Exception as e:
-                    logger.error(f"Judge {judge.judge_id} failed: {e}")
-                    continue
+        # Collect results as they complete
+        for future in as_completed(futures):
+            try:
+                judge_id, result = future.result()
+                if result and result.get("violation_detected"):
+                    violations.append(result)
+                    logger.info(f"Violation detected by {judge_id}")
+            except Exception as e:
+                logger.error(f"Error collecting judge result: {e}")
 
         # Calculate risk score
         risk_score = calculate_risk_score(violations)
@@ -247,28 +315,38 @@ async def analyze_compliance(request: AnalyzeRequest):
 
 @app.get("/api/frameworks")
 async def list_frameworks():
-    """List available regulatory frameworks."""
+    """List available regulatory frameworks and their judges."""
     return {
         "frameworks": [
             {
                 "id": "gdpr",
                 "name": "GDPR",
                 "full_name": "General Data Protection Regulation",
-                "judges": ["Article 22 - Automated Decision-Making",
-                          "Article 17 - Right to Erasure",
-                          "Article 32 - Security of Processing"]
+                "judges": [
+                    "Article 22 - Automated Decision-Making",
+                    "Article 17 - Right to Erasure",
+                    "Article 32 - Security of Processing"
+                ]
             },
             {
                 "id": "sox",
                 "name": "SOX",
                 "full_name": "Sarbanes-Oxley Act",
-                "judges": ["Coming soon"]
+                "judges": [
+                    "Section 404 - Internal Control Assessment",
+                    "Section 302 - Corporate Responsibility",
+                    "Audit Trail Requirements"
+                ]
             },
             {
                 "id": "euai",
                 "name": "EU AI Act",
                 "full_name": "EU Artificial Intelligence Act",
-                "judges": ["Coming soon"]
+                "judges": [
+                    "High-Risk AI Systems",
+                    "Prohibited AI Practices",
+                    "Transparency Requirements"
+                ]
             }
         ]
     }

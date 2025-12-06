@@ -9,6 +9,245 @@ const API_BASE = 'https://sovereign-v5.onrender.com';
 let selectedFrameworks = ['gdpr'];
 let analysisResults = null;
 let charts = {};
+let particleSystem = null;
+let networkGraph = null;
+let animationFrameId = null;
+
+// ============================================================================
+// PARTICLE SYSTEM
+// ============================================================================
+
+class Particle {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.reset();
+    }
+
+    reset() {
+        this.x = Math.random() * this.canvas.width;
+        this.y = Math.random() * this.canvas.height;
+        this.vx = (Math.random() - 0.5) * 1.5;
+        this.vy = (Math.random() - 0.5) * 1.5;
+        this.radius = Math.random() * 2 + 1;
+        this.opacity = Math.random() * 0.5 + 0.3;
+    }
+
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Wrap around edges
+        if (this.x < 0) this.x = this.canvas.width;
+        if (this.x > this.canvas.width) this.x = 0;
+        if (this.y < 0) this.y = this.canvas.height;
+        if (this.y > this.canvas.height) this.y = 0;
+    }
+
+    draw(ctx) {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(30, 58, 95, ${this.opacity})`;
+        ctx.fill();
+    }
+}
+
+class ParticleSystem {
+    constructor(canvas, particleCount = 120) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.particles = [];
+        this.isRunning = false;
+
+        // Set canvas size
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+
+        // Create particles
+        for (let i = 0; i < particleCount; i++) {
+            this.particles.push(new Particle(canvas));
+        }
+    }
+
+    resize() {
+        this.canvas.width = this.canvas.offsetWidth;
+        this.canvas.height = this.canvas.offsetHeight;
+    }
+
+    start() {
+        this.isRunning = true;
+        this.animate();
+    }
+
+    stop() {
+        this.isRunning = false;
+    }
+
+    animate() {
+        if (!this.isRunning) return;
+
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Update and draw particles
+        this.particles.forEach(particle => {
+            particle.update();
+            particle.draw(this.ctx);
+        });
+
+        // Draw connections
+        this.drawConnections();
+
+        requestAnimationFrame(() => this.animate());
+    }
+
+    drawConnections() {
+        const maxDistance = 100;
+
+        for (let i = 0; i < this.particles.length; i++) {
+            for (let j = i + 1; j < this.particles.length; j++) {
+                const dx = this.particles[i].x - this.particles[j].x;
+                const dy = this.particles[i].y - this.particles[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < maxDistance) {
+                    const opacity = (1 - distance / maxDistance) * 0.2;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
+                    this.ctx.lineTo(this.particles[j].x, this.particles[j].y);
+                    this.ctx.strokeStyle = `rgba(30, 58, 95, ${opacity})`;
+                    this.ctx.lineWidth = 1;
+                    this.ctx.stroke();
+                }
+            }
+        }
+    }
+}
+
+// ============================================================================
+// NETWORK GRAPH
+// ============================================================================
+
+class NetworkGraph {
+    constructor(canvas, nodeCount) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.nodes = [];
+        this.edges = [];
+        this.isRunning = false;
+        this.activeNodeIndex = -1;
+
+        // Set canvas size
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+
+        // Create nodes in a circle
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const radius = Math.min(this.canvas.width, this.canvas.height) * 0.3;
+
+        for (let i = 0; i < nodeCount; i++) {
+            const angle = (i / nodeCount) * Math.PI * 2 - Math.PI / 2;
+            this.nodes.push({
+                x: centerX + Math.cos(angle) * radius,
+                y: centerY + Math.sin(angle) * radius,
+                radius: 8,
+                active: false,
+                complete: false
+            });
+        }
+
+        // Create edges between nodes
+        for (let i = 0; i < nodeCount; i++) {
+            for (let j = i + 1; j < nodeCount; j++) {
+                this.edges.push({ from: i, to: j, opacity: 0 });
+            }
+        }
+    }
+
+    resize() {
+        const container = this.canvas.parentElement;
+        this.canvas.width = container.offsetWidth;
+        this.canvas.height = container.offsetHeight;
+    }
+
+    start() {
+        this.isRunning = true;
+        this.animate();
+    }
+
+    stop() {
+        this.isRunning = false;
+    }
+
+    setActiveNode(index) {
+        this.activeNodeIndex = index;
+        if (index >= 0 && index < this.nodes.length) {
+            this.nodes[index].active = true;
+
+            // Activate edges connected to this node
+            this.edges.forEach(edge => {
+                if (edge.from === index || edge.to === index) {
+                    edge.opacity = 0.6;
+                }
+            });
+        }
+    }
+
+    setCompleteNode(index) {
+        if (index >= 0 && index < this.nodes.length) {
+            this.nodes[index].active = false;
+            this.nodes[index].complete = true;
+        }
+    }
+
+    animate() {
+        if (!this.isRunning) return;
+
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw edges
+        this.edges.forEach(edge => {
+            if (edge.opacity > 0) {
+                const from = this.nodes[edge.from];
+                const to = this.nodes[edge.to];
+
+                this.ctx.beginPath();
+                this.ctx.moveTo(from.x, from.y);
+                this.ctx.lineTo(to.x, to.y);
+                this.ctx.strokeStyle = `rgba(30, 58, 95, ${edge.opacity})`;
+                this.ctx.lineWidth = 2;
+                this.ctx.stroke();
+
+                // Fade out edges
+                edge.opacity *= 0.98;
+            }
+        });
+
+        // Draw nodes
+        this.nodes.forEach((node, i) => {
+            this.ctx.beginPath();
+            this.ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+
+            if (node.complete) {
+                this.ctx.fillStyle = '#059669';
+            } else if (node.active) {
+                this.ctx.fillStyle = '#1e3a5f';
+                // Pulse effect for active node
+                const pulseRadius = node.radius + Math.sin(Date.now() / 200) * 3;
+                this.ctx.beginPath();
+                this.ctx.arc(node.x, node.y, pulseRadius, 0, Math.PI * 2);
+                this.ctx.strokeStyle = 'rgba(30, 58, 95, 0.3)';
+                this.ctx.lineWidth = 2;
+                this.ctx.stroke();
+            } else {
+                this.ctx.fillStyle = '#cbd5e1';
+            }
+
+            this.ctx.fill();
+        });
+
+        requestAnimationFrame(() => this.animate());
+    }
+}
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -126,6 +365,9 @@ async function runAssessment() {
     // Setup judges list
     setupJudgesList();
 
+    // Initialize canvas animations
+    initializeProcessingAnimations();
+
     try {
         // Call API
         const response = await fetch(`${API_BASE}/api/analyze`, {
@@ -146,13 +388,46 @@ async function runAssessment() {
         // Animate judges completion
         await animateJudgesCompletion();
 
+        // Stop animations
+        stopProcessingAnimations();
+
         // Show victory screen
         showVictory();
 
     } catch (error) {
         console.error('Assessment error:', error);
         alert('Assessment failed. Please try again.');
+        stopProcessingAnimations();
         showSection('scan-section');
+    }
+}
+
+function initializeProcessingAnimations() {
+    const particleCanvas = document.getElementById('particle-canvas');
+    const networkCanvas = document.getElementById('network-canvas');
+    const judgeItems = document.querySelectorAll('.judge-item');
+
+    // Initialize particle system
+    if (particleCanvas) {
+        particleSystem = new ParticleSystem(particleCanvas, 120);
+        particleSystem.start();
+    }
+
+    // Initialize network graph
+    if (networkCanvas && judgeItems.length > 0) {
+        networkGraph = new NetworkGraph(networkCanvas, judgeItems.length);
+        networkGraph.start();
+    }
+}
+
+function stopProcessingAnimations() {
+    if (particleSystem) {
+        particleSystem.stop();
+        particleSystem = null;
+    }
+    if (networkGraph) {
+        networkGraph.stop();
+        networkGraph = null;
     }
 }
 
@@ -204,18 +479,31 @@ async function animateJudgesCompletion() {
         // Mark as active
         item.classList.add('active');
 
-        // Simulate processing
-        await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 400));
+        // Update network graph
+        if (networkGraph) {
+            networkGraph.setActiveNode(i);
+        }
+
+        // Simulate processing with variable timing
+        await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 600));
 
         // Mark as complete
         item.classList.remove('active');
         item.classList.add('complete');
         item.querySelector('.judge-status').textContent = '✓';
 
+        // Update network graph
+        if (networkGraph) {
+            networkGraph.setCompleteNode(i);
+        }
+
         // Update progress
         const percent = Math.round(((i + 1) / items.length) * 100);
         progressFill.style.width = percent + '%';
         progressText.textContent = percent + '% Complete';
+
+        // Small delay between judges
+        await new Promise(resolve => setTimeout(resolve, 200));
     }
 }
 

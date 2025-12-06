@@ -154,20 +154,28 @@
             border-radius: 12px;
             padding: 24px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
             position: relative;
             background: white;
+            transform-style: preserve-3d;
+            perspective: 1000px;
         }
 
         .framework-card:hover {
             border-color: var(--navy-light);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 12px rgba(30, 58, 95, 0.1);
+            transform: translateY(-4px) rotateY(5deg) rotateX(-2deg);
+            box-shadow: 0 12px 24px rgba(30, 58, 95, 0.15);
         }
 
         .framework-card.selected {
             border-color: var(--navy);
             background: rgba(30, 58, 95, 0.04);
+            animation: subtleFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes subtleFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-4px); }
         }
 
         .framework-checkbox {
@@ -194,6 +202,19 @@
         .framework-icon {
             font-size: 40px;
             margin-bottom: 16px;
+            display: inline-block;
+            transition: transform 0.6s ease;
+            transform-style: preserve-3d;
+        }
+
+        .framework-card:hover .framework-icon {
+            animation: iconRotate3D 1.5s ease-in-out;
+        }
+
+        @keyframes iconRotate3D {
+            0% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+            100% { transform: rotateY(360deg); }
         }
 
         .framework-name {
@@ -320,80 +341,250 @@
             width: 100%;
         }
 
-        /* Processing Animation */
+        /* Processing Animation - Enhanced */
         .processing-container {
             text-align: center;
             padding: 40px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .processing-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, #1e3a5f 0%, #2c5282 50%, #1e3a5f 100%);
+            background-size: 200% 200%;
+            animation: gradientMesh 8s ease infinite;
+            opacity: 0.03;
+            z-index: 0;
+        }
+
+        @keyframes gradientMesh {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        #particle-canvas, #network-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .processing-content {
+            position: relative;
+            z-index: 2;
         }
 
         .processing-title {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 32px;
+            font-weight: 800;
             color: var(--navy);
-            margin-bottom: 32px;
+            margin-bottom: 16px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .processing-subtitle {
+            font-size: 16px;
+            color: var(--text-light);
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+
+        .center-visualization {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+
+        .circuit-board {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(30,58,95,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            position: relative;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .progress-rings {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .progress-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            animation: rotate 3s linear infinite;
+        }
+
+        .progress-ring:nth-child(1) {
+            width: 180px;
+            height: 180px;
+            border-top-color: #1e3a5f;
+            animation-delay: 0s;
+            margin: -90px 0 0 -90px;
+        }
+
+        .progress-ring:nth-child(2) {
+            width: 140px;
+            height: 140px;
+            border-top-color: #2c5282;
+            animation-delay: -0.5s;
+            margin: -70px 0 0 -70px;
+        }
+
+        .progress-ring:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            border-top-color: #3182ce;
+            animation-delay: -1s;
+            margin: -50px 0 0 -50px;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .judges-list {
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto 32px;
             text-align: left;
+            perspective: 1000px;
         }
 
         .judge-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px;
+            gap: 16px;
+            padding: 16px;
             background: white;
-            border-radius: 8px;
-            margin-bottom: 8px;
+            border-radius: 12px;
+            margin-bottom: 12px;
             opacity: 0.3;
-            transition: all 0.3s ease;
+            transition: all 0.5s ease;
+            transform-style: preserve-3d;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .judge-item.active {
             opacity: 1;
-            background: #f1f5f9;
-            transform: translateX(4px);
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            transform: translateX(8px) rotateY(5deg) scale(1.02);
+            box-shadow: 0 8px 24px rgba(30,58,95,0.15);
         }
 
         .judge-item.complete {
             opacity: 1;
+            animation: flipComplete 0.6s ease;
+        }
+
+        @keyframes flipComplete {
+            0% { transform: rotateY(0deg); }
+            50% { transform: rotateY(180deg); }
+            100% { transform: rotateY(360deg); }
         }
 
         .judge-icon {
-            font-size: 20px;
+            font-size: 28px;
+            transform: translateZ(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .judge-item.active .judge-icon {
+            animation: rotate3D 1s ease infinite;
+        }
+
+        @keyframes rotate3D {
+            0% { transform: translateZ(20px) rotateY(0deg); }
+            100% { transform: translateZ(20px) rotateY(360deg); }
         }
 
         .judge-name {
             flex: 1;
             font-weight: 600;
             color: var(--text);
+            font-size: 15px;
+        }
+
+        .judge-item.active .judge-name {
+            animation: glitch 0.5s ease infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-2px); }
+            40% { transform: translateX(2px); }
+            60% { transform: translateX(-2px); }
+            80% { transform: translateX(2px); }
         }
 
         .judge-status {
-            font-size: 20px;
+            font-size: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .judge-item.complete .judge-status {
+            animation: checkBounce 0.5s ease;
+        }
+
+        @keyframes checkBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.5); }
         }
 
         .progress-bar {
-            height: 12px;
+            height: 16px;
             background: #e2e8f0;
-            border-radius: 6px;
+            border-radius: 8px;
             overflow: hidden;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--navy) 0%, var(--navy-light) 100%);
+            background: linear-gradient(90deg, var(--navy) 0%, var(--navy-light) 50%, var(--navy) 100%);
+            background-size: 200% 100%;
             width: 0%;
-            transition: width 0.3s ease;
+            transition: width 0.5s ease;
+            animation: shimmer 2s ease infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
         }
 
         .progress-text {
-            font-size: 14px;
-            color: var(--text-light);
-            font-weight: 600;
+            font-size: 16px;
+            color: var(--navy);
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
         /* Victory Screen */
@@ -891,12 +1082,36 @@ Example: Our recommendation engine uses machine learning to personalize product 
         <section id="processing-section" class="section">
             <div class="card">
                 <div class="processing-container">
-                    <div class="processing-title">Analyzing Your System...</div>
-                    <div class="judges-list" id="judges-list"></div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill"></div>
+                    <!-- Animated background -->
+                    <div class="processing-background"></div>
+
+                    <!-- Canvas layers for particles and network -->
+                    <div class="canvas-container">
+                        <canvas id="particle-canvas"></canvas>
+                        <canvas id="network-canvas"></canvas>
                     </div>
-                    <div class="progress-text" id="progress-text">0% Complete</div>
+
+                    <!-- Content -->
+                    <div class="processing-content">
+                        <div class="processing-title">Analyzing Your System...</div>
+                        <p class="processing-subtitle">Multi-dimensional compliance analysis in progress</p>
+
+                        <!-- Center visualization with spinning rings -->
+                        <div class="center-visualization">
+                            <div class="circuit-board"></div>
+                            <div class="progress-rings">
+                                <div class="progress-ring"></div>
+                                <div class="progress-ring"></div>
+                                <div class="progress-ring"></div>
+                            </div>
+                        </div>
+
+                        <div class="judges-list" id="judges-list"></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                        <div class="progress-text" id="progress-text">0% Complete</div>
+                    </div>
                 </div>
             </div>
         </section>

@@ -3,32 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sovereign | AI Compliance Intelligence</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>SOVEREIGN | Pre-deployment AI Compliance Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
             --navy: #1e3a5f;
             --navy-light: #2c5282;
             --navy-dark: #1a365d;
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8fafc;
-            --bg-tertiary: #f1f5f9;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
             --border: #e2e8f0;
-            --border-dark: #cbd5e1;
             --success: #059669;
-            --success-bg: #ecfdf5;
             --warning: #d97706;
-            --warning-bg: #fffbeb;
             --error: #dc2626;
-            --error-bg: #fef2f2;
-            --critical: #991b1b;
-            --critical-bg: #fee2e2;
-            --major: #c2410c;
-            --major-bg: #fff7ed;
-            --minor: #a16207;
-            --minor-bg: #fefce8;
+            --p0: #dc2626;
+            --p1: #d97706;
+            --p2: #059669;
         }
 
         * {
@@ -38,241 +32,157 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
             line-height: 1.6;
         }
 
-        /* Header */
-        .header {
+        /* Hero Section */
+        .hero {
             background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
             color: white;
-            padding: 20px 0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 60px 20px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .header-content {
-            max-width: 1200px;
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            max-width: 900px;
             margin: 0 auto;
-            padding: 0 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            position: relative;
+            z-index: 1;
         }
 
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+            text-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .tagline {
             font-size: 20px;
+            margin-bottom: 24px;
+            opacity: 0.95;
+            font-weight: 500;
         }
 
-        .logo h1 {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+        .fines-ticker {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 16px;
+            display: inline-block;
+            min-width: 400px;
+            margin-top: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .logo span {
-            font-size: 12px;
-            opacity: 0.8;
-            font-weight: 400;
-        }
-
-        .header-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .ticker-content {
             font-size: 14px;
+            font-weight: 600;
+            opacity: 1;
+            transition: opacity 0.5s ease;
         }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: #34d399;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
+        .ticker-content.fade {
+            opacity: 0;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* Main Container */
+        /* Container */
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 32px 24px;
+            padding: 40px 20px;
+        }
+
+        /* Section */
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Cards */
         .card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             margin-bottom: 24px;
         }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
         .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--navy);
-        }
-
-        /* File Upload */
-        .upload-zone {
-            border: 2px dashed var(--border-dark);
-            border-radius: 12px;
-            padding: 48px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: var(--bg-tertiary);
-        }
-
-        .upload-zone:hover, .upload-zone.dragover {
-            border-color: var(--navy);
-            background: rgba(30, 58, 95, 0.05);
-        }
-
-        .upload-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
-
-        .upload-text {
-            font-size: 16px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-
-        .upload-hint {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .file-preview {
-            display: none;
-            padding: 16px;
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-            margin-top: 16px;
-        }
-
-        .file-preview.active {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .file-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .file-icon {
             font-size: 24px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 24px;
         }
 
-        .file-name {
-            font-weight: 500;
-        }
-
-        .file-size {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .remove-file {
-            background: none;
-            border: none;
-            color: var(--error);
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        /* Text Input */
-        .text-input {
-            width: 100%;
-            min-height: 150px;
-            padding: 16px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 14px;
-            resize: vertical;
-            margin-top: 16px;
-        }
-
-        .text-input:focus {
-            outline: none;
-            border-color: var(--navy);
-            box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
-        }
-
-        /* Framework Selection */
+        /* Framework Cards */
         .frameworks-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
+            gap: 20px;
+            margin-bottom: 32px;
         }
 
         .framework-card {
             border: 2px solid var(--border);
             border-radius: 12px;
-            padding: 20px;
+            padding: 24px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             position: relative;
+            background: white;
         }
 
         .framework-card:hover {
             border-color: var(--navy-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(30, 58, 95, 0.1);
         }
 
         .framework-card.selected {
             border-color: var(--navy);
-            background: rgba(30, 58, 95, 0.03);
+            background: rgba(30, 58, 95, 0.04);
         }
 
         .framework-checkbox {
             position: absolute;
             top: 16px;
             right: 16px;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border-dark);
-            border-radius: 4px;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
+            font-size: 14px;
+            transition: all 0.3s ease;
         }
 
         .framework-card.selected .framework-checkbox {
@@ -282,80 +192,195 @@
         }
 
         .framework-icon {
-            font-size: 32px;
-            margin-bottom: 12px;
+            font-size: 40px;
+            margin-bottom: 16px;
         }
 
         .framework-name {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 4px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--navy);
         }
 
         .framework-desc {
-            font-size: 13px;
-            color: var(--text-secondary);
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        /* Demo Buttons */
+        .demo-section {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .demo-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .demo-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .demo-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .demo-btn:hover {
+            border-color: var(--navy);
+            background: var(--navy);
+            color: white;
+        }
+
+        /* Textarea */
+        .textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 15px;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .textarea:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 4px rgba(30, 58, 95, 0.1);
         }
 
         /* Buttons */
         .btn {
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             border: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            justify-content: center;
         }
 
         .btn-primary {
             background: var(--navy);
             color: white;
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             background: var(--navy-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(30, 58, 95, 0.4);
         }
 
         .btn-primary:disabled {
-            background: var(--border-dark);
+            background: #94a3b8;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .btn-secondary {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
+            background: white;
+            color: var(--navy);
+            border: 2px solid var(--navy);
         }
 
         .btn-secondary:hover {
-            background: var(--border);
+            background: var(--navy);
+            color: white;
         }
 
-        .btn-group {
+        .btn-full {
+            width: 100%;
+        }
+
+        /* Processing Animation */
+        .processing-container {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .processing-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 32px;
+        }
+
+        .judges-list {
+            max-width: 600px;
+            margin: 0 auto 32px;
+            text-align: left;
+        }
+
+        .judge-item {
             display: flex;
+            align-items: center;
             gap: 12px;
-            margin-top: 24px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            opacity: 0.3;
+            transition: all 0.3s ease;
         }
 
-        /* Progress */
-        .progress-container {
-            display: none;
-            margin-top: 24px;
+        .judge-item.active {
+            opacity: 1;
+            background: #f1f5f9;
+            transform: translateX(4px);
         }
 
-        .progress-container.active {
-            display: block;
+        .judge-item.complete {
+            opacity: 1;
+        }
+
+        .judge-icon {
+            font-size: 20px;
+        }
+
+        .judge-name {
+            flex: 1;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .judge-status {
+            font-size: 20px;
         }
 
         .progress-bar {
-            height: 8px;
-            background: var(--bg-tertiary);
-            border-radius: 4px;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 6px;
             overflow: hidden;
+            margin-bottom: 8px;
         }
 
         .progress-fill {
@@ -363,82 +388,280 @@
             background: linear-gradient(90deg, var(--navy) 0%, var(--navy-light) 100%);
             width: 0%;
             transition: width 0.3s ease;
-            animation: progress-pulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes progress-pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
         }
 
         .progress-text {
-            margin-top: 12px;
             font-size: 14px;
-            color: var(--text-secondary);
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* Victory Screen */
+        .victory-container {
             text-align: center;
+            padding: 60px 20px;
+        }
+
+        .victory-icon {
+            font-size: 80px;
+            margin-bottom: 24px;
+            animation: bounce 1s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .victory-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 16px;
+        }
+
+        .victory-subtitle {
+            font-size: 18px;
+            color: var(--text-light);
+            margin-bottom: 40px;
+        }
+
+        .victory-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto 40px;
+        }
+
+        .victory-metric {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .victory-metric-value {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--navy);
+            margin-bottom: 8px;
+        }
+
+        .victory-metric-label {
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 600;
         }
 
         /* Results Dashboard */
-        .results-section {
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .dashboard-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--navy);
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .metric-large {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .risk-gauge {
+            width: 120px;
+            height: 120px;
+            position: relative;
+        }
+
+        .metric-info h3 {
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--navy);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .metric-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--navy);
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-p0 {
+            background: #fee2e2;
+            color: var(--p0);
+        }
+
+        .badge-p1 {
+            background: #fff7ed;
+            color: var(--p1);
+        }
+
+        .badge-p2 {
+            background: #ecfdf5;
+            color: var(--p2);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            color: var(--navy);
+        }
+
+        .tab.active {
+            color: var(--navy);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--navy);
+        }
+
+        .tab-content {
             display: none;
         }
 
-        .results-section.active {
+        .tab-content.active {
             display: block;
+            animation: fadeIn 0.3s ease;
         }
 
-        /* Executive Summary */
-        .summary-grid {
+        /* Charts Container */
+        .charts-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
         }
 
-        .summary-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
+        .chart-card {
+            background: white;
             border-radius: 12px;
-            padding: 20px;
-            text-align: center;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
-        .summary-value {
-            font-size: 32px;
+        .chart-title {
+            font-size: 16px;
             font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 20px;
+        }
+
+        /* Fix Plan Table */
+        .fix-plan-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .fix-column {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .fix-column h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 20px;
+        }
+
+        .fix-item {
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--navy);
+        }
+
+        .fix-item-title {
+            font-weight: 600;
             color: var(--navy);
             margin-bottom: 4px;
         }
 
-        .summary-value.risk-low { color: var(--success); }
-        .summary-value.risk-medium { color: var(--warning); }
-        .summary-value.risk-high { color: var(--major); }
-        .summary-value.risk-critical { color: var(--critical); }
-
-        .summary-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        /* Risk Meter */
-        .risk-meter {
-            height: 12px;
-            background: linear-gradient(90deg, #059669 0%, #d97706 50%, #dc2626 100%);
-            border-radius: 6px;
-            position: relative;
-            margin: 16px 0;
-        }
-
-        .risk-indicator {
-            position: absolute;
-            top: -4px;
-            width: 20px;
-            height: 20px;
-            background: white;
-            border: 3px solid var(--navy);
-            border-radius: 50%;
-            transform: translateX(-50%);
-            transition: left 0.5s ease;
+        .fix-item-desc {
+            font-size: 14px;
+            color: var(--text-light);
         }
 
         /* Violation Cards */
@@ -449,112 +672,132 @@
         }
 
         .violation-card {
+            background: white;
             border-radius: 12px;
-            padding: 20px;
-            border-left: 4px solid;
+            border: 2px solid var(--border);
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
 
-        .violation-card.critical {
-            background: var(--critical-bg);
-            border-color: var(--critical);
-        }
-
-        .violation-card.major {
-            background: var(--major-bg);
-            border-color: var(--major);
-        }
-
-        .violation-card.minor {
-            background: var(--minor-bg);
-            border-color: var(--minor);
+        .violation-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .violation-header {
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 12px;
+            cursor: pointer;
+            background: #f8fafc;
         }
 
-        .violation-title {
-            font-weight: 600;
-            font-size: 16px;
+        .violation-header:hover {
+            background: #f1f5f9;
         }
 
-        .violation-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
+        .violation-title-section {
+            flex: 1;
+        }
+
+        .violation-framework {
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
+            color: var(--navy);
             text-transform: uppercase;
-        }
-
-        .violation-badge.critical {
-            background: var(--critical);
-            color: white;
-        }
-
-        .violation-badge.major {
-            background: var(--major);
-            color: white;
-        }
-
-        .violation-badge.minor {
-            background: var(--minor);
-            color: white;
-        }
-
-        .violation-meta {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-        }
-
-        .violation-evidence {
-            background: rgba(0, 0, 0, 0.05);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 12px;
-            font-style: italic;
-        }
-
-        .violation-remediation {
-            margin-top: 12px;
-        }
-
-        .violation-remediation h4 {
-            font-size: 14px;
-            font-weight: 600;
+            letter-spacing: 0.5px;
             margin-bottom: 8px;
         }
 
-        .violation-remediation ul {
-            padding-left: 20px;
-            font-size: 14px;
+        .violation-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
         }
 
-        .violation-remediation li {
-            margin-bottom: 4px;
-        }
-
-        /* Export Buttons */
-        .export-group {
+        .violation-meta {
             display: flex;
             gap: 12px;
-            justify-content: flex-end;
+            align-items: center;
         }
 
-        /* No Violations */
-        .no-violations {
-            text-align: center;
-            padding: 48px;
-            color: var(--text-secondary);
+        .violation-body {
+            padding: 20px;
+            display: none;
         }
 
-        .no-violations-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
+        .violation-card.expanded .violation-body {
+            display: block;
+        }
+
+        .violation-section {
+            margin-bottom: 20px;
+        }
+
+        .violation-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .violation-section h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .evidence-box {
+            background: #f1f5f9;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid var(--navy);
+            font-style: italic;
+            color: var(--text);
+        }
+
+        .remediation-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .remediation-list li {
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            padding-left: 40px;
+            position: relative;
+        }
+
+        .remediation-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 12px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .risk-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .risk-list li {
+            padding: 12px;
+            background: #fef2f2;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            padding-left: 40px;
+            position: relative;
+            color: var(--error);
+        }
+
+        .risk-list li::before {
+            content: '⚠';
+            position: absolute;
+            left: 12px;
         }
 
         /* Responsive */
@@ -562,173 +805,217 @@
             .frameworks-grid {
                 grid-template-columns: 1fr;
             }
-            .summary-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .fix-plan-grid {
+                grid-template-columns: 1fr;
+            }
+            .victory-metrics {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">
-                <div class="logo-icon">⚖️</div>
-                <div>
-                    <h1>Sovereign</h1>
-                    <span>AI Compliance Intelligence</span>
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-content">
+            <div class="logo">SOVEREIGN</div>
+            <div class="tagline">Pre-deployment AI compliance scanning. Identify violations before $2M+ fines.</div>
+            <div class="fines-ticker">
+                <div class="ticker-content" id="ticker-content">
+                    🚨 Recent fine: GDPR Meta €225M penalty
                 </div>
-            </div>
-            <div class="header-status">
-                <span class="status-dot"></span>
-                <span>System Operational</span>
             </div>
         </div>
-    </header>
+    </div>
 
-    <!-- Main Content -->
-    <main class="container">
-        <!-- Input Section -->
-        <section id="input-section">
-            <!-- File Upload Card -->
+    <div class="container">
+        <!-- Scan Section -->
+        <section id="scan-section" class="section active">
             <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Upload System Documentation</h2>
-                </div>
-                <div class="upload-zone" id="upload-zone">
-                    <div class="upload-icon">📄</div>
-                    <div class="upload-text">Drag and drop your file here, or click to browse</div>
-                    <div class="upload-hint">Supports PDF, TXT, DOCX (Max 10MB)</div>
-                    <input type="file" class="file-input" id="file-input" accept=".pdf,.txt,.docx,.doc">
-                </div>
-                <div class="file-preview" id="file-preview">
-                    <div class="file-info">
-                        <span class="file-icon">📄</span>
-                        <div>
-                            <div class="file-name" id="file-name"></div>
-                            <div class="file-size" id="file-size"></div>
-                        </div>
-                    </div>
-                    <button class="remove-file" id="remove-file">✕</button>
-                </div>
-                <div style="text-align: center; margin: 16px 0; color: var(--text-secondary);">— or —</div>
-                <textarea class="text-input" id="text-input" placeholder="Paste your AI system description here...&#10;&#10;Example: Our recommendation engine uses machine learning to suggest products based on user browsing history and purchase patterns. The system automatically profiles users and makes personalized pricing decisions."></textarea>
-            </div>
-
-            <!-- Framework Selection Card -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Select Regulatory Frameworks</h2>
-                </div>
+                <h2 class="card-title">Select Regulatory Frameworks</h2>
                 <div class="frameworks-grid">
                     <div class="framework-card selected" data-framework="gdpr">
                         <div class="framework-checkbox">✓</div>
                         <div class="framework-icon">🇪🇺</div>
                         <div class="framework-name">GDPR</div>
-                        <div class="framework-desc">General Data Protection Regulation - EU data privacy and protection</div>
+                        <div class="framework-desc">EU data privacy and protection regulation</div>
                     </div>
                     <div class="framework-card" data-framework="sox">
                         <div class="framework-checkbox"></div>
                         <div class="framework-icon">💼</div>
                         <div class="framework-name">SOX</div>
-                        <div class="framework-desc">Sarbanes-Oxley Act - Financial reporting and internal controls</div>
+                        <div class="framework-desc">Financial reporting and internal controls</div>
                     </div>
                     <div class="framework-card" data-framework="euai">
                         <div class="framework-checkbox"></div>
                         <div class="framework-icon">🤖</div>
                         <div class="framework-name">EU AI Act</div>
-                        <div class="framework-desc">EU Artificial Intelligence Act - AI system risk classification</div>
+                        <div class="framework-desc">AI system risk classification and requirements</div>
                     </div>
                 </div>
 
-                <!-- Quick Test Scenarios -->
-                <div class="card-header" style="margin-top: 24px;">
-                    <h3 class="card-title" style="font-size: 16px;">Quick Test Scenarios</h3>
-                </div>
-                <div class="btn-group" style="margin-top: 12px; margin-bottom: 16px;">
-                    <button class="btn btn-secondary" id="test-gdpr-btn">
-                        <span>🇪🇺</span> Test GDPR Violation
-                    </button>
-                    <button class="btn btn-secondary" id="test-sox-btn">
-                        <span>💼</span> Test SOX Violation
-                    </button>
-                    <button class="btn btn-secondary" id="test-euai-btn">
-                        <span>🤖</span> Test EU AI Act Violation
-                    </button>
+                <div class="demo-section">
+                    <div class="demo-title">Quick Test Scenarios</div>
+                    <div class="demo-buttons">
+                        <button class="demo-btn" id="test-gdpr">
+                            <span>🇪🇺</span> GDPR: Hiring AI
+                        </button>
+                        <button class="demo-btn" id="test-sox">
+                            <span>💼</span> SOX: Financial AI
+                        </button>
+                        <button class="demo-btn" id="test-euai">
+                            <span>🤖</span> EU AI: Biometric
+                        </button>
+                    </div>
                 </div>
 
-                <div class="btn-group">
-                    <button class="btn btn-primary" id="analyze-btn" disabled>
-                        <span>🔍</span> Analyze Compliance
+                <textarea class="textarea" id="system-description" placeholder="Describe your AI system here...
+
+Example: Our recommendation engine uses machine learning to personalize product suggestions based on user behavior. The system automatically profiles users and makes pricing decisions without human oversight."></textarea>
+
+                <div style="margin-top: 24px;">
+                    <button class="btn btn-primary btn-full" id="run-assessment" disabled>
+                        <span>🔍</span> Run Assessment
                     </button>
                 </div>
-                <div class="progress-container" id="progress-container">
+            </div>
+        </section>
+
+        <!-- Processing Section -->
+        <section id="processing-section" class="section">
+            <div class="card">
+                <div class="processing-container">
+                    <div class="processing-title">Analyzing Your System...</div>
+                    <div class="judges-list" id="judges-list"></div>
                     <div class="progress-bar">
                         <div class="progress-fill" id="progress-fill"></div>
                     </div>
-                    <div class="progress-text" id="progress-text">Initializing analysis...</div>
+                    <div class="progress-text" id="progress-text">0% Complete</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Victory Section -->
+        <section id="victory-section" class="section">
+            <div class="card">
+                <div class="victory-container">
+                    <div class="victory-icon">🎉</div>
+                    <h1 class="victory-title">Assessment Complete!</h1>
+                    <p class="victory-subtitle">Your compliance report is ready</p>
+
+                    <div class="victory-metrics">
+                        <div class="victory-metric">
+                            <div class="victory-metric-value" id="victory-violations">0</div>
+                            <div class="victory-metric-label">Violations Found</div>
+                        </div>
+                        <div class="victory-metric">
+                            <div class="victory-metric-value" id="victory-frameworks">0</div>
+                            <div class="victory-metric-label">Frameworks Analyzed</div>
+                        </div>
+                        <div class="victory-metric">
+                            <div class="victory-metric-value" id="victory-risk">0</div>
+                            <div class="victory-metric-label">Risk Score</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="view-results-btn" style="padding: 20px 48px; font-size: 18px;">
+                        <span>📊</span> View Detailed Results
+                    </button>
                 </div>
             </div>
         </section>
 
         <!-- Results Section -->
-        <section id="results-section" class="results-section">
-            <!-- Executive Summary -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Executive Summary</h2>
-                    <div class="export-group">
-                        <button class="btn btn-secondary" id="export-pdf">
-                            <span>📄</span> Export PDF
-                        </button>
-                        <button class="btn btn-secondary" id="export-csv">
-                            <span>📊</span> Export CSV
-                        </button>
-                    </div>
-                </div>
-                <div class="summary-grid">
-                    <div class="summary-card">
-                        <div class="summary-value" id="risk-score">0</div>
-                        <div class="summary-label">Risk Score</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="summary-value" id="violation-count">0</div>
-                        <div class="summary-label">Violations Found</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="summary-value" id="critical-count">0</div>
-                        <div class="summary-label">Critical Issues</div>
-                    </div>
-                    <div class="summary-card">
-                        <div class="summary-value" id="frameworks-count">0</div>
-                        <div class="summary-label">Frameworks Analyzed</div>
-                    </div>
-                </div>
-                <div class="risk-meter">
-                    <div class="risk-indicator" id="risk-indicator" style="left: 0%"></div>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary);">
-                    <span>Low Risk</span>
-                    <span>Medium Risk</span>
-                    <span>High Risk</span>
-                    <span>Critical Risk</span>
+        <section id="results-section" class="section">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Compliance Report</h1>
+                <div class="export-buttons">
+                    <button class="btn btn-secondary" id="export-pdf">
+                        <span>📄</span> PDF
+                    </button>
+                    <button class="btn btn-secondary" id="export-csv">
+                        <span>📊</span> CSV
+                    </button>
+                    <button class="btn btn-secondary" id="new-scan">
+                        <span>+</span> New Scan
+                    </button>
                 </div>
             </div>
 
-            <!-- Violations List -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Compliance Violations</h2>
-                    <button class="btn btn-secondary" id="new-analysis-btn">
-                        <span>+</span> New Analysis
-                    </button>
+            <!-- Metrics Grid -->
+            <div class="metrics-grid">
+                <div class="metric-card metric-large">
+                    <canvas id="risk-gauge" class="risk-gauge"></canvas>
+                    <div class="metric-info">
+                        <h3>Risk Score</h3>
+                        <div class="metric-value" id="dashboard-risk">0</div>
+                    </div>
                 </div>
-                <div class="violations-list" id="violations-list">
-                    <!-- Violations will be rendered here -->
+                <div class="metric-card">
+                    <div class="metric-label">Total Violations</div>
+                    <div class="metric-number" id="dashboard-total">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">P0 Critical</div>
+                    <div class="metric-number" id="dashboard-p0" style="color: var(--p0);">0</div>
+                    <div class="priority-badge badge-p0">Immediate</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">P1 High</div>
+                    <div class="metric-number" id="dashboard-p1" style="color: var(--p1);">0</div>
+                    <div class="priority-badge badge-p1">Short-term</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="card">
+                <div class="tabs">
+                    <button class="tab active" data-tab="overview">Overview</button>
+                    <button class="tab" data-tab="fixplan">Fix Plan</button>
+                    <button class="tab" data-tab="citations">Citations</button>
+                </div>
+
+                <!-- Overview Tab -->
+                <div class="tab-content active" id="tab-overview">
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h3 class="chart-title">Violations by Severity</h3>
+                            <canvas id="severity-chart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3 class="chart-title">Violations by Framework</h3>
+                            <canvas id="framework-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fix Plan Tab -->
+                <div class="tab-content" id="tab-fixplan">
+                    <div class="fix-plan-grid">
+                        <div class="fix-column">
+                            <h3>💻 Technical Changes</h3>
+                            <div id="technical-changes"></div>
+                        </div>
+                        <div class="fix-column">
+                            <h3>📋 Business Process Changes</h3>
+                            <div id="business-changes"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Citations Tab -->
+                <div class="tab-content" id="tab-citations">
+                    <div class="violations-list" id="violations-list"></div>
                 </div>
             </div>
         </section>
-    </main>
+    </div>
 
     <script src="demo_scenarios.js"></script>
     <script src="app.js"></script>

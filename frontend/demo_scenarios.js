@@ -100,13 +100,13 @@ function loadDemoScenario(scenarioId) {
         return;
     }
 
-    // Load description into textarea
-    const textInput = document.getElementById('text-input');
-    if (textInput) {
-        textInput.value = scenario.description;
+    // Load description into textarea (updated ID for new HTML)
+    const textarea = document.getElementById('system-description');
+    if (textarea) {
+        textarea.value = scenario.description;
 
         // Trigger input event to enable analyze button
-        textInput.dispatchEvent(new Event('input', { bubbles: true }));
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
     // Select the appropriate framework
@@ -125,68 +125,20 @@ function loadDemoScenario(scenarioId) {
     });
 
     // Scroll to text area
-    textInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-    // Show a brief notification
-    showNotification(`Loaded: ${scenario.title}`);
-}
-
-function showNotification(message) {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.textContent = message;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #1e3a5f;
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
-        animation: slideIn 0.3s ease;
-    `;
-
-    document.body.appendChild(notification);
-
-    // Remove after 3 seconds
-    setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    }, 3000);
-}
-
-// Add CSS animations
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
+    if (textarea) {
+        textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(400px);
-            opacity: 0;
-        }
+    // Show toast notification (use new function from app.js)
+    if (typeof showToast === 'function') {
+        showToast(`✓ Loaded: ${scenario.title}`);
     }
-`;
-document.head.appendChild(style);
+}
 
-// Export for use in app.js
+// Export for use globally
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { DEMO_SCENARIOS, loadDemoScenario };
 }
+
+// Make function globally available
+window.loadDemoScenario = loadDemoScenario;

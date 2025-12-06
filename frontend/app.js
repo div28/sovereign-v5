@@ -3,7 +3,10 @@
  * Built for CPO-level judges from OpenAI/Google/Shopify
  */
 
-const API_BASE = 'https://sovereign-v5.onrender.com';
+// Toggle between local and production
+const API_BASE = window.location.hostname === 'localhost'
+    ? 'http://localhost:8000'
+    : 'https://sovereign-v5.onrender.com';
 
 // ============================================================================
 // STATE MANAGEMENT

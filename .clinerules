@@ -1,1 +1,27 @@
-404: Not Found
+# SOVEREIGN V4 - FRESH START
+
+**NO OLD CODE - Building from scratch**
+
+## Project: AI Compliance Intelligence Platform
+- Frameworks: GDPR, SOX, EU AI Act
+- Demo: Jan 11, 2026
+- Judges: CPO-level from OpenAI, Google, Shopify, Atlassian
+
+## Tech Stack
+- Backend: FastAPI/Render, PostgreSQL
+- Frontend: HTML/Tailwind/Netlify
+- Pinecone: sovereign-gdpr-regulation, sovereign-sox-regulation, sovereign-euai-regulation
+- LLMs: Haiku (GDPR/SOX), Sonnet 4.5 (EU AI Act)
+
+## Design: Professional GRC (NOT AI purple)
+- Navy #1e3a5f, white backgrounds
+- Reference: Vanta, OneTrust, Stripe
+
+## Architecture
+- 9 judges, Advanced RAG, Multi-model routing
+- Target: 95.8% TPR, 60-70% cost savings
+
+## Rules
+- Ask before implementing
+- Production quality only
+- Never reference old code

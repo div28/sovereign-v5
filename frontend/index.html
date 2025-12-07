@@ -1117,6 +1117,9 @@
             const modal = document.getElementById('scanModal');
             modal.classList.add('active');
 
+            // Clear insights feed
+            document.getElementById('insightsFeed').innerHTML = '';
+
             // Reset agents
             const agents = ['parser', 'rag', 'orchestrator'];
             agents.forEach(agent => {
@@ -1142,6 +1145,15 @@
                 // Animate RAG
                 await animateAgent('rag', 'Searching regulations...', 2000);
                 document.getElementById('rag-action').textContent = 'Found 12 relevant articles';
+
+                // Add found articles insight
+                const insightsFeed = document.getElementById('insightsFeed');
+                const foundInsight = document.createElement('div');
+                foundInsight.className = 'insight-item';
+                foundInsight.textContent = 'Found 12 relevant articles';
+                insightsFeed.appendChild(foundInsight);
+                insightsFeed.scrollTop = insightsFeed.scrollHeight;
+
                 await new Promise(r => setTimeout(r, 500));
                 
                 // Call API
@@ -1178,15 +1190,23 @@
             const card = document.getElementById(`agent-${agent}`);
             const actionEl = document.getElementById(`${agent}-action`);
             const timeEl = document.getElementById(`${agent}-time`);
-            
+
             // Set active
             card.setAttribute('data-status', 'active');
             actionEl.textContent = actionText;
-            
+
+            // Add to live insights feed
+            const insightsFeed = document.getElementById('insightsFeed');
+            const insight = document.createElement('div');
+            insight.className = 'insight-item';
+            insight.textContent = actionText;
+            insightsFeed.appendChild(insight);
+            insightsFeed.scrollTop = insightsFeed.scrollHeight;
+
             // Simulate work
             const start = Date.now();
             await new Promise(r => setTimeout(r, duration));
-            
+
             // Set complete
             card.setAttribute('data-status', 'complete');
             actionEl.textContent = 'Complete';

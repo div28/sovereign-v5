@@ -67,6 +67,7 @@ class AnalyzeResponse(BaseModel):
     risk_score: int
     frameworks_analyzed: List[str]
     chunks_retrieved: int
+    analysis_id: str
 
 
 # Lazy initialization of components

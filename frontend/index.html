@@ -757,10 +757,10 @@
             transition: width 0.3s;
         }
 
-        /* Results - Compact Design */
+        /* Results - Redesigned Compact */
         .results-section {
             display: none;
-            padding: 20px;
+            padding: 16px;
             min-height: 100vh;
         }
 
@@ -774,332 +774,122 @@
         }
 
         /* Compact Header */
-        .results-header-compact {
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
-        .results-title {
-            font-size: 1.6rem;
+        .header h1 {
+            font-size: 1.5rem;
             font-weight: 700;
         }
 
-        .results-meta {
+        .meta {
             color: rgba(255,255,255,0.5);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             margin-top: 4px;
         }
 
-        .export-btns-compact {
+        .export-btns {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
 
-        .btn-compact {
-            padding: 8px 18px;
-            border-radius: 8px;
+        .btn {
+            padding: 6px 14px;
+            border-radius: 6px;
             border: none;
             font-weight: 600;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
-        .btn-pdf-compact {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+        .btn-pdf {
+            background: #ef4444;
             color: white;
         }
 
-        .btn-csv-compact {
-            background: linear-gradient(135deg, #10b981, #059669);
+        .btn-csv {
+            background: #10b981;
             color: white;
         }
 
-        /* Compact Metrics - 50% smaller */
-        .metrics-compact {
+        /* Compact Summary Bar */
+        .summary-bar {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
-        .metric-compact {
+        .summary-item {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 14px;
-            position: relative;
+            border-radius: 8px;
+            padding: 12px;
         }
 
-        .metric-compact::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #60a5fa, #a78bfa);
-        }
-
-        .metric-label-compact {
+        .summary-label {
             font-size: 0.7rem;
-            color: rgba(255,255,255,0.6);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 8px;
-        }
-
-        .metric-value-compact {
-            font-size: 1.8rem;
-            font-weight: 800;
-            line-height: 1;
-        }
-
-        .metric-value-compact.green { color: #10b981; }
-        .metric-value-compact.yellow { color: #f59e0b; }
-        .metric-value-compact.red { color: #ef4444; }
-
-        .metric-sub-compact {
-            font-size: 0.75rem;
             color: rgba(255,255,255,0.5);
-            margin-top: 6px;
-        }
-
-        /* Compact Section Titles */
-        .section-title-compact {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 14px;
-        }
-
-        /* Compact Frameworks */
-        .frameworks-compact {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 14px;
-            margin-bottom: 20px;
-        }
-
-        .framework-compact {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 14px;
-        }
-
-        .framework-header-compact {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .framework-icon-compact {
-            font-size: 1.3rem;
-        }
-
-        .framework-name-compact {
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .framework-stats-compact {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .stat-compact {
-            text-align: center;
-            padding: 8px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 6px;
-        }
-
-        .stat-num-compact {
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-
-        .stat-label-compact {
-            font-size: 0.65rem;
-            color: rgba(255,255,255,0.6);
-            text-transform: uppercase;
-            margin-top: 2px;
-        }
-
-        .progress-compact {
-            margin-top: 10px;
-        }
-
-        .progress-label-compact {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
             margin-bottom: 6px;
-            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
         }
 
-        .progress-bar-compact {
-            height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 3px;
-            overflow: hidden;
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 800;
         }
 
-        .progress-fill-compact {
-            height: 100%;
-            border-radius: 3px;
-            transition: width 1s ease;
+        .summary-value.green { color: #10b981; }
+        .summary-value.red { color: #ef4444; }
+
+        .summary-sub {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 4px;
         }
 
-        .progress-fill-compact.green { background: linear-gradient(90deg, #10b981, #059669); }
-        .progress-fill-compact.yellow { background: linear-gradient(90deg, #f59e0b, #d97706); }
-        .progress-fill-compact.red { background: linear-gradient(90deg, #ef4444, #dc2626); }
-
-        /* Compact Compliance Areas */
-        .compliance-compact {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            margin-bottom: 20px;
+        /* Violations Overview */
+        .violations-overview {
+            margin-bottom: 16px;
         }
 
-        .compliance-card-compact {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 14px;
-        }
-
-        .compliance-title-compact {
-            font-size: 1rem;
-            font-weight: 600;
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
             margin-bottom: 12px;
         }
 
-        .compliance-list-compact {
-            display: flex;
-            flex-direction: column;
+        .violation-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 10px;
         }
 
-        .compliance-row-compact {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .compliance-icon-compact {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            flex-shrink: 0;
-        }
-
-        .compliance-icon-compact.pass {
-            background: rgba(16,185,129,0.1);
-            border: 2px solid rgba(16,185,129,0.3);
-        }
-
-        .compliance-icon-compact.fail {
-            background: rgba(239,68,68,0.1);
-            border: 2px solid rgba(239,68,68,0.3);
-        }
-
-        .compliance-info-compact {
-            flex: 1;
-        }
-
-        .compliance-count-compact {
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-
-        .compliance-desc-compact {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.6);
-        }
-
-        /* Compact Violations */
-        .violations-header-compact {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-        }
-
-        .filters-compact {
-            display: flex;
-            gap: 6px;
-            background: rgba(255,255,255,0.05);
-            padding: 4px;
-            border-radius: 8px;
-        }
-
-        .filter-compact {
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: none;
-            background: transparent;
-            color: rgba(255,255,255,0.6);
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .filter-compact.active {
-            background: rgba(96,165,250,0.2);
-            color: #60a5fa;
-        }
-
-        .violations-list-compact {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .violation-compact {
+        .violation-card {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.1);
+            border-left: 3px solid #ef4444;
             border-radius: 8px;
-            padding: 14px;
-            position: relative;
+            padding: 12px;
         }
 
-        .violation-compact::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            border-radius: 8px 0 0 8px;
-        }
-
-        .violation-compact.critical::before { background: #ef4444; }
-        .violation-compact.major::before { background: #f59e0b; }
-        .violation-compact.minor::before { background: #eab308; }
-
-        .violation-header-compact {
+        .violation-header {
             display: flex;
             justify-content: space-between;
             margin-bottom: 8px;
         }
 
-        .badges-compact {
+        .badges {
             display: flex;
             gap: 6px;
         }
 
-        .badge-compact {
-            padding: 3px 8px;
+        .badge {
+            padding: 2px 8px;
             border-radius: 4px;
             font-size: 0.65rem;
             font-weight: 600;
@@ -1109,95 +899,149 @@
         .badge-critical {
             background: rgba(239,68,68,0.2);
             color: #ef4444;
-            border: 1px solid rgba(239,68,68,0.3);
-        }
-
-        .badge-major {
-            background: rgba(245,158,11,0.2);
-            color: #f59e0b;
-            border: 1px solid rgba(245,158,11,0.3);
-        }
-
-        .badge-minor {
-            background: rgba(234,179,8,0.2);
-            color: #eab308;
-            border: 1px solid rgba(234,179,8,0.3);
         }
 
         .badge-framework {
             background: rgba(96,165,250,0.2);
             color: #60a5fa;
-            border: 1px solid rgba(96,165,250,0.3);
         }
 
-        .violation-title-compact {
-            font-size: 0.95rem;
+        .violation-title {
+            font-size: 0.9rem;
             font-weight: 600;
             margin-bottom: 6px;
         }
 
-        .violation-desc-compact {
+        .violation-desc {
+            font-size: 0.8rem;
             color: rgba(255,255,255,0.7);
-            font-size: 0.85rem;
             line-height: 1.4;
         }
 
+        /* Tabs */
         .tabs {
             display: flex;
-            gap: 2rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 2rem;
-            max-width: 1400px;
-            margin-left: auto;
-            margin-right: auto;
+            gap: 8px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
         }
 
         .tab {
-            background: none;
+            padding: 10px 20px;
+            background: transparent;
             border: none;
             color: rgba(255,255,255,0.6);
-            padding: 1rem 0;
-            font-size: 1rem;
-            font-weight: 600;
             cursor: pointer;
-            position: relative;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
         }
 
         .tab.active {
             color: #60a5fa;
-        }
-
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #60a5fa;
+            border-bottom-color: #60a5fa;
         }
 
         .tab-content {
             display: none;
-            max-width: 1400px;
-            margin: 0 auto;
         }
 
         .tab-content.active {
             display: block;
         }
 
-        .charts-grid {
+        /* Fix Plan Layout */
+        .fix-plan-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 2rem;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
 
-        .chart-card {
+        .plan-column {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 2rem;
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .plan-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .plan-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .plan-item {
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 3px solid #60a5fa;
+        }
+
+        .plan-item-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .plan-item-desc {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .plan-priority {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .priority-p0 {
+            background: rgba(239,68,68,0.2);
+            color: #ef4444;
+        }
+
+        .priority-p1 {
+            background: rgba(245,158,11,0.2);
+            color: #f59e0b;
+        }
+
+        /* Citations */
+        .citations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .citation-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .citation-ref {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #60a5fa;
+            margin-bottom: 6px;
+        }
+
+        .citation-text {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.7);
+            font-style: italic;
         }
 
         /* Professional GRC Design System */
@@ -1655,35 +1499,80 @@
     <!-- Results Section -->
     <section class="results-section" id="resultsSection">
         <div class="container">
-            <!-- Compact Header -->
-            <div class="results-header-compact">
+            <div class="header">
                 <div>
-                    <h1 class="results-title">Assessment Results</h1>
-                    <div class="results-meta" id="metaInfo"></div>
+                    <h1>Assessment Results</h1>
+                    <div class="meta" id="metaInfo">Loading...</div>
                 </div>
-                <div class="export-btns-compact">
-                    <button class="btn-compact btn-pdf-compact" onclick="downloadPDF()">📄 PDF</button>
-                    <button class="btn-compact btn-csv-compact" onclick="exportToCSV()">📊 CSV</button>
+                <div class="export-btns">
+                    <button class="btn btn-pdf" onclick="downloadPDF()">📄 PDF</button>
+                    <button class="btn btn-csv" onclick="downloadCSV()">📊 CSV</button>
                 </div>
             </div>
 
-            <!-- Compact Metrics -->
-            <div class="metrics-compact" id="metricsGrid"></div>
-
-            <!-- Frameworks -->
-            <div class="section-title-compact">Framework Status</div>
-            <div class="frameworks-compact" id="frameworksGrid"></div>
-
-            <!-- Compliance Areas -->
-            <div class="section-title-compact">Compliance Status</div>
-            <div class="compliance-compact" id="complianceAreas"></div>
-
-            <!-- Violations -->
-            <div class="violations-header-compact">
-                <div class="section-title-compact">Detected Violations</div>
-                <div class="filters-compact" id="filters"></div>
+            <!-- Compact Summary -->
+            <div class="summary-bar">
+                <div class="summary-item">
+                    <div class="summary-label">Risk Score</div>
+                    <div class="summary-value red" id="riskScore">-</div>
+                    <div class="summary-sub" id="riskLevel">-</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Total Violations</div>
+                    <div class="summary-value red" id="totalViolations">-</div>
+                    <div class="summary-sub" id="violationBreakdown">-</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Frameworks Analyzed</div>
+                    <div class="summary-value" id="frameworkCount">-</div>
+                    <div class="summary-sub" id="frameworkList">-</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Audit Readiness</div>
+                    <div class="summary-value red" id="auditStatus">🔴 Not Ready</div>
+                    <div class="summary-sub" id="auditEta">-</div>
+                </div>
             </div>
-            <div class="violations-list-compact" id="violationsList"></div>
+
+            <!-- Violations Overview -->
+            <div class="violations-overview">
+                <div class="section-title">Violations Overview</div>
+                <div class="violation-cards" id="violationCards"></div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('technical')">Technical Fix Plan</button>
+                <button class="tab" onclick="switchTab('business')">Business Plan</button>
+                <button class="tab" onclick="switchTab('citations')">Citations</button>
+            </div>
+
+            <!-- Tab 1: Technical Fix Plan -->
+            <div class="tab-content active" id="technical">
+                <div class="fix-plan-grid">
+                    <div class="plan-column">
+                        <div class="plan-title">🔧 Code & API Changes</div>
+                        <div class="plan-list" id="technicalList"></div>
+                    </div>
+                    <div class="plan-column">
+                        <div class="plan-title">🏗️ Architecture Updates</div>
+                        <div class="plan-list" id="architectureList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Business Plan -->
+            <div class="tab-content" id="business">
+                <div class="plan-column">
+                    <div class="plan-title">📋 Process & Policy Changes</div>
+                    <div class="plan-list" id="businessList"></div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Citations -->
+            <div class="tab-content" id="citations">
+                <div class="citations-list" id="citationsList"></div>
+            </div>
         </div>
     </section>
 
@@ -1886,14 +1775,13 @@
             document.getElementById('assessmentSection').classList.remove('active');
             document.getElementById('resultsSection').classList.add('active');
 
-            // Store assessment globally for exports
+            // Store assessment globally for exports and localStorage
             window.currentAssessment = result;
+            window.assessmentResult = result;
+            localStorage.setItem('currentAssessment', JSON.stringify(result));
 
-            // Render compact design
-            renderMetricsCompact(result);
-            renderFrameworksCompact(result);
-            renderComplianceAreasCompact(result);
-            renderViolationsCompact(result);
+            // Render new compact design
+            renderResults(result);
             return; // Skip old rendering below
 
             // Update risk score display with circular gauge
@@ -2099,276 +1987,132 @@
             `;
         }
 
-        // Compact rendering functions
-        function renderMetricsCompact(data) {
-            const total = data.violations?.length || 0;
-            const critical = data.violations?.filter(v => v.severity === 'CRITICAL').length || 0;
-            const major = data.violations?.filter(v => v.severity === 'MAJOR').length || 0;
-            const minor = total - critical - major;
-
-            const risk = data.risk_score || 0;
-            const readiness = Math.max(0, 100 - risk);
-            const auditReady = risk < 30;
-
+        // New redesigned rendering function
+        function renderResults(data) {
+            // Meta
             document.getElementById('metaInfo').textContent =
-                `ID: ${data.analysis_id || 'N/A'} • Frameworks: ${data.frameworks_analyzed?.map(f => f.toUpperCase()).join(', ') || 'N/A'}`;
+                `ID: ${data.analysis_id || 'N/A'} • ${data.frameworks_analyzed?.join(', ').toUpperCase() || 'N/A'}`;
 
-            document.getElementById('metricsGrid').innerHTML = `
-                <div class="metric-compact">
-                    <div class="metric-label-compact">
-                        <span class="tooltip" title="% of required controls implemented">Readiness</span>
-                    </div>
-                    <div class="metric-value-compact ${readiness >= 70 ? 'green' : readiness >= 40 ? 'yellow' : 'red'}">${readiness}%</div>
-                    <div class="metric-sub-compact">${100 - readiness}% to ready</div>
-                </div>
-                <div class="metric-compact">
-                    <div class="metric-label-compact">
-                        <span class="tooltip" title="Risk score across frameworks">Health</span>
-                    </div>
-                    <div class="metric-value-compact ${risk < 30 ? 'green' : risk < 60 ? 'yellow' : 'red'}">${risk}/100</div>
-                    <div class="metric-sub-compact">${risk < 30 ? 'Low' : risk < 60 ? 'Medium' : 'High'} Risk</div>
-                </div>
-                <div class="metric-compact">
-                    <div class="metric-label-compact">Violations</div>
-                    <div class="metric-value-compact red">${total}</div>
-                    <div class="metric-sub-compact">${critical}C, ${major}M, ${minor}m</div>
-                </div>
-                <div class="metric-compact">
-                    <div class="metric-label-compact">
-                        <span class="tooltip" title="Ready for external audit">Audit</span>
-                    </div>
-                    <div class="metric-value-compact ${auditReady ? 'green' : 'red'}">${auditReady ? '🟢' : '🔴'} ${auditReady ? 'Ready' : 'Not Ready'}</div>
-                    <div class="metric-sub-compact">${auditReady ? 'Can proceed' : '~3 mo'}</div>
-                </div>
-            `;
-        }
-
-        function renderFrameworksCompact(data) {
-            const icons = {gdpr:'🔒',sox:'📊',euai:'🤖',euaiact:'🤖',ccpa:'🛡️',hipaa:'🏥',eeoc:'⚖️'};
-            const names = {gdpr:'GDPR',sox:'SOX',euai:'EU AI Act',euaiact:'EU AI Act',ccpa:'CCPA',hipaa:'HIPAA',eeoc:'EEOC'};
-
-            const grid = document.getElementById('frameworksGrid');
-            const frameworks = data.frameworks_analyzed || [];
-
-            if (!frameworks.length) {
-                grid.innerHTML = '<p style="color:rgba(255,255,255,0.6);">No frameworks analyzed</p>';
-                return;
-            }
-
-            grid.innerHTML = '';
-            frameworks.forEach(fw => {
-                const key = fw.toLowerCase().replace(/\s+/g, '');
-                const violations = data.violations?.filter(v => v.framework?.toLowerCase() === fw.toLowerCase()) || [];
-                const count = violations.length;
-                const criticalCount = violations.filter(v => v.severity === 'CRITICAL').length;
-                const ready = count === 0 ? 100 : Math.max(0, Math.round(100 - (criticalCount * 40 + (count - criticalCount) * 10)));
-                const color = ready < 40 ? 'red' : ready < 70 ? 'yellow' : 'green';
-
-                const card = document.createElement('div');
-                card.className = 'framework-compact';
-                card.innerHTML = `
-                    <div class="framework-header-compact">
-                        <div class="framework-icon-compact">${icons[key] || '📋'}</div>
-                        <div class="framework-name-compact">${names[key] || fw.toUpperCase()}</div>
-                    </div>
-                    <div class="framework-stats-compact">
-                        <div class="stat-compact">
-                            <div class="stat-num-compact ${count ? 'red' : 'green'}">${count}</div>
-                            <div class="stat-label-compact">Violations</div>
-                        </div>
-                        <div class="stat-compact">
-                            <div class="stat-num-compact ${color}">${ready}%</div>
-                            <div class="stat-label-compact">Ready</div>
-                        </div>
-                    </div>
-                    <div class="progress-compact">
-                        <div class="progress-label-compact"><span>Readiness</span><span>${ready}%</span></div>
-                        <div class="progress-bar-compact">
-                            <div class="progress-fill-compact ${color}" style="width:${ready}%;"></div>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function renderComplianceAreasCompact(data) {
-            const total = data.violations?.length || 0;
-            const areas = (data.frameworks_analyzed?.length || 1) * 10;
-            const compliant = Math.max(0, areas - total);
-            const critical = data.violations?.filter(v => v.severity === 'CRITICAL').length || 0;
-            const major = data.violations?.filter(v => v.severity === 'MAJOR').length || 0;
-            const minor = total - critical - major;
-
-            document.getElementById('complianceAreas').innerHTML = `
-                <div class="compliance-card-compact">
-                    <div class="compliance-title-compact">Overall Status</div>
-                    <div class="compliance-list-compact">
-                        <div class="compliance-row-compact">
-                            <div class="compliance-icon-compact pass">✓</div>
-                            <div class="compliance-info-compact">
-                                <div class="compliance-count-compact green">${compliant}</div>
-                                <div class="compliance-desc-compact">Compliant Areas</div>
-                            </div>
-                        </div>
-                        <div class="compliance-row-compact">
-                            <div class="compliance-icon-compact fail">✗</div>
-                            <div class="compliance-info-compact">
-                                <div class="compliance-count-compact red">${total}</div>
-                                <div class="compliance-desc-compact">Non-Compliant Areas</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="compliance-card-compact">
-                    <div class="compliance-title-compact">Priority Items</div>
-                    <div class="compliance-list-compact">
-                        <div class="compliance-row-compact">
-                            <div class="compliance-icon-compact fail">🔴</div>
-                            <div class="compliance-info-compact">
-                                <div class="compliance-count-compact red">${critical}</div>
-                                <div class="compliance-desc-compact">P0 Critical (0-14d)</div>
-                            </div>
-                        </div>
-                        <div class="compliance-row-compact">
-                            <div class="compliance-icon-compact fail">🟠</div>
-                            <div class="compliance-info-compact">
-                                <div class="compliance-count-compact yellow">${major}</div>
-                                <div class="compliance-desc-compact">P1 Major (15-30d)</div>
-                            </div>
-                        </div>
-                        <div class="compliance-row-compact">
-                            <div class="compliance-icon-compact fail">🟡</div>
-                            <div class="compliance-info-compact">
-                                <div class="compliance-count-compact">${minor}</div>
-                                <div class="compliance-desc-compact">P2 Minor (30-90d)</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderViolationsCompact(data) {
+            // Summary
+            const risk = data.risk_score || 0;
             const violations = data.violations || [];
             const critical = violations.filter(v => v.severity === 'CRITICAL').length;
             const major = violations.filter(v => v.severity === 'MAJOR').length;
-            const minor = violations.filter(v => v.severity === 'MINOR').length;
+            const minor = violations.length - critical - major;
 
-            document.getElementById('filters').innerHTML = `
-                <button class="filter-compact active" onclick="filterViolationsCompact('all')">All (${violations.length})</button>
-                <button class="filter-compact" onclick="filterViolationsCompact('critical')">Critical (${critical})</button>
-                <button class="filter-compact" onclick="filterViolationsCompact('major')">Major (${major})</button>
-                <button class="filter-compact" onclick="filterViolationsCompact('minor')">Minor (${minor})</button>
-            `;
+            document.getElementById('riskScore').textContent = `${risk}/100`;
+            document.getElementById('riskLevel').textContent = risk < 30 ? 'Low Risk' : risk < 60 ? 'Medium Risk' : 'High Risk';
+            document.getElementById('totalViolations').textContent = violations.length;
+            document.getElementById('violationBreakdown').textContent =
+                `${critical} Critical, ${major} Major, ${minor} Minor`;
+            document.getElementById('frameworkCount').textContent = data.frameworks_analyzed?.length || 0;
+            document.getElementById('frameworkList').textContent = data.frameworks_analyzed?.join(', ').toUpperCase() || 'N/A';
+            document.getElementById('auditStatus').textContent = risk < 30 ? '🟢 Ready' : '🔴 Not Ready';
+            document.getElementById('auditEta').textContent = risk < 30 ? 'Can proceed' : '~3 months';
 
-            const list = document.getElementById('violationsList');
-            list.innerHTML = '';
-
-            violations.forEach(v => {
-                const sev = v.severity === 'CRITICAL' ? 'critical' : v.severity === 'MAJOR' ? 'major' : 'minor';
-                const label = v.severity || 'Unknown';
-
+            // Violations Overview (max 6 cards)
+            const cardsContainer = document.getElementById('violationCards');
+            cardsContainer.innerHTML = '';
+            violations.slice(0, 6).forEach(v => {
                 const card = document.createElement('div');
-                card.className = `violation-compact ${sev}`;
-                card.setAttribute('data-severity', sev);
+                card.className = 'violation-card';
+                const sevLabel = v.severity === 'CRITICAL' ? 'Critical' : v.severity === 'MAJOR' ? 'Major' : 'Minor';
                 card.innerHTML = `
-                    <div class="violation-header-compact">
-                        <div class="badges-compact">
-                            <span class="badge-compact badge-${sev}">${label}</span>
-                            <span class="badge-compact badge-framework">${v.framework?.toUpperCase() || 'N/A'}</span>
+                    <div class="violation-header">
+                        <div class="badges">
+                            <span class="badge badge-critical">${sevLabel}</span>
+                            <span class="badge badge-framework">${v.framework?.toUpperCase() || 'N/A'}</span>
                         </div>
                     </div>
-                    <div class="violation-title-compact">${v.article_violated || 'Violation'}</div>
-                    <div class="violation-desc-compact">${v.evidence_quote || 'No description'}</div>
+                    <div class="violation-title">${v.article_violated || 'Violation'}</div>
+                    <div class="violation-desc">${(v.evidence_quote || v.issue || '').substring(0, 120)}...</div>
                 `;
-                list.appendChild(card);
+                cardsContainer.appendChild(card);
             });
-        }
 
-        function filterViolationsCompact(severity) {
-            document.querySelectorAll('.filter-compact').forEach(f => f.classList.remove('active'));
-            event.target.classList.add('active');
-            document.querySelectorAll('.violation-compact').forEach(v => {
-                v.style.display = severity === 'all' || v.getAttribute('data-severity') === severity ? 'block' : 'none';
+            // Technical Plan
+            const techList = document.getElementById('technicalList');
+            const archList = document.getElementById('architectureList');
+            techList.innerHTML = '';
+            archList.innerHTML = '';
+            violations.forEach((v, i) => {
+                const article = v.article_violated || 'Fix Required';
+                if (i % 2 === 0) {
+                    techList.innerHTML += `
+                        <div class="plan-item">
+                            <div class="plan-item-title">${article}</div>
+                            <div class="plan-item-desc">Implement encryption, access controls, audit logging</div>
+                            <span class="plan-priority priority-p0">P0 - Immediate</span>
+                        </div>
+                    `;
+                } else {
+                    archList.innerHTML += `
+                        <div class="plan-item">
+                            <div class="plan-item-title">${article}</div>
+                            <div class="plan-item-desc">Database schema changes, API endpoint security</div>
+                            <span class="plan-priority priority-p1">P1 - 30 days</span>
+                        </div>
+                    `;
+                }
             });
-        }
 
-        function toggleSection(header) {
-            const content = header.nextElementSibling;
-            const arrow = header.querySelector('span');
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                arrow.textContent = '▶';
-            } else {
-                content.classList.add('expanded');
-                arrow.textContent = '▼';
-            }
-        }
+            // Business Plan
+            const bizList = document.getElementById('businessList');
+            bizList.innerHTML = '';
+            violations.forEach(v => {
+                bizList.innerHTML += `
+                    <div class="plan-item">
+                        <div class="plan-item-title">${v.article_violated || 'Process Change'}</div>
+                        <div class="plan-item-desc">Update privacy policy, staff training, consent mechanisms</div>
+                        <span class="plan-priority priority-p1">P1 - 30 days</span>
+                    </div>
+                `;
+            });
 
-        function getSeverityColor(severity) {
-            const sev = (severity || '').toUpperCase();
-            if (sev === 'CRITICAL') return '#ef4444';
-            if (sev === 'MAJOR') return '#f59e0b';
-            if (sev === 'MINOR') return '#eab308';
-            return '#6b7280';
+            // Citations
+            const citList = document.getElementById('citationsList');
+            citList.innerHTML = '';
+            violations.forEach(v => {
+                citList.innerHTML += `
+                    <div class="citation-item">
+                        <div class="citation-ref">${v.framework?.toUpperCase()} ${v.article_violated || ''}</div>
+                        <div class="citation-text">${v.evidence_quote || v.issue || 'Regulatory citation'}</div>
+                    </div>
+                `;
+            });
         }
 
         function switchTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             event.target.classList.add('active');
-            document.getElementById(`${tab}Tab`).classList.add('active');
+            document.getElementById(tab).classList.add('active');
         }
 
-        async function downloadPDF() {
-            if (!window.currentAssessment || !window.currentAssessment.analysis_id) {
+        function downloadPDF() {
+            if (!window.currentAssessment) {
                 alert('No assessment data available');
                 return;
             }
-
-            try {
-                const response = await fetch(`${API_BASE}/api/export/pdf/${window.currentAssessment.analysis_id}`);
-                if (!response.ok) throw new Error('PDF export failed');
-
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `compliance_report_${currentAssessment.analysis_id.substring(0, 8)}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            } catch (error) {
-                console.error('PDF download failed:', error);
-                alert('Failed to download PDF report');
+            const assessmentId = window.currentAssessment.assessment_id || window.currentAssessment.analysis_id;
+            if (!assessmentId) {
+                alert('No assessment ID available');
+                return;
             }
+            window.open(`${API_BASE}/api/export/pdf/${assessmentId}`, '_blank');
         }
 
-        async function exportToCSV() {
-            if (!window.currentAssessment || !window.currentAssessment.analysis_id) {
+        function downloadCSV() {
+            if (!window.currentAssessment) {
                 alert('No assessment data available');
                 return;
             }
-
-            try {
-                const response = await fetch(`${API_BASE}/api/export/csv/${window.currentAssessment.analysis_id}`);
-                if (!response.ok) throw new Error('CSV export failed');
-
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `violations_${currentAssessment.analysis_id.substring(0, 8)}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            } catch (error) {
-                console.error('CSV export failed:', error);
-                alert('Failed to export CSV');
+            const assessmentId = window.currentAssessment.assessment_id || window.currentAssessment.analysis_id;
+            if (!assessmentId) {
+                alert('No assessment ID available');
+                return;
             }
+            window.open(`${API_BASE}/api/export/csv/${assessmentId}`, '_blank');
         }
     </script>
 </body>

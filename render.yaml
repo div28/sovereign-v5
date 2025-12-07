@@ -4,8 +4,8 @@ services:
     env: python
     region: oregon
     plan: free
-    buildCommand: "pip install --upgrade --force-reinstall -r backend/requirements.txt"
-    startCommand: "uvicorn app:app --host 0.0.0.0 --port $PORT"
+    buildCommand: "pip cache purge && pip install --no-cache-dir --upgrade -r backend/requirements.txt"
+    startCommand: "unset HTTP_PROXY HTTPS_PROXY http_proxy https_proxy && uvicorn app:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: ANTHROPIC_API_KEY
         sync: false

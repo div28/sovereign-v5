@@ -803,17 +803,7 @@
     <!-- Header -->
     <div class="header">
         <div class="logo-container">
-            <svg class="logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
-                <path d="M40 60 L80 40 L120 60 L100 100 L60 100 Z" fill="url(#grad)" opacity="0.8"/>
-                <path d="M120 60 L160 80 L140 120 L100 100 Z" fill="url(#grad)" opacity="0.9"/>
-                <rect x="70" y="90" width="60" height="40" rx="5" fill="url(#grad)" opacity="0.7"/>
-            </svg>
+            <img src="logo.png" alt="Sovereign Logo" class="logo">
             <div class="brand">
                 <div class="brand-name">SOVEREIGN</div>
                 <div class="brand-tagline">The Compliance Whisperer</div>
@@ -1015,24 +1005,51 @@
     <!-- Results Section -->
     <section class="results-section" id="resultsSection">
         <div class="results-header">
-            <h2>Assessment Results</h2>
+            <div>
+                <h2>Assessment Results</h2>
+                <p id="frameworksSummary" style="color: rgba(255,255,255,0.6); margin-top: 0.5rem;"></p>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button class="export-button" onclick="downloadPDF()" style="background: #ef4444; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                    📄 Download PDF Report
+                </button>
+                <button class="export-button" onclick="exportToCSV()" style="background: #22c55e; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                    📊 Export to Jira (CSV)
+                </button>
+            </div>
         </div>
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('overview')">Overview</button>
-            <button class="tab" onclick="switchTab('violations')">Violations</button>
-            <button class="tab" onclick="switchTab('remediation')">Remediation</button>
-        </div>
-        <div class="tab-content active" id="overviewTab">
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <canvas id="severityChart"></canvas>
+
+        <!-- Risk Score Overview -->
+        <div style="background: rgba(255,255,255,0.03); border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
+            <div style="display: grid; grid-template-columns: auto 1fr 1fr; gap: 2rem; align-items: center;">
+                <div style="text-align: center;">
+                    <div style="font-size: 4rem; font-weight: 700; background: linear-gradient(135deg, #ef4444, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" id="riskScoreDisplay">
+                        --
+                    </div>
+                    <div style="font-size: 0.9rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.1em;" id="riskLevelDisplay">
+                        RISK SCORE
+                    </div>
                 </div>
-                <div class="chart-card">
-                    <canvas id="frameworkChart"></canvas>
+                <div>
+                    <h3 style="margin-bottom: 1rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.6);">Severity Distribution</h3>
+                    <div style="height: 150px;">
+                        <canvas id="severityChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 1rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.6);">Framework Breakdown</h3>
+                    <div style="height: 150px;">
+                        <canvas id="frameworkChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="tab-content" id="violationsTab">
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('violations')">Violations (<span id="violationsCount">0</span>)</button>
+            <button class="tab" onclick="switchTab('remediation')">Remediation Plan</button>
+        </div>
+        <div class="tab-content active" id="violationsTab">
             <div id="violationsList"></div>
         </div>
         <div class="tab-content" id="remediationTab">
@@ -1190,14 +1207,35 @@
             document.getElementById('assessmentSection').classList.remove('active');
             document.getElementById('resultsSection').classList.add('active');
 
-            // Charts
-            const severities = {critical: 0, major: 0, minor: 0};
+            // Update risk score display
+            const riskScore = result.risk_score || 0;
+            document.getElementById('riskScoreDisplay').textContent = riskScore;
+
+            let riskLevel = 'LOW RISK';
+            if (riskScore >= 76) riskLevel = 'CRITICAL RISK';
+            else if (riskScore >= 51) riskLevel = 'HIGH RISK';
+            else if (riskScore >= 26) riskLevel = 'MEDIUM RISK';
+            document.getElementById('riskLevelDisplay').textContent = riskLevel;
+
+            // Update frameworks summary
+            const frameworks = result.frameworks_analyzed || [];
+            document.getElementById('frameworksSummary').textContent =
+                `Analyzed ${frameworks.map(f => f.toUpperCase()).join(', ')} • ${result.violations.length} violations found`;
+
+            // Update violations count
+            document.getElementById('violationsCount').textContent = result.violations.length;
+
+            // Count severities (severity is a string: "CRITICAL", "MAJOR", "MINOR")
+            const severities = {critical: 0, major: 0, minor: 0, none: 0};
             result.violations.forEach(v => {
-                if (v.severity >= 8) severities.critical++;
-                else if (v.severity >= 5) severities.major++;
-                else severities.minor++;
+                const sev = (v.severity || '').toUpperCase();
+                if (sev === 'CRITICAL') severities.critical++;
+                else if (sev === 'MAJOR') severities.major++;
+                else if (sev === 'MINOR') severities.minor++;
+                else severities.none++;
             });
 
+            // Severity Chart
             new Chart(document.getElementById('severityChart'), {
                 type: 'doughnut',
                 data: {
@@ -1207,16 +1245,29 @@
                         backgroundColor: ['#ef4444', '#f59e0b', '#eab308']
                     }]
                 },
-                options: {responsive: true, plugins: {legend: {labels: {color: '#fff'}}}}
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {color: '#fff', font: {size: 11}}
+                        }
+                    }
+                }
             });
 
+            // Framework breakdown
             const fwCounts = {};
-            result.violations.forEach(v => fwCounts[v.framework] = (fwCounts[v.framework]||0) + 1);
+            result.violations.forEach(v => {
+                const fw = (v.framework || 'unknown').toUpperCase();
+                fwCounts[fw] = (fwCounts[fw]||0) + 1;
+            });
 
             new Chart(document.getElementById('frameworkChart'), {
                 type: 'bar',
                 data: {
-                    labels: Object.keys(fwCounts).map(f => f.toUpperCase()),
+                    labels: Object.keys(fwCounts),
                     datasets: [{
                         label: 'Violations',
                         data: Object.values(fwCounts),
@@ -1225,10 +1276,78 @@
                 },
                 options: {
                     responsive: true,
-                    scales: {x: {ticks: {color: '#fff'}}, y: {ticks: {color: '#fff'}}},
-                    plugins: {legend: {labels: {color: '#fff'}}}
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {ticks: {color: '#fff', font: {size: 11}}},
+                        y: {ticks: {color: '#fff', font: {size: 11}}, beginAtZero: true}
+                    },
+                    plugins: {
+                        legend: {display: false}
+                    }
                 }
             });
+
+            // Populate violations list
+            const violationsList = document.getElementById('violationsList');
+            if (result.violations.length === 0) {
+                violationsList.innerHTML = '<div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.6);">✅ No violations detected</div>';
+            } else {
+                violationsList.innerHTML = result.violations.map(v => `
+                    <div style="background: rgba(255,255,255,0.03); border-left: 4px solid ${getSeverityColor(v.severity)}; padding: 1.5rem; margin-bottom: 1rem; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <div>
+                                <span style="background: ${getSeverityColor(v.severity)}; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">${v.severity}</span>
+                                <span style="background: rgba(96,165,250,0.2); color: #60a5fa; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 0.5rem;">${v.framework}</span>
+                            </div>
+                            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.5);">Confidence: ${Math.round(v.confidence * 100)}%</div>
+                        </div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem;">${v.article_violated}</h3>
+                        <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem; color: rgba(255,255,255,0.8); font-style: italic;">
+                            "${v.evidence_quote}"
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <div style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; color: rgba(255,255,255,0.7);">Remediation Steps:</div>
+                            <ol style="margin-left: 1.5rem; color: rgba(255,255,255,0.8); font-size: 0.9rem;">
+                                ${v.remediation_steps.map(step => `<li style="margin-bottom: 0.5rem;">${step}</li>`).join('')}
+                            </ol>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Populate remediation plan
+            const remediationPlan = document.getElementById('remediationPlan');
+            const criticalViolations = result.violations.filter(v => v.severity === 'CRITICAL');
+            remediationPlan.innerHTML = `
+                <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <h3 style="color: #ef4444; margin-bottom: 0.5rem;">🚨 Priority Actions (${criticalViolations.length} Critical Issues)</h3>
+                    <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem;">Address these critical violations immediately to avoid regulatory penalties</p>
+                </div>
+                ${result.violations.map((v, idx) => `
+                    <div style="padding: 1.5rem; background: rgba(255,255,255,0.02); border-radius: 8px; margin-bottom: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="background: ${getSeverityColor(v.severity)}; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">${idx + 1}</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; font-size: 1rem;">${v.article_violated}</div>
+                                <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 0.25rem;">${v.framework} • ${v.severity}</div>
+                            </div>
+                        </div>
+                        <ul style="margin-left: 3rem; color: rgba(255,255,255,0.8); font-size: 0.9rem; list-style: none;">
+                            ${v.remediation_steps.map(step => `<li style="margin-bottom: 0.75rem; padding-left: 1.5rem; position: relative;">
+                                <span style="position: absolute; left: 0;">✓</span> ${step}
+                            </li>`).join('')}
+                        </ul>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function getSeverityColor(severity) {
+            const sev = (severity || '').toUpperCase();
+            if (sev === 'CRITICAL') return '#ef4444';
+            if (sev === 'MAJOR') return '#f59e0b';
+            if (sev === 'MINOR') return '#eab308';
+            return '#6b7280';
         }
 
         function switchTab(tab) {
@@ -1236,6 +1355,56 @@
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             event.target.classList.add('active');
             document.getElementById(`${tab}Tab`).classList.add('active');
+        }
+
+        async function downloadPDF() {
+            if (!currentAssessment || !currentAssessment.analysis_id) {
+                alert('No assessment data available');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/export/pdf/${currentAssessment.analysis_id}`);
+                if (!response.ok) throw new Error('PDF export failed');
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `compliance_report_${currentAssessment.analysis_id.substring(0, 8)}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('PDF download failed:', error);
+                alert('Failed to download PDF report');
+            }
+        }
+
+        async function exportToCSV() {
+            if (!currentAssessment || !currentAssessment.analysis_id) {
+                alert('No assessment data available');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/export/csv/${currentAssessment.analysis_id}`);
+                if (!response.ok) throw new Error('CSV export failed');
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `violations_${currentAssessment.analysis_id.substring(0, 8)}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('CSV export failed:', error);
+                alert('Failed to export CSV');
+            }
         }
     </script>
 </body>

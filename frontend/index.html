@@ -139,6 +139,32 @@
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 12px;
             padding: 1.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .example-card:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+
+        .example-card:nth-child(2) {
+            animation-delay: 0.8s;
+        }
+
+        .example-card:nth-child(3) {
+            animation-delay: 1.4s;
+        }
+
+        .example-card.hidden {
+            display: none;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .example-header {
@@ -219,6 +245,15 @@
             font-size: 0.9rem;
             font-weight: 600;
             color: #f59e0b;
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+            animation-delay: 2.5s;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
         }
 
         /* Assessment Section */
@@ -828,6 +863,55 @@
             border-radius: 50%;
         }
 
+        /* Tooltips for technical terms */
+        .tooltip {
+            position: relative;
+            border-bottom: 1px dotted rgba(96,165,250,0.5);
+            cursor: help;
+            color: #60a5fa;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20,30,48,0.98);
+            color: #fff;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            border: 1px solid rgba(96,165,250,0.3);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            z-index: 1000;
+            line-height: 1.4;
+            max-width: 250px;
+            white-space: normal;
+        }
+
+        .tooltip::before {
+            content: '';
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: rgba(96,165,250,0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .tooltip:hover::after,
+        .tooltip:hover::before {
+            opacity: 1;
+        }
+
         .gauge-value {
             position: relative;
             z-index: 1;
@@ -995,7 +1079,7 @@
     <section class="hero" id="heroSection">
         <div class="hero-content">
             <h1>
-                Catch AI Compliance Violations 
+                Catch <span class="tooltip" data-tooltip="AI systems must comply with GDPR, SOX, HIPAA, and EU AI Act regulations">AI Compliance</span> Violations
                 <span class="highlight">Before Regulators Do</span>
             </h1>
             <p>Ship AI without the regulator</p>
@@ -1073,7 +1157,7 @@
                         <div class="framework-checkbox"></div>
                         <span class="framework-icon">🔒</span>
                         <div class="framework-info">
-                            <div class="framework-name">GDPR</div>
+                            <div class="framework-name"><span class="tooltip" data-tooltip="General Data Protection Regulation - EU data privacy law enforced since May 2018">GDPR</span></div>
                             <div class="framework-desc">EU data privacy</div>
                         </div>
                     </div>
@@ -1081,7 +1165,7 @@
                         <div class="framework-checkbox"></div>
                         <span class="framework-icon">📊</span>
                         <div class="framework-info">
-                            <div class="framework-name">SOX</div>
+                            <div class="framework-name"><span class="tooltip" data-tooltip="Sarbanes-Oxley Act - US financial reporting and corporate governance law">SOX</span></div>
                             <div class="framework-desc">Financial controls</div>
                         </div>
                     </div>
@@ -1089,7 +1173,7 @@
                         <div class="framework-checkbox"></div>
                         <span class="framework-icon">🤖</span>
                         <div class="framework-info">
-                            <div class="framework-name">EU AI Act</div>
+                            <div class="framework-name"><span class="tooltip" data-tooltip="European Union Artificial Intelligence Act - regulates AI systems based on risk levels">EU AI Act</span></div>
                             <div class="framework-desc">AI risk classification</div>
                         </div>
                     </div>
@@ -1121,7 +1205,7 @@
                     </div>
                     <div class="test-scenario" data-scenario="sox">
                         <span class="scenario-icon">📊</span>
-                        <span class="scenario-name">SOX Controls</span>
+                        <span class="scenario-name">SOX Compliance</span>
                     </div>
                 </div>
             </div>
@@ -1268,6 +1352,31 @@
         let selectedFrameworks = new Set();
         let currentAssessment = null;
 
+        // Auto-rotate hero violation cards every 3 seconds
+        let currentCard = 0;
+        const exampleCards = document.querySelectorAll('.example-card');
+
+        function rotateCards() {
+            if (exampleCards.length > 0) {
+                // Hide all cards except the current one
+                exampleCards.forEach((card, index) => {
+                    if (index === currentCard) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+
+                // Move to next card
+                currentCard = (currentCard + 1) % exampleCards.length;
+            }
+        }
+
+        // Start rotating after initial animations (after 2s)
+        setTimeout(() => {
+            setInterval(rotateCards, 3000);
+        }, 2000);
+
         function showAssessment() {
             document.getElementById('heroSection').style.display = 'none';
             document.getElementById('assessmentSection').classList.add('active');
@@ -1363,7 +1472,11 @@
                 });
 
                 const result = await response.json();
-                currentAssessment = result;
+
+                // Store assessment globally and in localStorage
+                window.assessmentResult = result;
+                window.currentAssessment = result;
+                localStorage.setItem('currentAssessment', JSON.stringify(result));
 
                 // Animate orchestrator
                 await animateAgent('orchestrator', 'Aggregating results...', 1500);

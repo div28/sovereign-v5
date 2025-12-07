@@ -1241,36 +1241,36 @@
             color: #eab308;
         }
 
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+        /* Risk score summary card */
+        .risk-summary-card {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+            animation-delay: 2s;
         }
 
-        .ticker-container {
-            overflow: hidden;
-            background: rgba(239,68,68,0.1);
-            border-top: 1px solid rgba(239,68,68,0.3);
-            border-bottom: 1px solid rgba(239,68,68,0.3);
-            padding: 12px 0;
-            margin: 3rem 0;
+        .risk-summary-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 0.5rem;
         }
 
-        .ticker-content {
-            display: flex;
-            animation: scroll 30s linear infinite;
-            width: max-content;
+        .risk-summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #f59e0b;
+            margin-bottom: 0.5rem;
         }
 
-        .ticker-item {
-            padding: 0 48px;
-            color: rgba(255,255,255,0.8);
-            font-size: 0.95rem;
-            white-space: nowrap;
-        }
-
-        .ticker-fine {
-            color: #ef4444;
-            font-weight: 700;
+        .risk-summary-desc {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
         }
     </style>
 </head>
@@ -1290,10 +1290,10 @@
     <section class="hero" id="heroSection">
         <div class="hero-content">
             <h1>
-                Catch <span class="tooltip" data-tooltip="AI systems must comply with GDPR, SOX, HIPAA, and EU AI Act regulations">AI Compliance</span> Violations
+                Catch AI Compliance Violations
                 <span class="highlight">Before Regulators Do</span>
             </h1>
-            <p>Ship AI without the regulator</p>
+            <p>Ship AI without the regulatory panic</p>
             <button class="cta-button" onclick="showAssessment()">
                 Analyze Your AI System →
             </button>
@@ -1303,47 +1303,10 @@
                 <span class="audience-badge">Risk & Compliance Officers</span>
                 <span class="audience-badge">Legal Counsel</span>
             </div>
-
-            <!-- Fines Ticker -->
-            <div class="ticker-container">
-                <div class="ticker-content">
-                    <div class="ticker-item">TikTok <span class="ticker-fine">€530M</span> (2025)</div>
-                    <div class="ticker-item">Meta <span class="ticker-fine">€479M</span> (2024)</div>
-                    <div class="ticker-item">LinkedIn <span class="ticker-fine">€310M</span> (2024)</div>
-                    <div class="ticker-item">Amazon <span class="ticker-fine">€746M</span> (2021)</div>
-                    <div class="ticker-item">Google <span class="ticker-fine">€90M</span> (2024)</div>
-                    <div class="ticker-item">WhatsApp <span class="ticker-fine">€225M</span> (2021)</div>
-                    <!-- Duplicate for seamless loop -->
-                    <div class="ticker-item">TikTok <span class="ticker-fine">€530M</span> (2025)</div>
-                    <div class="ticker-item">Meta <span class="ticker-fine">€479M</span> (2024)</div>
-                    <div class="ticker-item">LinkedIn <span class="ticker-fine">€310M</span> (2024)</div>
-                    <div class="ticker-item">Amazon <span class="ticker-fine">€746M</span> (2021)</div>
-                    <div class="ticker-item">Google <span class="ticker-fine">€90M</span> (2024)</div>
-                    <div class="ticker-item">WhatsApp <span class="ticker-fine">€225M</span> (2021)</div>
-                </div>
-            </div>
         </div>
 
         <div class="example-cards">
-            <div class="example-card">
-                <div class="example-header">
-                    <span class="severity-badge critical">CRITICAL</span>
-                    <span class="framework-badge">GDPR</span>
-                </div>
-                <div class="example-title">Automated profiling without Article 22(2) exemption</div>
-                <div class="example-quote">
-                    Article 22(2): "...shall not apply if..."
-                </div>
-                <div class="risk-indicator">
-                    <div class="risk-label">Calculating Risk Score...</div>
-                    <div class="risk-bar">
-                        <div class="risk-fill" style="width: 74%"></div>
-                    </div>
-                    <div class="risk-score">74/100 HIGH RISK</div>
-                </div>
-            </div>
-
-            <div class="example-card">
+            <div class="example-card" id="card0">
                 <div class="example-header">
                     <span class="severity-badge high">HIGH</span>
                     <span class="framework-badge">HIPAA</span>
@@ -1352,6 +1315,35 @@
                 <div class="example-quote">
                     §164.312(a)(2)(iv): Encryption required
                 </div>
+            </div>
+
+            <div class="example-card" id="card1">
+                <div class="example-header">
+                    <span class="severity-badge critical">CRITICAL</span>
+                    <span class="framework-badge">GDPR</span>
+                </div>
+                <div class="example-title">Automated profiling without Article 22(2) exemption</div>
+                <div class="example-quote">
+                    Article 22(2): "...shall not apply if..."
+                </div>
+            </div>
+
+            <div class="example-card" id="card2">
+                <div class="example-header">
+                    <span class="severity-badge critical">CRITICAL</span>
+                    <span class="framework-badge">SOX</span>
+                </div>
+                <div class="example-title">Inadequate segregation of duties in financial controls</div>
+                <div class="example-quote">
+                    Section 404: Internal control requirements
+                </div>
+            </div>
+
+            <!-- Risk Score Summary Card -->
+            <div class="risk-summary-card">
+                <div class="risk-summary-label">Calculating Risk Score...</div>
+                <div class="risk-summary-value">84/100</div>
+                <div class="risk-summary-desc">HIGH RISK</div>
             </div>
         </div>
     </section>
@@ -1590,7 +1582,11 @@
 
         // Auto-rotate hero violation cards every 3 seconds
         let currentCard = 0;
-        const exampleCards = document.querySelectorAll('.example-card');
+        const exampleCards = [
+            document.getElementById('card0'),
+            document.getElementById('card1'),
+            document.getElementById('card2')
+        ].filter(card => card !== null);
 
         function rotateCards() {
             if (exampleCards.length > 0) {

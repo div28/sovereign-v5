@@ -74,15 +74,16 @@ class PDFComplianceReport:
             fontName='Helvetica-Bold'
         ))
 
-        # Body text
-        self.styles.add(ParagraphStyle(
-            name='BodyText',
-            parent=self.styles['Normal'],
-            fontSize=10,
-            textColor=colors.HexColor('#2c3e50'),
-            alignment=TA_JUSTIFY,
-            spaceAfter=6
-        ))
+        # Body text - only add if not already exists
+        if 'BodyText' not in self.styles:
+            self.styles.add(ParagraphStyle(
+                name='BodyText',
+                parent=self.styles['Normal'],
+                fontSize=10,
+                textColor=colors.HexColor('#2c3e50'),
+                alignment=TA_JUSTIFY,
+                spaceAfter=6
+            ))
 
         # Critical alert
         self.styles.add(ParagraphStyle(

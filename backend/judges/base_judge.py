@@ -160,7 +160,10 @@ class BaseComplianceJudge(ABC):
         if not self.api_key:
             raise ValueError("ANTHROPIC_API_KEY not found")
 
-        self._client = Anthropic(api_key=self.api_key)
+        # Create Anthropic client with explicit proxy=None to avoid Render proxy issues
+        import httpx
+        http_client = httpx.Client(proxy=None)
+        self._client = Anthropic(api_key=self.api_key, http_client=http_client)
         logger.info(f"Initialized {self.__class__.__name__} for {framework} - {focus_area}")
 
     @property

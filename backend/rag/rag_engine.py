@@ -105,7 +105,10 @@ Respond with ONLY the category name, nothing else."""
         self.api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
         if not self.api_key:
             raise ValueError("ANTHROPIC_API_KEY not found")
-        self._client = Anthropic(api_key=self.api_key)
+        # Create Anthropic client with explicit proxy=None to avoid Render proxy issues
+        import httpx
+        http_client = httpx.Client(proxy=None)
+        self._client = Anthropic(api_key=self.api_key, http_client=http_client)
         self.model = "claude-3-5-haiku-20241022"
 
     def classify(self, query: str) -> QueryType:

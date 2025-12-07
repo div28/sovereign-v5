@@ -76,7 +76,10 @@ Keep the same structure with {{regulatory_context}} and {{submission}} placehold
         if not self.api_key:
             raise ValueError("ANTHROPIC_API_KEY not found")
 
-        self._client = Anthropic(api_key=self.api_key)
+        # Create Anthropic client with explicit proxy=None to avoid Render proxy issues
+        import httpx
+        http_client = httpx.Client(proxy=None)
+        self._client = Anthropic(api_key=self.api_key, http_client=http_client)
         logger.info("PromptRefiner initialized")
 
     def refine_prompt(

@@ -44,7 +44,10 @@ class EmbeddingsClient:
                 "Set it as an environment variable or pass it directly."
             )
 
-        self._client = OpenAI(api_key=self.api_key)
+        # Create OpenAI client with explicit proxy=None to avoid Render proxy issues
+        import httpx
+        http_client = httpx.Client(proxy=None)
+        self._client = OpenAI(api_key=self.api_key, http_client=http_client)
         self.model = MODEL_NAME
         self.dimension = EMBEDDING_DIMENSION
         logger.info(f"Embeddings client initialized with model: {self.model}")

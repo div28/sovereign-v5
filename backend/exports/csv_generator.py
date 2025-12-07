@@ -15,7 +15,9 @@ logger = logging.getLogger(__name__)
 
 def generate_compliance_csv(violations: List[Dict[str, Any]]) -> str:
     """
-    Generate CSV export of compliance violations.
+    Generate Jira-compatible CSV export of compliance violations.
+
+    Columns: Framework, Article, Severity, Priority, Description, Remediation Steps
 
     Args:
         violations: List of violation dictionaries.
@@ -25,16 +27,14 @@ def generate_compliance_csv(violations: List[Dict[str, Any]]) -> str:
     """
     output = StringIO()
 
-    # Define CSV columns
+    # Define Jira-compatible CSV columns
     fieldnames = [
-        'framework',
-        'severity',
-        'article',
-        'focus_area',
-        'evidence',
-        'remediation',
-        'confidence',
-        'judge_id'
+        'Framework',
+        'Article',
+        'Severity',
+        'Priority',
+        'Description',
+        'Remediation Steps'
     ]
 
     writer = csv.DictWriter(output, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
@@ -47,20 +47,35 @@ def generate_compliance_csv(violations: List[Dict[str, Any]]) -> str:
         key=lambda v: severity_order.get(v.get('severity', 'NONE'), 4)
     )
 
+    # Severity to Priority mapping
+    severity_to_priority = {
+        'CRITICAL': 'P0 (Immediate)',
+        'MAJOR': 'P1 (30 days)',
+        'MINOR': 'P2 (90 days)'
+    }
+
     for violation in sorted_violations:
-        # Combine remediation steps into single field
+        severity = violation.get('severity', 'UNKNOWN')
+        priority = severity_to_priority.get(severity, 'P2 (90 days)')
+
+        # Combine remediation steps into single field with numbered list
         remediation_steps = violation.get('remediation_steps', [])
-        remediation_text = ' | '.join(remediation_steps) if remediation_steps else 'No remediation provided'
+        if remediation_steps:
+            remediation_text = '\n'.join([f"{i}. {step}" for i, step in enumerate(remediation_steps, 1)])
+        else:
+            remediation_text = 'No remediation provided'
+
+        # Build description from evidence
+        evidence = violation.get('evidence_quote', 'No evidence provided')
+        description = f"Violation detected: {evidence}"
 
         row = {
-            'framework': violation.get('framework', 'Unknown'),
-            'severity': violation.get('severity', 'UNKNOWN'),
-            'article': violation.get('article_violated', 'Unknown Article'),
-            'focus_area': violation.get('focus_area', 'Unknown'),
-            'evidence': violation.get('evidence_quote', 'No evidence provided'),
-            'remediation': remediation_text,
-            'confidence': f"{violation.get('confidence', 0.0):.2f}",
-            'judge_id': violation.get('judge_id', 'unknown')
+            'Framework': violation.get('framework', 'Unknown').upper(),
+            'Article': violation.get('article_violated', 'Unknown Article'),
+            'Severity': severity,
+            'Priority': priority,
+            'Description': description,
+            'Remediation Steps': remediation_text
         }
 
         writer.writerow(row)
@@ -68,7 +83,7 @@ def generate_compliance_csv(violations: List[Dict[str, Any]]) -> str:
     csv_content = output.getvalue()
     output.close()
 
-    logger.info(f"Generated CSV with {len(violations)} violations")
+    logger.info(f"Generated Jira-compatible CSV with {len(violations)} violations")
     return csv_content
 
 

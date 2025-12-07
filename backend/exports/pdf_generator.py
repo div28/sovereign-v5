@@ -145,10 +145,14 @@ class PDFComplianceReport:
         # Detailed findings
         story.extend(self._build_detailed_findings(violations))
 
-        # Remediation recommendations
+        # 90-day remediation roadmap
         if violations:
             story.append(PageBreak())
-            story.extend(self._build_remediation_section(violations))
+            story.extend(self._build_remediation_roadmap(violations))
+
+        # Technical appendix
+        story.append(PageBreak())
+        story.extend(self._build_technical_appendix(violations, frameworks))
 
         # Build PDF
         doc.build(story)
@@ -265,37 +269,37 @@ class PDFComplianceReport:
         elements.append(Paragraph(summary_text, self.styles['BodyText']))
         elements.append(Spacer(1, 0.3 * inch))
 
-        # Violation breakdown table
+        # Priority breakdown table (P0/P1/P2)
         if total_violations > 0:
             elements.append(Paragraph(
-                "Violation Breakdown by Severity",
+                "Priority Breakdown",
                 self.styles['SubsectionHeader']
             ))
 
-            breakdown_data = [
-                ['Severity Level', 'Count', 'Description'],
-                ['CRITICAL', str(critical_count), 'Immediate legal/regulatory risk'],
-                ['MAJOR', str(major_count), 'Significant compliance gap'],
-                ['MINOR', str(minor_count), 'Minor improvement needed']
+            priority_data = [
+                ['Priority', 'Timeline', 'Count', 'Description'],
+                ['P0', 'Immediate', str(critical_count), 'Critical legal/regulatory risk - fix now'],
+                ['P1', '30 days', str(major_count), 'Significant compliance gap - address soon'],
+                ['P2', '90 days', str(minor_count), 'Minor improvement - scheduled fix']
             ]
 
-            breakdown_table = Table(breakdown_data, colWidths=[1.5*inch, 1*inch, 3.5*inch])
-            breakdown_table.setStyle(TableStyle([
+            priority_table = Table(priority_data, colWidths=[0.8*inch, 1*inch, 0.8*inch, 3.4*inch])
+            priority_table.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#34495e')),
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 11),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
                 ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                 ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-                ('FONTSIZE', (0, 1), (-1, -1), 10),
+                ('FONTSIZE', (0, 1), (-1, -1), 9),
                 ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
                 ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8f9fa')]),
                 ('TOPPADDING', (0, 0), (-1, -1), 8),
                 ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
             ]))
 
-            elements.append(breakdown_table)
+            elements.append(priority_table)
             elements.append(Spacer(1, 0.3 * inch))
 
         # Framework breakdown
@@ -312,7 +316,7 @@ class PDFComplianceReport:
 
             fw_data = [['Framework', 'Violations']]
             for fw, count in sorted(framework_counts.items()):
-                fw_data.append([fw, str(count)])
+                fw_data.append([fw.upper(), str(count)])
 
             fw_table = Table(fw_data, colWidths=[3*inch, 2*inch])
             fw_table.setStyle(TableStyle([
@@ -330,6 +334,25 @@ class PDFComplianceReport:
             ]))
 
             elements.append(fw_table)
+            elements.append(Spacer(1, 0.3 * inch))
+
+        # Top 3 Critical Issues
+        critical_violations = [v for v in violations if v.get('severity') == 'CRITICAL']
+        if critical_violations:
+            elements.append(Paragraph(
+                "Top Critical Issues (Immediate Action Required)",
+                self.styles['SubsectionHeader']
+            ))
+            elements.append(Spacer(1, 0.1 * inch))
+
+            for i, violation in enumerate(critical_violations[:3], 1):
+                article = violation.get('article_violated', 'Unknown Article')
+                framework = violation.get('framework', 'Unknown').upper()
+                evidence = violation.get('evidence_quote', 'No evidence')[:150]
+
+                issue_text = f"<b>{i}. {framework} - {article}</b><br/>{evidence}..."
+                elements.append(Paragraph(issue_text, self.styles['BodyText']))
+                elements.append(Spacer(1, 0.15 * inch))
 
         return elements
 
@@ -358,6 +381,10 @@ class PDFComplianceReport:
         )
 
         for i, violation in enumerate(sorted_violations, 1):
+            # Add pagebreak before each violation (except first)
+            if i > 1:
+                elements.append(PageBreak())
+
             elements.extend(self._build_violation_detail(i, violation))
             elements.append(Spacer(1, 0.3 * inch))
 
@@ -407,48 +434,196 @@ class PDFComplianceReport:
 
         return elements
 
-    def _build_remediation_section(self, violations: List[Dict[str, Any]]) -> List:
-        """Build remediation recommendations section."""
+    def _build_remediation_roadmap(self, violations: List[Dict[str, Any]]) -> List:
+        """Build 90-day remediation roadmap with phases."""
         elements = []
 
         elements.append(Paragraph(
-            "Remediation Recommendations",
+            "90-Day Remediation Roadmap",
             self.styles['SectionHeader']
         ))
         elements.append(Spacer(1, 0.2 * inch))
 
-        # Group violations by framework for organized recommendations
-        framework_violations = {}
-        for v in violations:
-            fw = v.get('framework', 'Unknown')
-            if fw not in framework_violations:
-                framework_violations[fw] = []
-            framework_violations[fw].append(v)
+        intro_text = """
+        This roadmap provides a phased approach to addressing compliance violations,
+        prioritized by severity and regulatory impact. Each phase includes specific
+        action items and expected outcomes.
+        """
+        elements.append(Paragraph(intro_text, self.styles['BodyText']))
+        elements.append(Spacer(1, 0.3 * inch))
 
-        for framework, fw_violations in sorted(framework_violations.items()):
+        # Phase 1: Immediate (P0 - CRITICAL)
+        critical_violations = [v for v in violations if v.get('severity') == 'CRITICAL']
+        if critical_violations:
             elements.append(Paragraph(
-                f"{framework} Remediation Steps",
+                "Phase 1: Immediate Action (Days 1-7) - P0 Critical",
                 self.styles['SubsectionHeader']
             ))
 
-            for i, violation in enumerate(fw_violations, 1):
+            for i, violation in enumerate(critical_violations, 1):
                 article = violation.get('article_violated', 'Unknown')
+                framework = violation.get('framework', 'Unknown').upper()
                 steps = violation.get('remediation_steps', [])
 
                 elements.append(Paragraph(
-                    f"<b>{i}. {article}</b>",
+                    f"<b>{i}. {framework} - {article}</b>",
                     self.styles['BodyText']
                 ))
 
-                for step in steps:
-                    elements.append(Paragraph(
-                        f"• {step}",
-                        self.styles['BodyText']
-                    ))
+                for step in steps[:3]:  # Show top 3 steps
+                    elements.append(Paragraph(f"  • {step}", self.styles['BodyText']))
 
-                elements.append(Spacer(1, 0.15 * inch))
+                elements.append(Spacer(1, 0.1 * inch))
 
             elements.append(Spacer(1, 0.2 * inch))
+
+        # Phase 2: Short-term (P1 - MAJOR)
+        major_violations = [v for v in violations if v.get('severity') == 'MAJOR']
+        if major_violations:
+            elements.append(Paragraph(
+                "Phase 2: Short-term Fixes (Days 8-30) - P1 Major",
+                self.styles['SubsectionHeader']
+            ))
+
+            for i, violation in enumerate(major_violations, 1):
+                article = violation.get('article_violated', 'Unknown')
+                framework = violation.get('framework', 'Unknown').upper()
+                steps = violation.get('remediation_steps', [])
+
+                elements.append(Paragraph(
+                    f"<b>{i}. {framework} - {article}</b>",
+                    self.styles['BodyText']
+                ))
+
+                for step in steps[:2]:  # Show top 2 steps
+                    elements.append(Paragraph(f"  • {step}", self.styles['BodyText']))
+
+                elements.append(Spacer(1, 0.1 * inch))
+
+            elements.append(Spacer(1, 0.2 * inch))
+
+        # Phase 3: Long-term (P2 - MINOR)
+        minor_violations = [v for v in violations if v.get('severity') == 'MINOR']
+        if minor_violations:
+            elements.append(Paragraph(
+                "Phase 3: Long-term Improvements (Days 31-90) - P2 Minor",
+                self.styles['SubsectionHeader']
+            ))
+
+            for i, violation in enumerate(minor_violations, 1):
+                article = violation.get('article_violated', 'Unknown')
+                framework = violation.get('framework', 'Unknown').upper()
+
+                elements.append(Paragraph(
+                    f"<b>{i}. {framework} - {article}</b>",
+                    self.styles['BodyText']
+                ))
+
+                elements.append(Spacer(1, 0.1 * inch))
+
+            elements.append(Spacer(1, 0.2 * inch))
+
+        return elements
+
+    def _build_technical_appendix(
+        self,
+        violations: List[Dict[str, Any]],
+        frameworks: List[str]
+    ) -> List:
+        """Build technical appendix with methodology and references."""
+        elements = []
+
+        elements.append(Paragraph(
+            "Technical Appendix",
+            self.styles['SectionHeader']
+        ))
+        elements.append(Spacer(1, 0.2 * inch))
+
+        # Methodology
+        elements.append(Paragraph(
+            "Analysis Methodology",
+            self.styles['SubsectionHeader']
+        ))
+
+        methodology_text = """
+        This compliance analysis was performed using Sovereign V5, an AI-powered
+        regulatory intelligence platform. The system employs:
+        <br/><br/>
+        <b>1. RAG-Enhanced Analysis:</b> Retrieval-Augmented Generation (RAG) with
+        Pinecone vector database for semantic search across regulatory documents.
+        <br/><br/>
+        <b>2. Specialized Compliance Judges:</b> 9 AI judges trained on specific
+        regulatory articles and enforcement precedents:
+        <br/>
+          • GDPR: Article 22 (Automated Decision-Making), Article 17 (Right to Erasure),
+            Article 32 (Security of Processing)
+        <br/>
+          • SOX: Section 404 (Internal Controls), Section 302 (Corporate Responsibility),
+            Audit Trail Requirements
+        <br/>
+          • EU AI Act: High-Risk AI Systems, Prohibited Practices, Transparency Requirements
+        <br/><br/>
+        <b>3. Confidence Scoring:</b> Each violation includes a confidence score
+        (0-100%) based on evidence strength and regulatory precedent alignment.
+        """
+        elements.append(Paragraph(methodology_text, self.styles['BodyText']))
+        elements.append(Spacer(1, 0.3 * inch))
+
+        # Risk Scoring Formula
+        elements.append(Paragraph(
+            "Risk Score Calculation",
+            self.styles['SubsectionHeader']
+        ))
+
+        risk_formula_text = """
+        The overall risk score (0-100) is calculated using weighted severity:
+        <br/><br/>
+        Risk Score = Σ (Severity Weight × Confidence)
+        <br/><br/>
+        Where:
+        <br/>
+          • CRITICAL = 40 points (max)
+        <br/>
+          • MAJOR = 25 points (max)
+        <br/>
+          • MINOR = 10 points (max)
+        <br/><br/>
+        Risk Levels:
+        <br/>
+          • 0-25: Low Risk (Green)
+        <br/>
+          • 26-50: Medium Risk (Orange)
+        <br/>
+          • 51-75: High Risk (Dark Orange)
+        <br/>
+          • 76-100: Critical Risk (Red)
+        """
+        elements.append(Paragraph(risk_formula_text, self.styles['BodyText']))
+        elements.append(Spacer(1, 0.3 * inch))
+
+        # Regulatory References
+        elements.append(Paragraph(
+            "Regulatory References",
+            self.styles['SubsectionHeader']
+        ))
+
+        references_text = """
+        <b>GDPR (General Data Protection Regulation):</b>
+        <br/>
+        Regulation (EU) 2016/679 - Official Journal of the European Union
+        <br/><br/>
+        <b>SOX (Sarbanes-Oxley Act):</b>
+        <br/>
+        Public Company Accounting Reform and Investor Protection Act of 2002
+        <br/><br/>
+        <b>EU AI Act:</b>
+        <br/>
+        Regulation (EU) 2024/1689 on Artificial Intelligence
+        <br/><br/>
+        <i>For questions or clarifications, consult with qualified legal counsel
+        specializing in regulatory compliance.</i>
+        """
+        elements.append(Paragraph(references_text, self.styles['BodyText']))
 
         return elements
 

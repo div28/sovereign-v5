@@ -1413,6 +1413,10 @@
                         <span class="scenario-icon">📊</span>
                         <span class="scenario-name">SOX Controls</span>
                     </div>
+                    <div class="test-scenario" data-scenario="euaiact">
+                        <span class="scenario-icon">🤖</span>
+                        <span class="scenario-name">EU AI Act</span>
+                    </div>
                 </div>
             </div>
 
@@ -1575,9 +1579,9 @@
         const API_BASE = 'https://sovereign-v5.onrender.com';
         
         const SCENARIOS = {
-            gdpr: 'Automated hiring system that analyzes candidate resumes, facial expressions during video interviews, and makes final hiring decisions without human review. The system uses emotion detection AI and automatically rejects candidates based on algorithm scores.',
-            hipaa: 'Healthcare AI that analyzes patient medical records and stores sensitive health information in unencrypted databases. The system has no access controls and PHI is accessible to unauthorized staff.',
-            sox: 'Financial reporting AI that automatically generates quarterly statements and makes adjustments without human oversight. No audit trail of changes, modifications can be made by any employee.'
+            gdpr: 'Automated hiring system that analyzes candidate resumes, facial expressions during video interviews, and makes final hiring decisions without human review.',
+            sox: 'Financial reporting AI that automatically generates quarterly statements and makes adjustments without human oversight, violating internal control requirements.',
+            euaiact: 'Biometric identification system used in public spaces without required conformity assessment, technical documentation, or human oversight mechanisms.'
         };
 
         let selectedFrameworks = new Set();
@@ -1636,11 +1640,13 @@
             scenario.addEventListener('click', () => {
                 const type = scenario.dataset.scenario;
                 document.getElementById('systemDescription').value = SCENARIOS[type];
-                
+
                 // Auto-select framework
                 selectedFrameworks.clear();
                 document.querySelectorAll('.framework-option').forEach(o => o.classList.remove('selected'));
-                const fw = type === 'hipaa' ? 'gdpr' : type; // Map hipaa to gdpr for demo
+
+                // Map scenario to framework
+                const fw = type === 'euaiact' ? 'euai' : type;
                 const opt = document.querySelector(`[data-framework="${fw}"]`);
                 if (opt) {
                     opt.classList.add('selected');

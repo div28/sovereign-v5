@@ -64,7 +64,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 4rem;
-            padding: 6rem 3rem;
+            padding: 40px 3rem;
             align-items: center;
         }
 
@@ -88,17 +88,16 @@
         }
 
         .cta-button {
-            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
             border: none;
             color: #fff;
-            padding: 1rem 2.5rem;
+            padding: 14px 28px;
             font-size: 1.1rem;
             font-weight: 600;
             border-radius: 8px;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+            display: inline-block;
+            width: auto;
             transition: transform 0.2s;
         }
 
@@ -142,6 +141,7 @@
             opacity: 0;
             transform: translateY(20px);
             animation: fadeInUp 0.6s ease forwards;
+            box-shadow: 0 0 20px rgba(6,182,212,0.3);
         }
 
         .example-card:nth-child(1) {
@@ -760,7 +760,7 @@
         /* Results - Redesigned Compact */
         .results-section {
             display: none;
-            padding: 16px;
+            padding: 16px 16px 40px 16px;
             min-height: 100vh;
         }
 
@@ -1253,6 +1253,7 @@
             transform: translateY(20px);
             animation: fadeInUp 0.6s ease forwards;
             animation-delay: 2s;
+            box-shadow: 0 0 20px rgba(6,182,212,0.3);
         }
 
         .risk-summary-label {
@@ -1264,13 +1265,19 @@
         .risk-summary-value {
             font-size: 2.5rem;
             font-weight: 800;
-            color: #f59e0b;
+            color: #ef4444;
             margin-bottom: 0.5rem;
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+            animation-delay: 2.5s;
         }
 
         .risk-summary-desc {
             font-size: 0.9rem;
             color: rgba(255,255,255,0.6);
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+            animation-delay: 2.5s;
         }
     </style>
 </head>
@@ -1295,7 +1302,7 @@
             </h1>
             <p>Ship AI without the regulatory panic</p>
             <button class="cta-button" onclick="showAssessment()">
-                Analyze Your AI System →
+                Analyze Your AI System
             </button>
             <div class="built-for">
                 <span>Built for:</span>
@@ -1402,13 +1409,9 @@
                         <span class="scenario-icon">🔒</span>
                         <span class="scenario-name">GDPR Severe</span>
                     </div>
-                    <div class="test-scenario" data-scenario="hipaa">
-                        <span class="scenario-icon">🏥</span>
-                        <span class="scenario-name">HIPAA Breach</span>
-                    </div>
                     <div class="test-scenario" data-scenario="sox">
                         <span class="scenario-icon">📊</span>
-                        <span class="scenario-name">SOX Compliance</span>
+                        <span class="scenario-name">SOX Controls</span>
                     </div>
                 </div>
             </div>
@@ -1497,8 +1500,8 @@
                     <div class="meta" id="metaInfo">Loading...</div>
                 </div>
                 <div class="export-btns">
-                    <button class="btn btn-pdf" onclick="downloadPDF()">📄 PDF</button>
-                    <button class="btn btn-csv" onclick="downloadCSV()">📊 CSV</button>
+                    <button class="btn btn-pdf" onclick="downloadPDF()">PDF</button>
+                    <button class="btn btn-csv" onclick="downloadCSV()">CSV</button>
                 </div>
             </div>
 
@@ -1543,12 +1546,12 @@
             <div class="tab-content active" id="technical">
                 <div class="fix-plan-grid">
                     <div class="plan-column">
-                        <div class="plan-title">🔧 Code & API Changes</div>
+                        <div class="plan-title">🔧 Technical Fixes (Code/API/Architecture)</div>
                         <div class="plan-list" id="technicalList"></div>
                     </div>
                     <div class="plan-column">
-                        <div class="plan-title">🏗️ Architecture Updates</div>
-                        <div class="plan-list" id="architectureList"></div>
+                        <div class="plan-title">📋 Business Process Changes</div>
+                        <div class="plan-list" id="businessProcessList"></div>
                     </div>
                 </div>
             </div>
@@ -2026,40 +2029,58 @@
                 cardsContainer.appendChild(card);
             });
 
-            // Technical Plan
+            // Technical Fixes (merged code/API/architecture)
             const techList = document.getElementById('technicalList');
-            const archList = document.getElementById('architectureList');
             techList.innerHTML = '';
-            archList.innerHTML = '';
-            violations.forEach((v, i) => {
-                const article = v.article_violated || 'Fix Required';
-                if (i % 2 === 0) {
-                    techList.innerHTML += `
-                        <div class="plan-item">
-                            <div class="plan-item-title">${article}</div>
-                            <div class="plan-item-desc">Implement encryption, access controls, audit logging</div>
-                            <span class="plan-priority priority-p0">P0 - Immediate</span>
-                        </div>
-                    `;
-                } else {
-                    archList.innerHTML += `
-                        <div class="plan-item">
-                            <div class="plan-item-title">${article}</div>
-                            <div class="plan-item-desc">Database schema changes, API endpoint security</div>
-                            <span class="plan-priority priority-p1">P1 - 30 days</span>
-                        </div>
-                    `;
-                }
+
+            const technicalFixes = [
+                { title: 'Implement encryption at rest using AES-256', desc: 'Encrypt all personal and biometric data', priority: 'priority-p0', label: 'P0 - Immediate' },
+                { title: 'Add mandatory human review workflow', desc: 'For Article 22 automated decisions', priority: 'priority-p0', label: 'P0 - Immediate' },
+                { title: 'Build automated data retention/deletion service', desc: 'Comply with GDPR right to erasure', priority: 'priority-p0', label: 'P0 - Immediate' },
+                { title: 'Deploy access control middleware with RBAC', desc: 'Segregation of duties for SOX compliance', priority: 'priority-p1', label: 'P1 - 30 days' },
+                { title: 'Create audit logging infrastructure', desc: 'Immutable logs for all data access', priority: 'priority-p1', label: 'P1 - 30 days' }
+            ];
+
+            technicalFixes.forEach(fix => {
+                techList.innerHTML += `
+                    <div class="plan-item">
+                        <div class="plan-item-title">${fix.title}</div>
+                        <div class="plan-item-desc">${fix.desc}</div>
+                        <span class="plan-priority ${fix.priority}">${fix.label}</span>
+                    </div>
+                `;
             });
 
-            // Business Plan
+            // Business Process Changes
+            const bizProcessList = document.getElementById('businessProcessList');
+            bizProcessList.innerHTML = '';
+
+            const businessFixes = [
+                { title: 'Update privacy policy', desc: 'Include automated decision-making disclosures per Article 13/14', priority: 'priority-p0', label: 'P0 - Immediate' },
+                { title: 'Establish Data Protection Officer oversight', desc: 'Create DPO review process for high-risk AI', priority: 'priority-p1', label: 'P1 - 30 days' },
+                { title: 'Implement explicit consent collection', desc: 'Granular consent mechanisms for automated profiling', priority: 'priority-p1', label: 'P1 - 30 days' },
+                { title: 'Create data subject rights request workflow', desc: 'Handle access, rectification, erasure requests', priority: 'priority-p1', label: 'P1 - 30 days' },
+                { title: 'Deploy staff training program', desc: 'Train teams on GDPR, SOX, and EU AI Act compliance', priority: 'priority-p1', label: 'P1 - 30 days' }
+            ];
+
+            businessFixes.forEach(fix => {
+                bizProcessList.innerHTML += `
+                    <div class="plan-item">
+                        <div class="plan-item-title">${fix.title}</div>
+                        <div class="plan-item-desc">${fix.desc}</div>
+                        <span class="plan-priority ${fix.priority}">${fix.label}</span>
+                    </div>
+                `;
+            });
+
+            // Business Plan (overall summary)
             const bizList = document.getElementById('businessList');
             bizList.innerHTML = '';
             violations.forEach(v => {
                 bizList.innerHTML += `
                     <div class="plan-item">
                         <div class="plan-item-title">${v.article_violated || 'Process Change'}</div>
-                        <div class="plan-item-desc">Update privacy policy, staff training, consent mechanisms</div>
+                        <div class="plan-item-desc">Policy updates, training, and organizational changes required</div>
                         <span class="plan-priority priority-p1">P1 - 30 days</span>
                     </div>
                 `;

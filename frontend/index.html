@@ -757,22 +757,389 @@
             transition: width 0.3s;
         }
 
-        /* Results */
+        /* Results - Compact Design */
         .results-section {
             display: none;
-            padding: 4rem 3rem;
+            padding: 20px;
+            min-height: 100vh;
         }
 
         .results-section.active {
             display: block;
         }
 
-        .results-header {
-            max-width: 1400px;
-            margin: 0 auto 3rem;
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Compact Header */
+        .results-header-compact {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .results-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .results-meta {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+
+        .export-btns-compact {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-compact {
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .btn-pdf-compact {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .btn-csv-compact {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        /* Compact Metrics - 50% smaller */
+        .metrics-compact {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .metric-compact {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 14px;
+            position: relative;
+        }
+
+        .metric-compact::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+        }
+
+        .metric-label-compact {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .metric-value-compact {
+            font-size: 1.8rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .metric-value-compact.green { color: #10b981; }
+        .metric-value-compact.yellow { color: #f59e0b; }
+        .metric-value-compact.red { color: #ef4444; }
+
+        .metric-sub-compact {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 6px;
+        }
+
+        /* Compact Section Titles */
+        .section-title-compact {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        /* Compact Frameworks */
+        .frameworks-compact {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .framework-compact {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .framework-header-compact {
             display: flex;
             align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .framework-icon-compact {
+            font-size: 1.3rem;
+        }
+
+        .framework-name-compact {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .framework-stats-compact {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stat-compact {
+            text-align: center;
+            padding: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+        }
+
+        .stat-num-compact {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .stat-label-compact {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .progress-compact {
+            margin-top: 10px;
+        }
+
+        .progress-label-compact {
+            display: flex;
             justify-content: space-between;
+            font-size: 0.75rem;
+            margin-bottom: 6px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .progress-bar-compact {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill-compact {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+
+        .progress-fill-compact.green { background: linear-gradient(90deg, #10b981, #059669); }
+        .progress-fill-compact.yellow { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .progress-fill-compact.red { background: linear-gradient(90deg, #ef4444, #dc2626); }
+
+        /* Compact Compliance Areas */
+        .compliance-compact {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .compliance-card-compact {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .compliance-title-compact {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .compliance-list-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .compliance-row-compact {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .compliance-icon-compact {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .compliance-icon-compact.pass {
+            background: rgba(16,185,129,0.1);
+            border: 2px solid rgba(16,185,129,0.3);
+        }
+
+        .compliance-icon-compact.fail {
+            background: rgba(239,68,68,0.1);
+            border: 2px solid rgba(239,68,68,0.3);
+        }
+
+        .compliance-info-compact {
+            flex: 1;
+        }
+
+        .compliance-count-compact {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .compliance-desc-compact {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* Compact Violations */
+        .violations-header-compact {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .filters-compact {
+            display: flex;
+            gap: 6px;
+            background: rgba(255,255,255,0.05);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .filter-compact {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .filter-compact.active {
+            background: rgba(96,165,250,0.2);
+            color: #60a5fa;
+        }
+
+        .violations-list-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .violation-compact {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 14px;
+            position: relative;
+        }
+
+        .violation-compact::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .violation-compact.critical::before { background: #ef4444; }
+        .violation-compact.major::before { background: #f59e0b; }
+        .violation-compact.minor::before { background: #eab308; }
+
+        .violation-header-compact {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .badges-compact {
+            display: flex;
+            gap: 6px;
+        }
+
+        .badge-compact {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-critical {
+            background: rgba(239,68,68,0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239,68,68,0.3);
+        }
+
+        .badge-major {
+            background: rgba(245,158,11,0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245,158,11,0.3);
+        }
+
+        .badge-minor {
+            background: rgba(234,179,8,0.2);
+            color: #eab308;
+            border: 1px solid rgba(234,179,8,0.3);
+        }
+
+        .badge-framework {
+            background: rgba(96,165,250,0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(96,165,250,0.3);
+        }
+
+        .violation-title-compact {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .violation-desc-compact {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.85rem;
+            line-height: 1.4;
         }
 
         .tabs {
@@ -1287,56 +1654,36 @@
 
     <!-- Results Section -->
     <section class="results-section" id="resultsSection">
-        <div class="results-header">
-            <div>
-                <h2>Assessment Results</h2>
-                <p id="frameworksSummary" style="color: rgba(255,255,255,0.6); margin-top: 0.5rem;"></p>
-            </div>
-            <div style="display: flex; gap: 1rem;">
-                <button class="export-button" onclick="downloadPDF()" style="background: #ef4444; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: 600;">
-                    📄 Download PDF Report
-                </button>
-                <button class="export-button" onclick="exportToCSV()" style="background: #22c55e; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: 600;">
-                    📊 Export to Jira (CSV)
-                </button>
-            </div>
-        </div>
-
-        <!-- Risk Score Overview -->
-        <div style="background: rgba(255,255,255,0.03); border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
-            <div style="display: grid; grid-template-columns: auto 1fr 1fr; gap: 2rem; align-items: center;">
-                <div style="text-align: center;">
-                    <div style="font-size: 4rem; font-weight: 700; background: linear-gradient(135deg, #ef4444, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" id="riskScoreDisplay">
-                        --
-                    </div>
-                    <div style="font-size: 0.9rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.1em;" id="riskLevelDisplay">
-                        RISK SCORE
-                    </div>
-                </div>
+        <div class="container">
+            <!-- Compact Header -->
+            <div class="results-header-compact">
                 <div>
-                    <h3 style="margin-bottom: 1rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.6);">Severity Distribution</h3>
-                    <div style="height: 150px;">
-                        <canvas id="severityChart"></canvas>
-                    </div>
+                    <h1 class="results-title">Assessment Results</h1>
+                    <div class="results-meta" id="metaInfo"></div>
                 </div>
-                <div>
-                    <h3 style="margin-bottom: 1rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.6);">Framework Breakdown</h3>
-                    <div style="height: 150px;">
-                        <canvas id="frameworkChart"></canvas>
-                    </div>
+                <div class="export-btns-compact">
+                    <button class="btn-compact btn-pdf-compact" onclick="downloadPDF()">📄 PDF</button>
+                    <button class="btn-compact btn-csv-compact" onclick="exportToCSV()">📊 CSV</button>
                 </div>
             </div>
-        </div>
 
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('violations')">Violations (<span id="violationsCount">0</span>)</button>
-            <button class="tab" onclick="switchTab('remediation')">Remediation Plan</button>
-        </div>
-        <div class="tab-content active" id="violationsTab">
-            <div id="violationsList"></div>
-        </div>
-        <div class="tab-content" id="remediationTab">
-            <div id="remediationPlan"></div>
+            <!-- Compact Metrics -->
+            <div class="metrics-compact" id="metricsGrid"></div>
+
+            <!-- Frameworks -->
+            <div class="section-title-compact">Framework Status</div>
+            <div class="frameworks-compact" id="frameworksGrid"></div>
+
+            <!-- Compliance Areas -->
+            <div class="section-title-compact">Compliance Status</div>
+            <div class="compliance-compact" id="complianceAreas"></div>
+
+            <!-- Violations -->
+            <div class="violations-header-compact">
+                <div class="section-title-compact">Detected Violations</div>
+                <div class="filters-compact" id="filters"></div>
+            </div>
+            <div class="violations-list-compact" id="violationsList"></div>
         </div>
     </section>
 

@@ -84,7 +84,7 @@ You must provide:
         super().__init__(
             framework="EU-AI",
             focus_area="high-risk AI systems",
-            model="claude-sonnet-4-20250514",  # Sonnet for nuanced analysis
+            model="claude-3-5-haiku-20241022",  # Haiku for cost efficiency
             api_key=api_key
         )
 
@@ -169,7 +169,7 @@ You must provide:
         super().__init__(
             framework="EU-AI",
             focus_area="prohibited AI practices",
-            model="claude-sonnet-4-20250514",  # Sonnet for nuanced analysis
+            model="claude-3-5-haiku-20241022",  # Haiku for cost efficiency
             api_key=api_key
         )
 
@@ -249,7 +249,7 @@ You must provide:
         super().__init__(
             framework="EU-AI",
             focus_area="transparency requirements",
-            model="claude-sonnet-4-20250514",  # Sonnet for nuanced analysis
+            model="claude-3-5-haiku-20241022",  # Haiku for cost efficiency
             api_key=api_key
         )
 

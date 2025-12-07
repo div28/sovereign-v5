@@ -1889,6 +1889,13 @@
             // Store assessment globally for exports
             window.currentAssessment = result;
 
+            // Render compact design
+            renderMetricsCompact(result);
+            renderFrameworksCompact(result);
+            renderComplianceAreasCompact(result);
+            renderViolationsCompact(result);
+            return; // Skip old rendering below
+
             // Update risk score display with circular gauge
             const riskScore = result.risk_score || 0;
             const riskDisplay = document.getElementById('riskScoreDisplay');
@@ -2090,6 +2097,201 @@
                     </div>
                 </div>
             `;
+        }
+
+        // Compact rendering functions
+        function renderMetricsCompact(data) {
+            const total = data.violations?.length || 0;
+            const critical = data.violations?.filter(v => v.severity === 'CRITICAL').length || 0;
+            const major = data.violations?.filter(v => v.severity === 'MAJOR').length || 0;
+            const minor = total - critical - major;
+
+            const risk = data.risk_score || 0;
+            const readiness = Math.max(0, 100 - risk);
+            const auditReady = risk < 30;
+
+            document.getElementById('metaInfo').textContent =
+                `ID: ${data.analysis_id || 'N/A'} • Frameworks: ${data.frameworks_analyzed?.map(f => f.toUpperCase()).join(', ') || 'N/A'}`;
+
+            document.getElementById('metricsGrid').innerHTML = `
+                <div class="metric-compact">
+                    <div class="metric-label-compact">
+                        <span class="tooltip" title="% of required controls implemented">Readiness</span>
+                    </div>
+                    <div class="metric-value-compact ${readiness >= 70 ? 'green' : readiness >= 40 ? 'yellow' : 'red'}">${readiness}%</div>
+                    <div class="metric-sub-compact">${100 - readiness}% to ready</div>
+                </div>
+                <div class="metric-compact">
+                    <div class="metric-label-compact">
+                        <span class="tooltip" title="Risk score across frameworks">Health</span>
+                    </div>
+                    <div class="metric-value-compact ${risk < 30 ? 'green' : risk < 60 ? 'yellow' : 'red'}">${risk}/100</div>
+                    <div class="metric-sub-compact">${risk < 30 ? 'Low' : risk < 60 ? 'Medium' : 'High'} Risk</div>
+                </div>
+                <div class="metric-compact">
+                    <div class="metric-label-compact">Violations</div>
+                    <div class="metric-value-compact red">${total}</div>
+                    <div class="metric-sub-compact">${critical}C, ${major}M, ${minor}m</div>
+                </div>
+                <div class="metric-compact">
+                    <div class="metric-label-compact">
+                        <span class="tooltip" title="Ready for external audit">Audit</span>
+                    </div>
+                    <div class="metric-value-compact ${auditReady ? 'green' : 'red'}">${auditReady ? '🟢' : '🔴'} ${auditReady ? 'Ready' : 'Not Ready'}</div>
+                    <div class="metric-sub-compact">${auditReady ? 'Can proceed' : '~3 mo'}</div>
+                </div>
+            `;
+        }
+
+        function renderFrameworksCompact(data) {
+            const icons = {gdpr:'🔒',sox:'📊',euai:'🤖',euaiact:'🤖',ccpa:'🛡️',hipaa:'🏥',eeoc:'⚖️'};
+            const names = {gdpr:'GDPR',sox:'SOX',euai:'EU AI Act',euaiact:'EU AI Act',ccpa:'CCPA',hipaa:'HIPAA',eeoc:'EEOC'};
+
+            const grid = document.getElementById('frameworksGrid');
+            const frameworks = data.frameworks_analyzed || [];
+
+            if (!frameworks.length) {
+                grid.innerHTML = '<p style="color:rgba(255,255,255,0.6);">No frameworks analyzed</p>';
+                return;
+            }
+
+            grid.innerHTML = '';
+            frameworks.forEach(fw => {
+                const key = fw.toLowerCase().replace(/\s+/g, '');
+                const violations = data.violations?.filter(v => v.framework?.toLowerCase() === fw.toLowerCase()) || [];
+                const count = violations.length;
+                const criticalCount = violations.filter(v => v.severity === 'CRITICAL').length;
+                const ready = count === 0 ? 100 : Math.max(0, Math.round(100 - (criticalCount * 40 + (count - criticalCount) * 10)));
+                const color = ready < 40 ? 'red' : ready < 70 ? 'yellow' : 'green';
+
+                const card = document.createElement('div');
+                card.className = 'framework-compact';
+                card.innerHTML = `
+                    <div class="framework-header-compact">
+                        <div class="framework-icon-compact">${icons[key] || '📋'}</div>
+                        <div class="framework-name-compact">${names[key] || fw.toUpperCase()}</div>
+                    </div>
+                    <div class="framework-stats-compact">
+                        <div class="stat-compact">
+                            <div class="stat-num-compact ${count ? 'red' : 'green'}">${count}</div>
+                            <div class="stat-label-compact">Violations</div>
+                        </div>
+                        <div class="stat-compact">
+                            <div class="stat-num-compact ${color}">${ready}%</div>
+                            <div class="stat-label-compact">Ready</div>
+                        </div>
+                    </div>
+                    <div class="progress-compact">
+                        <div class="progress-label-compact"><span>Readiness</span><span>${ready}%</span></div>
+                        <div class="progress-bar-compact">
+                            <div class="progress-fill-compact ${color}" style="width:${ready}%;"></div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderComplianceAreasCompact(data) {
+            const total = data.violations?.length || 0;
+            const areas = (data.frameworks_analyzed?.length || 1) * 10;
+            const compliant = Math.max(0, areas - total);
+            const critical = data.violations?.filter(v => v.severity === 'CRITICAL').length || 0;
+            const major = data.violations?.filter(v => v.severity === 'MAJOR').length || 0;
+            const minor = total - critical - major;
+
+            document.getElementById('complianceAreas').innerHTML = `
+                <div class="compliance-card-compact">
+                    <div class="compliance-title-compact">Overall Status</div>
+                    <div class="compliance-list-compact">
+                        <div class="compliance-row-compact">
+                            <div class="compliance-icon-compact pass">✓</div>
+                            <div class="compliance-info-compact">
+                                <div class="compliance-count-compact green">${compliant}</div>
+                                <div class="compliance-desc-compact">Compliant Areas</div>
+                            </div>
+                        </div>
+                        <div class="compliance-row-compact">
+                            <div class="compliance-icon-compact fail">✗</div>
+                            <div class="compliance-info-compact">
+                                <div class="compliance-count-compact red">${total}</div>
+                                <div class="compliance-desc-compact">Non-Compliant Areas</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="compliance-card-compact">
+                    <div class="compliance-title-compact">Priority Items</div>
+                    <div class="compliance-list-compact">
+                        <div class="compliance-row-compact">
+                            <div class="compliance-icon-compact fail">🔴</div>
+                            <div class="compliance-info-compact">
+                                <div class="compliance-count-compact red">${critical}</div>
+                                <div class="compliance-desc-compact">P0 Critical (0-14d)</div>
+                            </div>
+                        </div>
+                        <div class="compliance-row-compact">
+                            <div class="compliance-icon-compact fail">🟠</div>
+                            <div class="compliance-info-compact">
+                                <div class="compliance-count-compact yellow">${major}</div>
+                                <div class="compliance-desc-compact">P1 Major (15-30d)</div>
+                            </div>
+                        </div>
+                        <div class="compliance-row-compact">
+                            <div class="compliance-icon-compact fail">🟡</div>
+                            <div class="compliance-info-compact">
+                                <div class="compliance-count-compact">${minor}</div>
+                                <div class="compliance-desc-compact">P2 Minor (30-90d)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderViolationsCompact(data) {
+            const violations = data.violations || [];
+            const critical = violations.filter(v => v.severity === 'CRITICAL').length;
+            const major = violations.filter(v => v.severity === 'MAJOR').length;
+            const minor = violations.filter(v => v.severity === 'MINOR').length;
+
+            document.getElementById('filters').innerHTML = `
+                <button class="filter-compact active" onclick="filterViolationsCompact('all')">All (${violations.length})</button>
+                <button class="filter-compact" onclick="filterViolationsCompact('critical')">Critical (${critical})</button>
+                <button class="filter-compact" onclick="filterViolationsCompact('major')">Major (${major})</button>
+                <button class="filter-compact" onclick="filterViolationsCompact('minor')">Minor (${minor})</button>
+            `;
+
+            const list = document.getElementById('violationsList');
+            list.innerHTML = '';
+
+            violations.forEach(v => {
+                const sev = v.severity === 'CRITICAL' ? 'critical' : v.severity === 'MAJOR' ? 'major' : 'minor';
+                const label = v.severity || 'Unknown';
+
+                const card = document.createElement('div');
+                card.className = `violation-compact ${sev}`;
+                card.setAttribute('data-severity', sev);
+                card.innerHTML = `
+                    <div class="violation-header-compact">
+                        <div class="badges-compact">
+                            <span class="badge-compact badge-${sev}">${label}</span>
+                            <span class="badge-compact badge-framework">${v.framework?.toUpperCase() || 'N/A'}</span>
+                        </div>
+                    </div>
+                    <div class="violation-title-compact">${v.article_violated || 'Violation'}</div>
+                    <div class="violation-desc-compact">${v.evidence_quote || 'No description'}</div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function filterViolationsCompact(severity) {
+            document.querySelectorAll('.filter-compact').forEach(f => f.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.violation-compact').forEach(v => {
+                v.style.display = severity === 'all' || v.getAttribute('data-severity') === severity ? 'block' : 'none';
+            });
         }
 
         function toggleSection(header) {

@@ -15,6 +15,12 @@ import logging
 import uuid
 from datetime import datetime
 
+# Debug: Print SDK versions at startup
+import anthropic
+import openai
+print(f"DEBUG: anthropic version: {anthropic.__version__}")
+print(f"DEBUG: openai version: {openai.__version__}")
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

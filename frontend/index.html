@@ -1459,6 +1459,126 @@
             animation: fadeIn 0.8s ease forwards;
             animation-delay: 2.5s;
         }
+
+        /* ============================================
+           COMPACT UI FIXES - Production Polish
+           ============================================ */
+
+        /* FIX: Compact metric cards */
+        .metrics-grid {
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            padding: 16px 20px;
+        }
+
+        .metric-header {
+            margin-bottom: 12px;
+        }
+
+        /* FIX: Compact risk ring for 100/100 display */
+        .risk-score-ring {
+            width: 90px;
+            height: 90px;
+        }
+
+        .risk-score-ring svg {
+            width: 90px;
+            height: 90px;
+        }
+
+        .risk-number {
+            font-size: 26px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .risk-denom {
+            font-size: 11px;
+            margin-left: 1px;
+        }
+
+        .risk-label {
+            font-size: 10px;
+            margin-top: 2px;
+        }
+
+        /* FIX: Export buttons - larger and better positioned */
+        .assessment-header {
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .export-btn,
+        .btn-pdf,
+        .btn-csv {
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* FIX: Compact compliance section */
+        .compliance-section {
+            margin-bottom: 24px;
+        }
+
+        .compliance-grid {
+            gap: 16px;
+        }
+
+        .compliance-card {
+            padding: 16px 20px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+        }
+
+        /* FIX: Compact violations section */
+        .violations-section {
+            margin-bottom: 24px;
+        }
+
+        .violations-header {
+            margin-bottom: 16px;
+        }
+
+        .violation-card {
+            padding: 16px 20px;
+        }
+
+        .violation-card-header {
+            margin-bottom: 10px;
+        }
+
+        /* FIX: Responsive - maintain compactness */
+        @media (max-width: 1200px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .metrics-grid,
+            .compliance-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .assessment-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .export-buttons {
+                width: 100%;
+            }
+
+            .export-btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>

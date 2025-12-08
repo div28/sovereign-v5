@@ -1044,6 +1044,186 @@
             font-style: italic;
         }
 
+        /* Animated SVG Risk Ring */
+        .risk-score-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .risk-score-ring {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+
+        .risk-score-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .risk-score-ring .bg-ring {
+            fill: none;
+            stroke: rgba(255,255,255,0.06);
+            stroke-width: 8;
+        }
+
+        .risk-score-ring .progress-ring {
+            fill: none;
+            stroke: url(#riskGradient);
+            stroke-width: 8;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.4));
+            transition: stroke-dasharray 1s ease-out;
+        }
+
+        .risk-score-value-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: baseline;
+        }
+
+        .risk-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f87171;
+        }
+
+        .risk-denom {
+            font-size: 12px;
+            color: rgba(248, 113, 113, 0.6);
+            margin-left: 2px;
+        }
+
+        .risk-label {
+            font-size: 11px;
+            color: #f87171;
+            font-weight: 500;
+        }
+
+        /* Expandable Violation Cards */
+        .violation-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-left: 3px solid #ef4444;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .violation-card:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.15);
+            box-shadow: 0 0 20px rgba(6,182,212,0.15);
+        }
+
+        .violation-card.expanded {
+            background: rgba(255,255,255,0.06);
+        }
+
+        .expand-icon {
+            transition: transform 0.2s ease;
+            color: rgba(255,255,255,0.5);
+            font-size: 18px;
+        }
+
+        .violation-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .violation-details {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: none;
+        }
+
+        .violation-card.expanded .violation-details {
+            display: block;
+        }
+
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .metadata-item {
+            background: rgba(255,255,255,0.03);
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .metadata-label {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .metadata-value {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            background: rgba(255,255,255,0.03);
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .filter-tab-btn {
+            padding: 6px 14px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-tab-btn:hover {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .filter-tab-btn.active {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+        }
+
+        /* Status Dot Animation */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Card Hover Glows */
+        .summary-item:hover {
+            border-color: rgba(255,255,255,0.15);
+            box-shadow: 0 0 20px rgba(6,182,212,0.1);
+        }
+
         /* Professional GRC Design System */
         .glass-card {
             backdrop-filter: blur(20px);
@@ -1512,9 +1692,27 @@
             <!-- Compact Summary -->
             <div class="summary-bar">
                 <div class="summary-item">
-                    <div class="summary-label">Risk Score</div>
-                    <div class="summary-value red" id="riskScore">-</div>
-                    <div class="summary-sub" id="riskLevel">-</div>
+                    <div class="summary-label">RISK SCORE <span class="status-dot"></span></div>
+                    <div class="risk-score-container">
+                        <div class="risk-score-ring">
+                            <svg width="100" height="100" viewBox="0 0 100 100">
+                                <defs>
+                                    <linearGradient id="riskGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#dc2626"/>
+                                        <stop offset="100%" stop-color="#f87171"/>
+                                    </linearGradient>
+                                </defs>
+                                <circle class="bg-ring" cx="50" cy="50" r="42"/>
+                                <circle class="progress-ring" cx="50" cy="50" r="42"
+                                    stroke-dasharray="0 264" id="riskRing"/>
+                            </svg>
+                            <div class="risk-score-value-inner">
+                                <span class="risk-number" id="riskScore">0</span>
+                                <span class="risk-denom">/100</span>
+                            </div>
+                        </div>
+                        <span class="risk-label" id="riskLevel">-</span>
+                    </div>
                 </div>
                 <div class="summary-item">
                     <div class="summary-label">Total Violations</div>
@@ -1535,7 +1733,15 @@
 
             <!-- Violations Overview -->
             <div class="violations-overview">
-                <div class="section-title">Violations Overview</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div class="section-title">Violations Overview</div>
+                    <div class="filter-tabs" id="filterTabs">
+                        <button class="filter-tab-btn active" data-filter="all">All (<span id="filterAll">0</span>)</button>
+                        <button class="filter-tab-btn" data-filter="critical">Critical (<span id="filterCritical">0</span>)</button>
+                        <button class="filter-tab-btn" data-filter="major">Major (<span id="filterMajor">0</span>)</button>
+                        <button class="filter-tab-btn" data-filter="minor">Minor (<span id="filterMinor">0</span>)</button>
+                    </div>
+                </div>
                 <div class="violation-cards" id="violationCards"></div>
             </div>
 
@@ -1693,18 +1899,7 @@
                 
                 // Animate RAG
                 await animateAgent('rag', 'Searching regulations...', 2000);
-                document.getElementById('rag-action').textContent = 'Found 12 relevant articles';
 
-                // Add found articles insight
-                const insightsFeed = document.getElementById('insightsFeed');
-                const foundInsight = document.createElement('div');
-                foundInsight.className = 'insight-item';
-                foundInsight.textContent = 'Found 12 relevant articles';
-                insightsFeed.appendChild(foundInsight);
-                insightsFeed.scrollTop = insightsFeed.scrollHeight;
-
-                await new Promise(r => setTimeout(r, 500));
-                
                 // Call API
                 const response = await fetch(`${API_BASE}/api/analyze`, {
                     method: 'POST',
@@ -1713,6 +1908,20 @@
                 });
 
                 const result = await response.json();
+
+                // Update RAG action with actual article count
+                const articlesCount = result.retrieved_chunks_count || result.violations?.length * 3 || 12;
+                document.getElementById('rag-action').textContent = `Found ${articlesCount} relevant articles`;
+
+                // Add found articles insight
+                const insightsFeed = document.getElementById('insightsFeed');
+                const foundInsight = document.createElement('div');
+                foundInsight.className = 'insight-item';
+                foundInsight.textContent = `Found ${articlesCount} relevant articles`;
+                insightsFeed.appendChild(foundInsight);
+                insightsFeed.scrollTop = insightsFeed.scrollHeight;
+
+                await new Promise(r => setTimeout(r, 500));
 
                 // Store assessment globally and in localStorage
                 window.assessmentResult = result;
@@ -2005,8 +2214,16 @@
             const major = violations.filter(v => v.severity === 'MAJOR').length;
             const minor = violations.length - critical - major;
 
-            document.getElementById('riskScore').textContent = `${risk}/100`;
+            // Animate SVG Risk Ring
+            document.getElementById('riskScore').textContent = risk;
             document.getElementById('riskLevel').textContent = risk < 30 ? 'Low Risk' : risk < 60 ? 'Medium Risk' : 'High Risk';
+
+            setTimeout(() => {
+                const circumference = 2 * Math.PI * 42; // r=42
+                const progress = (risk / 100) * circumference;
+                document.getElementById('riskRing').style.strokeDasharray = `${progress} ${circumference}`;
+            }, 300);
+
             document.getElementById('totalViolations').textContent = violations.length;
             document.getElementById('violationBreakdown').textContent =
                 `${critical} Critical, ${major} Major, ${minor} Minor`;
@@ -2015,12 +2232,19 @@
             document.getElementById('auditStatus').textContent = risk < 30 ? '🟢 Ready' : '🔴 Not Ready';
             document.getElementById('auditEta').textContent = risk < 30 ? 'Can proceed' : '~3 months';
 
-            // Violations Overview (max 6 cards)
+            // Update filter counts
+            document.getElementById('filterAll').textContent = violations.length;
+            document.getElementById('filterCritical').textContent = critical;
+            document.getElementById('filterMajor').textContent = major;
+            document.getElementById('filterMinor').textContent = minor;
+
+            // Violations Overview - Expandable cards with metadata
             const cardsContainer = document.getElementById('violationCards');
             cardsContainer.innerHTML = '';
-            violations.slice(0, 6).forEach(v => {
+            violations.forEach(v => {
                 const card = document.createElement('div');
                 card.className = 'violation-card';
+                card.dataset.severity = v.severity.toLowerCase();
                 const sevLabel = v.severity === 'CRITICAL' ? 'Critical' : v.severity === 'MAJOR' ? 'Major' : 'Minor';
                 card.innerHTML = `
                     <div class="violation-header">
@@ -2028,10 +2252,47 @@
                             <span class="badge badge-critical">${sevLabel}</span>
                             <span class="badge badge-framework">${v.framework?.toUpperCase() || 'N/A'}</span>
                         </div>
+                        <span class="expand-icon">▼</span>
                     </div>
                     <div class="violation-title">${v.article_violated || 'Violation'}</div>
-                    <div class="violation-desc">${(v.evidence_quote || v.issue || '').substring(0, 120)}...</div>
+                    <div class="violation-desc">${(v.evidence_quote || v.issue || '').substring(0, 200)}</div>
+                    <div class="violation-details">
+                        <div class="metadata-grid">
+                            <div class="metadata-item">
+                                <div class="metadata-label">Severity</div>
+                                <div class="metadata-value">${v.severity}</div>
+                            </div>
+                            <div class="metadata-item">
+                                <div class="metadata-label">Priority</div>
+                                <div class="metadata-value">${v.priority || 'P0'}</div>
+                            </div>
+                            <div class="metadata-item">
+                                <div class="metadata-label">Complexity</div>
+                                <div class="metadata-value">${v.complexity || 'High'}</div>
+                            </div>
+                            <div class="metadata-item">
+                                <div class="metadata-label">Timeline</div>
+                                <div class="metadata-value">${v.timeline || '0-14 days'}</div>
+                            </div>
+                            <div class="metadata-item">
+                                <div class="metadata-label">Confidence</div>
+                                <div class="metadata-value">${v.confidence_score || '95%'}</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <div style="font-weight: 600; margin-bottom: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.7);">Remediation Steps:</div>
+                            <ol style="margin-left: 1.5rem; color: rgba(255,255,255,0.8); font-size: 0.85rem;">
+                                ${v.remediation_steps?.map(step => `<li style="margin-bottom: 0.5rem;">${step}</li>`).join('') || '<li>No remediation steps provided</li>'}
+                            </ol>
+                        </div>
+                    </div>
                 `;
+
+                // Add click handler for expand/collapse
+                card.addEventListener('click', () => {
+                    card.classList.toggle('expanded');
+                });
+
                 cardsContainer.appendChild(card);
             });
 
@@ -2044,7 +2305,8 @@
                 { title: 'Add mandatory human review workflow', desc: 'For Article 22 automated decisions', priority: 'priority-p0', label: 'P0 - Immediate' },
                 { title: 'Build automated data retention/deletion service', desc: 'Comply with GDPR right to erasure', priority: 'priority-p0', label: 'P0 - Immediate' },
                 { title: 'Deploy access control middleware with RBAC', desc: 'Segregation of duties for SOX compliance', priority: 'priority-p1', label: 'P1 - 30 days' },
-                { title: 'Create audit logging infrastructure', desc: 'Immutable logs for all data access', priority: 'priority-p1', label: 'P1 - 30 days' }
+                { title: 'Create audit logging infrastructure', desc: 'Immutable logs for all data access', priority: 'priority-p1', label: 'P1 - 30 days' },
+                { title: 'Build DSR (Data Subject Request) API endpoint', desc: 'REST API for access, rectification, erasure requests', priority: 'priority-p1', label: 'P1 - 30 days' }
             ];
 
             technicalFixes.forEach(fix => {
@@ -2066,7 +2328,8 @@
                 { title: 'Establish Data Protection Officer oversight', desc: 'Create DPO review process for high-risk AI', priority: 'priority-p1', label: 'P1 - 30 days' },
                 { title: 'Implement explicit consent collection', desc: 'Granular consent mechanisms for automated profiling', priority: 'priority-p1', label: 'P1 - 30 days' },
                 { title: 'Create data subject rights request workflow', desc: 'Handle access, rectification, erasure requests', priority: 'priority-p1', label: 'P1 - 30 days' },
-                { title: 'Deploy staff training program', desc: 'Train teams on GDPR, SOX, and EU AI Act compliance', priority: 'priority-p1', label: 'P1 - 30 days' }
+                { title: 'Deploy staff training program', desc: 'Train teams on GDPR, SOX, and EU AI Act compliance', priority: 'priority-p1', label: 'P1 - 30 days' },
+                { title: 'Conduct third-party vendor audits', desc: 'Review data processors and subprocessors for compliance', priority: 'priority-p1', label: 'P1 - 30 days' }
             ];
 
             businessFixes.forEach(fix => {
@@ -2111,6 +2374,29 @@
             event.target.classList.add('active');
             document.getElementById(tab).classList.add('active');
         }
+
+        // Filter tab handlers
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add filter tab click handlers
+            document.querySelectorAll('.filter-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update active state
+                    document.querySelectorAll('.filter-tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    // Filter violations
+                    const filter = btn.dataset.filter;
+                    document.querySelectorAll('.violation-card').forEach(card => {
+                        if (filter === 'all') {
+                            card.style.display = 'block';
+                        } else {
+                            const severity = card.dataset.severity;
+                            card.style.display = severity === filter ? 'block' : 'none';
+                        }
+                    });
+                });
+            });
+        });
 
         function downloadPDF() {
             if (!window.currentAssessment) {

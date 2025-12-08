@@ -430,16 +430,18 @@ async def export_pdf(analysis_id: str):
 
         analysis = _analysis_cache[analysis_id]
 
-        # Generate PDF
-        from backend.exports.pdf_generator import generate_compliance_pdf
+        # Generate PDF using professional report generator
+        from backend.utils.pdf_generator import generate_compliance_report
 
-        pdf_buffer = generate_compliance_pdf(
-            violations=analysis['violations'],
-            risk_score=analysis['risk_score'],
-            frameworks=analysis['frameworks'],
-            submission_preview=analysis['description'][:500],
-            analysis_id=analysis_id
-        )
+        # Prepare data in the format expected by the new generator
+        report_data = {
+            'assessment_id': analysis_id,
+            'risk_score': analysis['risk_score'],
+            'frameworks': analysis['frameworks'],
+            'violations': analysis['violations']
+        }
+
+        pdf_buffer = generate_compliance_report(data=report_data, output_path=None)
 
         # Return as streaming response
         return StreamingResponse(

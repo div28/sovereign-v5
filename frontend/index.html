@@ -1642,6 +1642,241 @@
                 justify-content: center;
             }
         }
+
+        /* ============================================
+           HERO ANIMATION - Impressive Scanning Effect
+           ============================================ */
+
+        /* Hero Animation Container */
+        .hero-animation {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 450px;
+        }
+
+        .scan-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(30, 41, 59, 0.4) 100%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Scanning line effect */
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #3b82f6, #8b5cf6, transparent);
+            box-shadow: 0 0 20px #3b82f6, 0 0 40px #3b82f6;
+            animation: scanDown 3s ease-in-out infinite;
+        }
+
+        @keyframes scanDown {
+            0% { top: 0; opacity: 1; }
+            50% { top: 100%; opacity: 0.5; }
+            51% { top: 0; opacity: 0; }
+            52% { opacity: 1; }
+            100% { top: 0; opacity: 1; }
+        }
+
+        /* Floating violation cards */
+        .detected-violations {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .violation-float {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 12px;
+            padding: 14px 16px;
+            border-left: 3px solid #ef4444;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideInViolation 0.5s ease forwards;
+        }
+
+        .violation-float.v1 { animation-delay: 0.5s; }
+        .violation-float.v2 { animation-delay: 1.2s; border-left-color: #f97316; }
+        .violation-float.v3 { animation-delay: 1.9s; }
+
+        @keyframes slideInViolation {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .v-badges {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .v-badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .v-badge.critical {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .v-badge.high {
+            background: rgba(249, 115, 22, 0.2);
+            color: #fb923c;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .v-badge.framework {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .v-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 4px;
+        }
+
+        .v-citation {
+            font-size: 11px;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        /* Risk Gauge */
+        .risk-display {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: 16px;
+            padding: 16px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .risk-label-top {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .risk-gauge {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+        }
+
+        .gauge-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 8;
+        }
+
+        .gauge-fill {
+            fill: none;
+            stroke: url(#gaugeGradient);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 339.292;
+            stroke-dashoffset: 339.292;
+            animation: fillGauge 2s ease-out 2.5s forwards;
+            filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5));
+        }
+
+        @keyframes fillGauge {
+            to {
+                stroke-dashoffset: 50;
+            }
+        }
+
+        .risk-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: baseline;
+        }
+
+        .risk-num {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f87171;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .risk-max {
+            font-size: 12px;
+            color: rgba(248, 113, 113, 0.6);
+        }
+
+        .risk-status {
+            font-size: 11px;
+            font-weight: 600;
+            color: #f87171;
+            margin-top: 8px;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        /* Floating particles */
+        .particles {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particles span {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #3b82f6;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .particles span:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .particles span:nth-child(2) { top: 60%; left: 80%; animation-delay: 1s; }
+        .particles span:nth-child(3) { top: 80%; left: 30%; animation-delay: 2s; }
+        .particles span:nth-child(4) { top: 40%; left: 60%; animation-delay: 0.5s; }
+        .particles span:nth-child(5) { top: 10%; left: 70%; animation-delay: 1.5s; }
+        .particles span:nth-child(6) { top: 70%; left: 50%; animation-delay: 2.5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+            50% { transform: translateY(-20px) scale(1.5); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -1675,45 +1910,68 @@
             </div>
         </div>
 
-        <div class="example-cards">
-            <div class="example-card" id="card0">
-                <div class="example-header">
-                    <span class="severity-badge high">HIGH</span>
-                    <span class="framework-badge">HIPAA</span>
-                </div>
-                <div class="example-title">Unencrypted PHI storage detected</div>
-                <div class="example-quote">
-                    §164.312(a)(2)(iv): Encryption required
-                </div>
-            </div>
+        <div class="hero-animation">
+            <!-- Scanning Effect Container -->
+            <div class="scan-container">
+                <div class="scan-line"></div>
 
-            <div class="example-card" id="card1">
-                <div class="example-header">
-                    <span class="severity-badge critical">CRITICAL</span>
-                    <span class="framework-badge">GDPR</span>
-                </div>
-                <div class="example-title">Automated profiling without Article 22(2) exemption</div>
-                <div class="example-quote">
-                    Article 22(2): "...shall not apply if..."
-                </div>
-            </div>
+                <!-- Floating violation cards that appear during scan -->
+                <div class="detected-violations">
+                    <div class="violation-float v1">
+                        <div class="v-badges">
+                            <span class="v-badge critical">CRITICAL</span>
+                            <span class="v-badge framework">GDPR</span>
+                        </div>
+                        <div class="v-title">Automated profiling without Article 22(2) exemption</div>
+                        <div class="v-citation">Article 22(2): "...shall not apply if..."</div>
+                    </div>
 
-            <div class="example-card" id="card2">
-                <div class="example-header">
-                    <span class="severity-badge critical">CRITICAL</span>
-                    <span class="framework-badge">SOX</span>
-                </div>
-                <div class="example-title">Inadequate segregation of duties in financial controls</div>
-                <div class="example-quote">
-                    Section 404: Internal control requirements
-                </div>
-            </div>
+                    <div class="violation-float v2">
+                        <div class="v-badges">
+                            <span class="v-badge high">HIGH</span>
+                            <span class="v-badge framework">HIPAA</span>
+                        </div>
+                        <div class="v-title">Unencrypted PHI storage detected</div>
+                        <div class="v-citation">§164.312(a)(2)(iv): Encryption required</div>
+                    </div>
 
-            <!-- Risk Score Summary Card -->
-            <div class="risk-summary-card">
-                <div class="risk-summary-label">Calculating Risk Score...</div>
-                <div class="risk-summary-value">84/100</div>
-                <div class="risk-summary-desc">HIGH RISK</div>
+                    <div class="violation-float v3">
+                        <div class="v-badges">
+                            <span class="v-badge critical">CRITICAL</span>
+                            <span class="v-badge framework">SOX</span>
+                        </div>
+                        <div class="v-title">Inadequate segregation of duties</div>
+                        <div class="v-citation">Section 404: Internal control requirements</div>
+                    </div>
+                </div>
+
+                <!-- Animated Risk Score -->
+                <div class="risk-display">
+                    <div class="risk-label-top">Risk Assessment</div>
+                    <div class="risk-gauge">
+                        <svg viewBox="0 0 120 120" class="gauge-svg">
+                            <defs>
+                                <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#dc2626" />
+                                    <stop offset="100%" stop-color="#f87171" />
+                                </linearGradient>
+                            </defs>
+                            <circle class="gauge-bg" cx="60" cy="60" r="54" />
+                            <circle class="gauge-fill" cx="60" cy="60" r="54" />
+                        </svg>
+                        <div class="risk-value">
+                            <span class="risk-num">0</span>
+                            <span class="risk-max">/100</span>
+                        </div>
+                    </div>
+                    <div class="risk-status">ANALYZING...</div>
+                </div>
+
+                <!-- Connection lines / particles -->
+                <div class="particles">
+                    <span></span><span></span><span></span>
+                    <span></span><span></span><span></span>
+                </div>
             </div>
         </div>
     </section>
@@ -1976,34 +2234,79 @@
         let selectedFrameworks = new Set();
         let currentAssessment = null;
 
-        // Auto-rotate hero violation cards every 3 seconds
-        let currentCard = 0;
-        const exampleCards = [
-            document.getElementById('card0'),
-            document.getElementById('card1'),
-            document.getElementById('card2')
-        ].filter(card => card !== null);
+        // Animate risk score number in hero
+        function animateRiskScore() {
+            const riskNum = document.querySelector('.hero-animation .risk-num');
+            const riskStatus = document.querySelector('.hero-animation .risk-status');
+            if (!riskNum) return;
 
-        function rotateCards() {
-            if (exampleCards.length > 0) {
-                // Hide all cards except the current one
-                exampleCards.forEach((card, index) => {
-                    if (index === currentCard) {
-                        card.classList.remove('hidden');
+            let current = 0;
+            const target = 87;
+            const duration = 2000;
+            const startTime = performance.now();
+            const startDelay = 2500; // Start after gauge animation begins
+
+            setTimeout(() => {
+                function update(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const easeProgress = 1 - Math.pow(1 - progress, 3);
+                    current = Math.round(target * easeProgress);
+                    riskNum.textContent = current;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(update);
                     } else {
-                        card.classList.add('hidden');
+                        riskStatus.textContent = 'HIGH RISK';
+                        riskStatus.style.animation = 'none';
                     }
-                });
-
-                // Move to next card
-                currentCard = (currentCard + 1) % exampleCards.length;
-            }
+                }
+                requestAnimationFrame(update);
+            }, startDelay);
         }
 
-        // Start rotating after initial animations (after 2s)
-        setTimeout(() => {
-            setInterval(rotateCards, 3000);
-        }, 2000);
+        // Restart animation periodically
+        function loopHeroAnimation() {
+            animateRiskScore();
+
+            // Reset and replay every 8 seconds
+            setInterval(() => {
+                const violations = document.querySelectorAll('.violation-float');
+                const gaugeFill = document.querySelector('.gauge-fill');
+                const riskNum = document.querySelector('.hero-animation .risk-num');
+                const riskStatus = document.querySelector('.hero-animation .risk-status');
+
+                // Reset violations
+                violations.forEach(v => {
+                    v.style.animation = 'none';
+                    v.offsetHeight; // Trigger reflow
+                    v.style.animation = '';
+                });
+
+                // Reset gauge
+                if (gaugeFill) {
+                    gaugeFill.style.animation = 'none';
+                    gaugeFill.offsetHeight;
+                    gaugeFill.style.animation = '';
+                }
+
+                // Reset number
+                if (riskNum) riskNum.textContent = '0';
+                if (riskStatus) {
+                    riskStatus.textContent = 'ANALYZING...';
+                    riskStatus.style.animation = '';
+                }
+
+                animateRiskScore();
+            }, 8000);
+        }
+
+        // Start hero animation on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loopHeroAnimation);
+        } else {
+            loopHeroAnimation();
+        }
 
         // Navigation functions with History API
         function navigateToHome() {

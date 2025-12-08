@@ -22,7 +22,8 @@
 
         /* Header */
         .header {
-            padding: 1.5rem 3rem;
+            padding: 16px 32px;
+            margin: 0;
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -70,7 +71,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 4rem;
-            padding: 40px 3rem;
+            padding: 24px 3rem 40px 3rem;
             align-items: center;
         }
 
@@ -463,16 +464,18 @@
         }
 
         .run-button {
-            width: 100%;
+            width: auto;
+            max-width: 280px;
             background: linear-gradient(135deg, #60a5fa, #3b82f6);
             border: none;
             color: #fff;
-            padding: 1.25rem;
+            padding: 14px 48px;
             font-size: 1.1rem;
             font-weight: 600;
             border-radius: 12px;
             cursor: pointer;
-            margin-top: 1.5rem;
+            margin: 24px auto 0;
+            display: block;
             transition: transform 0.2s;
         }
 
@@ -804,48 +807,65 @@
         }
 
         .btn {
-            padding: 6px 14px;
-            border-radius: 6px;
+            padding: 10px 20px;
+            border-radius: 8px;
             border: none;
             font-weight: 600;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
         }
 
         .btn-pdf {
-            background: #ef4444;
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
             color: white;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-pdf:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
         }
 
         .btn-csv {
-            background: #10b981;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
             color: white;
+            box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
+        }
+
+        .btn-csv:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
         }
 
         /* Compact Summary Bar */
         .summary-bar {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 16px;
+            margin-bottom: 24px;
         }
 
         .summary-item {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 8px;
-            padding: 12px;
+            padding: 16px 20px;
         }
 
         .summary-label {
-            font-size: 0.7rem;
+            font-size: 10px;
             color: rgba(255,255,255,0.5);
             margin-bottom: 6px;
             text-transform: uppercase;
+            letter-spacing: 0.08em;
         }
 
         .summary-value {
-            font-size: 1.5rem;
+            font-size: 36px;
             font-weight: 800;
         }
 
@@ -853,18 +873,18 @@
         .summary-value.red { color: #ef4444; }
 
         .summary-sub {
-            font-size: 0.7rem;
+            font-size: 11px;
             color: rgba(255,255,255,0.5);
             margin-top: 4px;
         }
 
         /* Violations Overview */
         .violations-overview {
-            margin-bottom: 16px;
+            margin-bottom: 24px;
         }
 
         .section-title {
-            font-size: 1.1rem;
+            font-size: 16px;
             font-weight: 700;
             margin-bottom: 12px;
         }
@@ -880,7 +900,7 @@
             border: 1px solid rgba(255,255,255,0.1);
             border-left: 3px solid #ef4444;
             border-radius: 8px;
-            padding: 12px;
+            padding: 16px 20px;
         }
 
         .violation-header {
@@ -895,9 +915,9 @@
         }
 
         .badge {
-            padding: 2px 8px;
+            padding: 3px 8px;
             border-radius: 4px;
-            font-size: 0.65rem;
+            font-size: 9px;
             font-weight: 600;
             text-transform: uppercase;
         }
@@ -913,13 +933,13 @@
         }
 
         .violation-title {
-            font-size: 0.9rem;
+            font-size: 14px;
             font-weight: 600;
             margin-bottom: 6px;
         }
 
         .violation-desc {
-            font-size: 0.8rem;
+            font-size: 12px;
             color: rgba(255,255,255,0.7);
             line-height: 1.4;
         }
@@ -1055,17 +1075,19 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
         }
 
         .risk-score-ring {
             position: relative;
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 90px;
         }
 
         .risk-score-ring svg {
             transform: rotate(-90deg);
+            width: 90px;
+            height: 90px;
         }
 
         .risk-score-ring .bg-ring {
@@ -1096,18 +1118,20 @@
             font-size: 28px;
             font-weight: 700;
             color: #f87171;
+            font-variant-numeric: tabular-nums;
         }
 
         .risk-denom {
             font-size: 12px;
             color: rgba(248, 113, 113, 0.6);
-            margin-left: 2px;
+            margin-left: 1px;
         }
 
         .risk-label {
             font-size: 11px;
             color: #f87171;
             font-weight: 500;
+            margin-top: 2px;
         }
 
         /* Expandable Violation Cards */
@@ -1194,7 +1218,7 @@
             border: none;
             border-radius: 6px;
             color: rgba(255,255,255,0.6);
-            font-size: 0.8rem;
+            font-size: 12px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -1484,30 +1508,9 @@
             margin-bottom: 12px;
         }
 
-        /* FIX: Compact risk ring for 100/100 display */
-        .risk-score-ring {
-            width: 90px;
-            height: 90px;
-        }
-
-        .risk-score-ring svg {
-            width: 90px;
-            height: 90px;
-        }
-
-        .risk-number {
-            font-size: 26px;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .risk-denom {
-            font-size: 11px;
-            margin-left: 1px;
-        }
-
-        .risk-label {
+        .metric-label {
             font-size: 10px;
-            margin-top: 2px;
+            letter-spacing: 0.08em;
         }
 
         /* FIX: Export buttons - larger and better positioned */
@@ -1516,9 +1519,14 @@
             margin-bottom: 24px;
         }
 
+        .export-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
         .export-btn,
-        .btn-pdf,
-        .btn-csv {
+        .export-btn-pdf,
+        .export-btn-csv {
             padding: 10px 20px;
             font-size: 13px;
             font-weight: 600;
@@ -1537,8 +1545,17 @@
             padding: 16px 20px;
         }
 
+        .compliance-card-title {
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
         .stat-number {
             font-size: 24px;
+        }
+
+        .stat-label {
+            font-size: 11px;
         }
 
         /* FIX: Compact violations section */
@@ -1550,12 +1567,52 @@
             margin-bottom: 16px;
         }
 
-        .violation-card {
-            padding: 16px 20px;
-        }
-
         .violation-card-header {
             margin-bottom: 10px;
+        }
+
+        /* Priority List Compact */
+        .priority-list {
+            gap: 10px;
+        }
+
+        .priority-dot {
+            width: 10px;
+            height: 10px;
+        }
+
+        .priority-count {
+            font-size: 16px;
+        }
+
+        .priority-label {
+            font-size: 13px;
+        }
+
+        .priority-sla {
+            font-size: 11px;
+        }
+
+        /* Big Number Styling */
+        .big-number {
+            font-size: 36px;
+        }
+
+        .total-label {
+            font-size: 11px;
+        }
+
+        /* Violations Breakdown Compact */
+        .violation-bars {
+            gap: 6px;
+        }
+
+        .violation-bar {
+            height: 5px;
+        }
+
+        .violation-bar-label {
+            font-size: 11px;
         }
 
         /* FIX: Responsive - maintain compactness */

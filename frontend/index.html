@@ -33,11 +33,17 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .logo-container:hover {
+            opacity: 0.8;
         }
 
         .logo {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
         }
 
         .brand {
@@ -1584,7 +1590,7 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <div class="logo-container">
+        <div class="logo-container" onclick="navigateToHome()">
             <img src="logo.png" alt="Sovereign Logo" class="logo">
             <div class="brand">
                 <div class="brand-name">SOVEREIGN</div>
@@ -1601,7 +1607,7 @@
                 <span class="highlight">Before Regulators Do</span>
             </h1>
             <p>Ship AI without the regulatory panic</p>
-            <button class="cta-button" onclick="showAssessment()">
+            <button class="cta-button" onclick="navigateToSetup()">
                 Analyze Your AI System
             </button>
             <div class="built-for">
@@ -1942,10 +1948,68 @@
             setInterval(rotateCards, 3000);
         }, 2000);
 
-        function showAssessment() {
+        // Navigation functions with History API
+        function navigateToHome() {
+            history.pushState({view: 'home'}, '', '/');
+            showHomeView();
+        }
+
+        function navigateToSetup() {
+            history.pushState({view: 'setup'}, '', '#setup');
+            showSetupView();
+        }
+
+        function navigateToResults(assessmentId) {
+            history.pushState({view: 'results', id: assessmentId}, '', '#results/' + assessmentId);
+            showResultsView(assessmentId);
+        }
+
+        // View display functions
+        function showHomeView() {
+            document.getElementById('heroSection').style.display = 'grid';
+            document.getElementById('assessmentSection').classList.remove('active');
+            document.getElementById('resultsSection').classList.remove('active');
+        }
+
+        function showSetupView() {
             document.getElementById('heroSection').style.display = 'none';
             document.getElementById('assessmentSection').classList.add('active');
+            document.getElementById('resultsSection').classList.remove('active');
         }
+
+        function showResultsView(assessmentId) {
+            document.getElementById('heroSection').style.display = 'none';
+            document.getElementById('assessmentSection').classList.remove('active');
+            document.getElementById('resultsSection').classList.add('active');
+
+            // Restore assessment data if available
+            if (assessmentId && window.currentAssessment) {
+                renderResults(window.currentAssessment);
+            }
+        }
+
+        // Legacy function for backward compatibility
+        function showAssessment() {
+            navigateToSetup();
+        }
+
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', (event) => {
+            if (event.state) {
+                if (event.state.view === 'setup') {
+                    showSetupView();
+                } else if (event.state.view === 'results') {
+                    showResultsView(event.state.id);
+                } else {
+                    showHomeView();
+                }
+            } else {
+                showHomeView();
+            }
+        });
+
+        // Initialize with home view state
+        history.replaceState({view: 'home'}, '', window.location.pathname);
 
         // Framework selection
         document.querySelectorAll('.framework-option').forEach(opt => {
@@ -2058,7 +2122,10 @@
 
                 await new Promise(r => setTimeout(r, 800));
                 modal.classList.remove('active');
-                displayResults(result);
+
+                // Navigate to results with History API
+                const assessmentId = result.assessment_id || result.analysis_id || 'latest';
+                navigateToResults(assessmentId);
 
             } catch (error) {
                 clearInterval(timerInterval);
@@ -2105,10 +2172,8 @@
             return map[framework] || [];
         }
 
+        // Legacy function for backward compatibility
         function displayResults(result) {
-            document.getElementById('assessmentSection').classList.remove('active');
-            document.getElementById('resultsSection').classList.add('active');
-
             // Store assessment globally for exports and localStorage
             window.currentAssessment = result;
             window.assessmentResult = result;

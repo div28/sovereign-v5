@@ -291,9 +291,9 @@ def create_executive_summary(styles, data):
 
     # Summary paragraph
     violations = data.get('violations', [])
-    p0_count = sum(1 for v in violations if v.get('severity', 0) >= 8)
-    p1_count = sum(1 for v in violations if 6 <= v.get('severity', 0) < 8)
-    p2_count = sum(1 for v in violations if v.get('severity', 0) < 6)
+    p0_count = sum(1 for v in violations if v.get('severity_score', 0) >= 8)
+    p1_count = sum(1 for v in violations if 6 <= v.get('severity_score', 0) < 8)
+    p2_count = sum(1 for v in violations if v.get('severity_score', 0) < 6)
 
     summary_text = f"""
     This assessment identified <b>{len(violations)}</b> compliance violations across
@@ -365,10 +365,10 @@ def create_executive_summary(styles, data):
     elements.append(Paragraph("Top 3 Critical Issues - Immediate Action Required", styles['SubsectionHeading']))
 
     # Sort by severity and get top 3
-    sorted_violations = sorted(violations, key=lambda x: x.get('severity', 0), reverse=True)[:3]
+    sorted_violations = sorted(violations, key=lambda x: x.get('severity_score', 0), reverse=True)[:3]
 
     for i, v in enumerate(sorted_violations, 1):
-        severity = v.get('severity', 0)
+        severity = v.get('severity_score', 0)
         severity_color, _, severity_label = get_severity_color(severity)
 
         issue_text = f"""
@@ -390,7 +390,7 @@ def create_violation_page(styles, violation, index, total):
     """Generate a detailed violation page"""
     elements = []
 
-    severity = violation.get('severity', 0)
+    severity = violation.get('severity_score', 0)
     severity_color, severity_bg, severity_label = get_severity_color(severity)
     priority, timeline = get_priority_label(severity)
 
@@ -503,7 +503,7 @@ def create_remediation_roadmap(styles, data):
     violations = data.get('violations', [])
 
     # Phase 1: Critical (P0)
-    p0_violations = [v for v in violations if v.get('severity', 0) >= 8]
+    p0_violations = [v for v in violations if v.get('severity_score', 0) >= 8]
     if p0_violations:
         elements.append(Paragraph(
             "Phase 1: Immediate Actions (Days 0-14) - Critical Priority",
@@ -541,7 +541,7 @@ def create_remediation_roadmap(styles, data):
         elements.append(Spacer(1, 0.2*inch))
 
     # Phase 2: High (P1)
-    p1_violations = [v for v in violations if 6 <= v.get('severity', 0) < 8]
+    p1_violations = [v for v in violations if 6 <= v.get('severity_score', 0) < 8]
     if p1_violations:
         elements.append(Paragraph(
             "Phase 2: Short-term Actions (Days 15-30) - High Priority",
@@ -578,7 +578,7 @@ def create_remediation_roadmap(styles, data):
         elements.append(Spacer(1, 0.2*inch))
 
     # Phase 3: Medium (P2)
-    p2_violations = [v for v in violations if v.get('severity', 0) < 6]
+    p2_violations = [v for v in violations if v.get('severity_score', 0) < 6]
     if p2_violations:
         elements.append(Paragraph(
             "Phase 3: Medium-term Actions (Days 30-90) - Medium Priority",

@@ -1540,6 +1540,109 @@
             }
         }
 
+        // Typewriter Effect
+        const taglines = [
+            "Ship AI without the regulatory panic",
+            "Compliance at the speed of deployment",
+            "Your AI's compliance co-pilot",
+            "Catch violations before regulators catch you"
+        ];
+
+        let taglineIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typewriterTimeout;
+
+        function typeWriter() {
+            const currentTagline = taglines[taglineIndex];
+            const textElement = document.getElementById('typewriterText');
+            if (!textElement) return;
+
+            if (!isDeleting) {
+                textElement.textContent = currentTagline.substring(0, charIndex + 1);
+                charIndex++;
+
+                if (charIndex === currentTagline.length) {
+                    isDeleting = true;
+                    typewriterTimeout = setTimeout(typeWriter, 2000); // Pause at end
+                    return;
+                }
+                typewriterTimeout = setTimeout(typeWriter, 100); // Typing speed
+            } else {
+                textElement.textContent = currentTagline.substring(0, charIndex - 1);
+                charIndex--;
+
+                if (charIndex === 0) {
+                    isDeleting = false;
+                    taglineIndex = (taglineIndex + 1) % taglines.length;
+                    typewriterTimeout = setTimeout(typeWriter, 500); // Pause before next
+                    return;
+                }
+                typewriterTimeout = setTimeout(typeWriter, 50); // Deleting speed
+            }
+        }
+
+        // Animate demo cards and risk bar
+        function animateDemo() {
+            const card1 = document.getElementById('violationCard1');
+            const card2 = document.getElementById('violationCard2');
+            const riskCalc = document.getElementById('riskCalculation');
+            const riskBar = document.getElementById('riskBar');
+            const scoreText = document.getElementById('riskScoreText');
+
+            if (card1) {
+                setTimeout(() => {
+                    card1.classList.add('animate');
+                }, 500);
+            }
+
+            if (card2) {
+                setTimeout(() => {
+                    card2.classList.add('animate');
+                }, 1000);
+            }
+
+            if (riskCalc) {
+                setTimeout(() => {
+                    riskCalc.classList.add('animate');
+
+                    if (riskBar && scoreText) {
+                        setTimeout(() => {
+                            riskBar.classList.add('animate');
+                            animateRiskScoreDemo();
+                        }, 100);
+                    }
+                }, 1500);
+            }
+        }
+
+        function animateRiskScoreDemo() {
+            const scoreElement = document.getElementById('riskScoreText');
+            if (!scoreElement) return;
+
+            let score = 0;
+            const target = 78;
+            const duration = 1000;
+            const increment = target / (duration / 16);
+
+            const interval = setInterval(() => {
+                score += increment;
+                if (score >= target) {
+                    score = target;
+                    clearInterval(interval);
+                    scoreElement.textContent = `${target}/100 HIGH RISK`;
+                } else {
+                    scoreElement.textContent = `${Math.round(score)}/100`;
+                }
+            }, 16);
+        }
+
+        // Start animations on load
+        window.addEventListener('load', () => {
+            typeWriter();
+            animateDemo();
+        });
+
         // Legacy functions for backward compatibility
         function showAssessment() {
             navigateToSetup();

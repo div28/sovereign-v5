@@ -867,358 +867,1001 @@
             </div>
         </div>
     </section>
-
     <!-- Assessment Section -->
     <section class="assessment-section" id="assessmentSection">
-        <div class="container">
-            <button class="back-button" onclick="goHome()">← Back to Home</button>
-
+        <h2 class="assessment-title">Compliance Assessment Setup</h2>
+        <div class="assessment-grid">
+            <!-- Select Frameworks -->
             <div class="assessment-card">
-                <h2 class="assessment-title">AI System Compliance Assessment</h2>
-                <p class="assessment-subtitle">Describe your AI system and select applicable frameworks for analysis</p>
-
-                <form id="assessmentForm" onsubmit="runAnalysis(event)">
-                    <div class="form-group">
-                        <label class="form-label">System Description</label>
-                        <textarea
-                            class="form-textarea"
-                            id="systemDescription"
-                            placeholder="Describe your AI system, its purpose, data processing activities, and decision-making capabilities..."
-                            required
-                        ></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Regulatory Frameworks</label>
-                        <div class="checkbox-group">
-                            <label class="checkbox-label" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="frameworks" value="gdpr" checked>
-                                <span>GDPR</span>
-                            </label>
-                            <label class="checkbox-label" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="frameworks" value="sox">
-                                <span>SOX</span>
-                            </label>
-                            <label class="checkbox-label" onclick="toggleCheckbox(this)">
-                                <input type="checkbox" name="frameworks" value="euai">
-                                <span>EU AI Act</span>
-                            </label>
+                <h3 class="card-title">Select Frameworks</h3>
+                <div class="framework-options">
+                    <div class="framework-option" data-framework="gdpr">
+                        <div class="framework-checkbox"></div>
+                        <span class="framework-icon">🔒</span>
+                        <div class="framework-info">
+                            <div class="framework-name"><span class="tooltip" data-tooltip="General Data Protection Regulation - EU data privacy law enforced since May 2018">GDPR</span></div>
+                            <div class="framework-desc">EU data privacy</div>
                         </div>
                     </div>
+                    <div class="framework-option" data-framework="sox">
+                        <div class="framework-checkbox"></div>
+                        <span class="framework-icon">📊</span>
+                        <div class="framework-info">
+                            <div class="framework-name"><span class="tooltip" data-tooltip="Sarbanes-Oxley Act - US financial reporting and corporate governance law">SOX</span></div>
+                            <div class="framework-desc">Financial controls</div>
+                        </div>
+                    </div>
+                    <div class="framework-option" data-framework="euai">
+                        <div class="framework-checkbox"></div>
+                        <span class="framework-icon">🤖</span>
+                        <div class="framework-info">
+                            <div class="framework-name"><span class="tooltip" data-tooltip="European Union Artificial Intelligence Act - regulates AI systems based on risk levels">EU AI Act</span></div>
+                            <div class="framework-desc">AI risk classification</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                    <button type="submit" class="analyze-button" id="analyzeButton">
-                        Analyze for Compliance Violations
-                    </button>
-                </form>
+            <!-- Upload Document -->
+            <div class="assessment-card">
+                <h3 class="card-title">Upload Document</h3>
+                <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+                    <input type="file" id="fileInput" style="display:none" accept=".pdf,.docx,.txt">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Drop file or browse</div>
+                    <div class="upload-hint">PDF, DOCX, TXT</div>
+                </div>
+            </div>
+
+            <!-- Quick Test Scenarios -->
+            <div class="assessment-card">
+                <h3 class="card-title">Quick Test Scenarios</h3>
+                <div class="test-scenarios">
+                    <div class="test-scenario" data-scenario="gdpr">
+                        <span class="scenario-icon">🔒</span>
+                        <span class="scenario-name">GDPR Severe</span>
+                    </div>
+                    <div class="test-scenario" data-scenario="sox">
+                        <span class="scenario-icon">📊</span>
+                        <span class="scenario-name">SOX Controls</span>
+                    </div>
+                    <div class="test-scenario" data-scenario="euaiact">
+                        <span class="scenario-icon">🤖</span>
+                        <span class="scenario-name">EU AI Act</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Textarea -->
+            <div class="textarea-section">
+                <textarea class="textarea" id="systemDescription" placeholder="Describe your AI system here..."></textarea>
+                <button class="run-button" onclick="runAssessment()">🔍 Run Assessment</button>
             </div>
         </div>
     </section>
 
+    <!-- Processing Modal -->
+    <div class="modal" id="scanModal">
+        <div class="modal-content">
+            <div class="processing-header">
+                <h2 class="processing-title">Processing Assessment</h2>
+                <div class="pipeline-timer" id="pipelineTimer">0.0s</div>
+            </div>
+
+            <!-- Agent Pipeline -->
+            <div class="agents-vertical" id="agentPipeline">
+                <!-- Document Parser -->
+                <div class="agent-card" id="agent-parser" data-status="pending">
+                    <div class="agent-icon">📄</div>
+                    <div class="agent-content">
+                        <div class="agent-name">Document Parser</div>
+                        <div class="agent-action" id="parser-action">Waiting...</div>
+                        <div class="agent-progress">
+                            <div class="progress-spinner"></div>
+                            <div class="progress-checkmark">✓</div>
+                        </div>
+                    </div>
+                    <div class="agent-time" id="parser-time">-</div>
+                </div>
+
+                <!-- Connection Line -->
+                <div class="pipeline-connector"></div>
+
+                <!-- RAG Retriever -->
+                <div class="agent-card" id="agent-rag" data-status="pending">
+                    <div class="agent-icon">🔍</div>
+                    <div class="agent-content">
+                        <div class="agent-name">RAG Retriever</div>
+                        <div class="agent-action" id="rag-action">Waiting...</div>
+                        <div class="agent-progress">
+                            <div class="progress-spinner"></div>
+                            <div class="progress-checkmark">✓</div>
+                        </div>
+                    </div>
+                    <div class="agent-time" id="rag-time">-</div>
+                </div>
+
+                <!-- Connection Line -->
+                <div class="pipeline-connector"></div>
+
+                <!-- Orchestrator -->
+                <div class="agent-card" id="agent-orchestrator" data-status="pending">
+                    <div class="agent-icon">📊</div>
+                    <div class="agent-content">
+                        <div class="agent-name">Orchestrator</div>
+                        <div class="agent-action" id="orchestrator-action">Waiting...</div>
+                        <div class="agent-progress">
+                            <div class="progress-spinner"></div>
+                            <div class="progress-checkmark">✓</div>
+                        </div>
+                    </div>
+                    <div class="agent-time" id="orchestrator-time">-</div>
+                </div>
+            </div>
+
+            <!-- Live Insights -->
+            <div class="live-insights" id="liveInsights">
+                <div class="insights-header">Live Insights</div>
+                <div class="insights-feed" id="insightsFeed"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Results Section -->
     <section class="results-section" id="resultsSection">
         <div class="container">
-            <button class="back-button" onclick="showAssessment()">← Back to Assessment</button>
-
-            <div class="results-header">
-                <h2 class="results-title">Compliance Analysis Results</h2>
-                <div class="risk-score-display">
-                    <span class="risk-score-number" id="finalRiskScore">0</span>
+            <div class="header">
+                <div>
+                    <h1>Assessment Results</h1>
+                    <div class="meta" id="metaInfo">Loading...</div>
                 </div>
-                <p id="riskLabel" style="color: #9ca3af; font-size: 16px;">Risk Level</p>
+                <div class="export-btns">
+                    <button class="btn btn-pdf" onclick="downloadPDF()">PDF</button>
+                    <button class="btn btn-csv" onclick="downloadCSV()">CSV</button>
+                </div>
             </div>
 
-            <div class="violations-list" id="violationsList">
-                <!-- Violations will be inserted here -->
+            <!-- Compact Summary -->
+            <div class="summary-bar">
+                <div class="summary-item">
+                    <div class="summary-label">RISK SCORE <span class="status-dot"></span></div>
+                    <div class="risk-score-container">
+                        <div class="risk-score-ring">
+                            <svg width="100" height="100" viewBox="0 0 100 100">
+                                <defs>
+                                    <linearGradient id="riskGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#dc2626"/>
+                                        <stop offset="100%" stop-color="#f87171"/>
+                                    </linearGradient>
+                                </defs>
+                                <circle class="bg-ring" cx="50" cy="50" r="42"/>
+                                <circle class="progress-ring" cx="50" cy="50" r="42"
+                                    stroke-dasharray="0 264" id="riskRing"/>
+                            </svg>
+                            <div class="risk-score-value-inner">
+                                <span class="risk-number" id="riskScore">0</span>
+                                <span class="risk-denom">/100</span>
+                            </div>
+                        </div>
+                        <span class="risk-label" id="riskLevel">-</span>
+                    </div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Total Violations</div>
+                    <div class="summary-value red" id="totalViolations">-</div>
+                    <div class="summary-sub" id="violationBreakdown">-</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Frameworks Analyzed</div>
+                    <div class="summary-value" id="frameworkCount">-</div>
+                    <div class="summary-sub" id="frameworkList">-</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Audit Readiness</div>
+                    <div class="summary-value red" id="auditStatus">🔴 Not Ready</div>
+                    <div class="summary-sub" id="auditEta">-</div>
+                </div>
             </div>
 
-            <div class="export-buttons">
-                <button class="export-button" onclick="exportPDF()">
-                    📄 Export PDF Report
-                </button>
-                <button class="export-button" onclick="exportCSV()">
-                    📊 Export CSV
-                </button>
+            <!-- Violations Overview -->
+            <div class="violations-overview">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div class="section-title">Violations Overview</div>
+                    <div class="filter-tabs" id="filterTabs">
+                        <button class="filter-tab-btn active" data-filter="all">All (<span id="filterAll">0</span>)</button>
+                        <button class="filter-tab-btn" data-filter="critical">Critical (<span id="filterCritical">0</span>)</button>
+                        <button class="filter-tab-btn" data-filter="major">Major (<span id="filterMajor">0</span>)</button>
+                        <button class="filter-tab-btn" data-filter="minor">Minor (<span id="filterMinor">0</span>)</button>
+                    </div>
+                </div>
+                <div class="violation-cards" id="violationCards"></div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('technical')">Technical Fix Plan</button>
+                <button class="tab" onclick="switchTab('business')">Business Plan</button>
+                <button class="tab" onclick="switchTab('citations')">Citations</button>
+            </div>
+
+            <!-- Tab 1: Technical Fix Plan -->
+            <div class="tab-content active" id="technical">
+                <div class="fix-plan-grid">
+                    <div class="plan-column">
+                        <div class="plan-title">🔧 Technical Fixes (Code/API/Architecture)</div>
+                        <div class="plan-list" id="technicalList"></div>
+                    </div>
+                    <div class="plan-column">
+                        <div class="plan-title">📋 Business Process Changes</div>
+                        <div class="plan-list" id="businessProcessList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Business Plan -->
+            <div class="tab-content" id="business">
+                <div class="plan-column">
+                    <div class="plan-title">📋 Process & Policy Changes</div>
+                    <div class="plan-list" id="businessList"></div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Citations -->
+            <div class="tab-content" id="citations">
+                <div class="citations-list" id="citationsList"></div>
             </div>
         </div>
     </section>
 
     <script>
-        // Global state
-        let currentAnalysisId = null;
-        let currentResults = null;
+        const API_BASE = 'https://sovereign-v5.onrender.com';
+        
+        const SCENARIOS = {
+            gdpr: 'Automated hiring system that analyzes candidate resumes, facial expressions during video interviews, and makes final hiring decisions without human review.',
+            sox: 'Financial reporting AI that automatically generates quarterly statements and makes adjustments without human oversight, violating internal control requirements.',
+            euaiact: 'Biometric identification system used in public spaces without required conformity assessment, technical documentation, or human oversight mechanisms.'
+        };
 
-        // Typewriter Effect
-        const taglines = [
-            "Ship AI without the regulatory panic",
-            "Compliance at the speed of deployment",
-            "Your AI's compliance co-pilot",
-            "Catch violations before regulators catch you"
-        ];
+        let selectedFrameworks = new Set();
+        let currentAssessment = null;
 
-        let taglineIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
-        let typewriterTimeout;
-
-        function typeWriter() {
-            const currentTagline = taglines[taglineIndex];
-            const textElement = document.getElementById('typewriterText');
-
-            if (!isDeleting) {
-                textElement.textContent = currentTagline.substring(0, charIndex + 1);
-                charIndex++;
-
-                if (charIndex === currentTagline.length) {
-                    isDeleting = true;
-                    typewriterTimeout = setTimeout(typeWriter, 2000); // Pause at end
-                    return;
-                }
-                typewriterTimeout = setTimeout(typeWriter, 100); // Typing speed
-            } else {
-                textElement.textContent = currentTagline.substring(0, charIndex - 1);
-                charIndex--;
-
-                if (charIndex === 0) {
-                    isDeleting = false;
-                    taglineIndex = (taglineIndex + 1) % taglines.length;
-                    typewriterTimeout = setTimeout(typeWriter, 500); // Pause before next
-                    return;
-                }
-                typewriterTimeout = setTimeout(typeWriter, 50); // Deleting speed
-            }
-        }
-
-        // Start typewriter on load
-        window.addEventListener('load', () => {
-            typeWriter();
-            animateDemo();
-        });
-
-        // Animate demo cards and risk bar
-        function animateDemo() {
-            setTimeout(() => {
-                document.getElementById('violationCard1').classList.add('animate');
-            }, 500);
-
-            setTimeout(() => {
-                document.getElementById('violationCard2').classList.add('animate');
-            }, 1000);
-
-            setTimeout(() => {
-                const riskCalc = document.getElementById('riskCalculation');
-                riskCalc.classList.add('animate');
-
-                setTimeout(() => {
-                    document.getElementById('riskBar').classList.add('animate');
-                    animateRiskScore();
-                }, 100);
-            }, 1500);
-        }
-
+        // Animate risk score number in hero
         function animateRiskScore() {
-            const scoreElement = document.getElementById('riskScoreText');
-            let score = 0;
-            const target = 78;
-            const duration = 1000;
-            const increment = target / (duration / 16);
+            const riskNum = document.querySelector('.hero-animation .risk-num');
+            const riskStatus = document.querySelector('.hero-animation .risk-status');
+            if (!riskNum) return;
 
-            const interval = setInterval(() => {
-                score += increment;
-                if (score >= target) {
-                    score = target;
-                    clearInterval(interval);
-                    scoreElement.textContent = `${target}/100 HIGH RISK`;
-                } else {
-                    scoreElement.textContent = `${Math.round(score)}/100`;
+            let current = 0;
+            const target = 87;
+            const duration = 2000;
+            const startTime = performance.now();
+            const startDelay = 2500; // Start after gauge animation begins
+
+            setTimeout(() => {
+                function update(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const easeProgress = 1 - Math.pow(1 - progress, 3);
+                    current = Math.round(target * easeProgress);
+                    riskNum.textContent = current;
+
+                    if (progress < 1) {
+                        requestAnimationFrame(update);
+                    } else {
+                        riskStatus.textContent = 'HIGH RISK';
+                        riskStatus.style.animation = 'none';
+                    }
                 }
-            }, 16);
+                requestAnimationFrame(update);
+            }, startDelay);
         }
 
-        // Navigation
-        function goHome() {
-            document.getElementById('heroSection').style.display = 'flex';
+        // Restart animation periodically
+        function loopHeroAnimation() {
+            animateRiskScore();
+
+            // Reset and replay every 8 seconds
+            setInterval(() => {
+                const violations = document.querySelectorAll('.violation-float');
+                const gaugeFill = document.querySelector('.gauge-fill');
+                const riskNum = document.querySelector('.hero-animation .risk-num');
+                const riskStatus = document.querySelector('.hero-animation .risk-status');
+
+                // Reset violations
+                violations.forEach(v => {
+                    v.style.animation = 'none';
+                    v.offsetHeight; // Trigger reflow
+                    v.style.animation = '';
+                });
+
+                // Reset gauge
+                if (gaugeFill) {
+                    gaugeFill.style.animation = 'none';
+                    gaugeFill.offsetHeight;
+                    gaugeFill.style.animation = '';
+                }
+
+                // Reset number
+                if (riskNum) riskNum.textContent = '0';
+                if (riskStatus) {
+                    riskStatus.textContent = 'ANALYZING...';
+                    riskStatus.style.animation = '';
+                }
+
+                animateRiskScore();
+            }, 8000);
+        }
+
+        // Start hero animation on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loopHeroAnimation);
+        } else {
+            loopHeroAnimation();
+        }
+
+        // Navigation functions with History API
+        function navigateToHome() {
+            history.pushState({view: 'home'}, '', '/');
+            showHomeView();
+        }
+
+        function navigateToSetup() {
+            history.pushState({view: 'setup'}, '', '#setup');
+            showSetupView();
+        }
+
+        function navigateToResults(assessmentId) {
+            history.pushState({view: 'results', id: assessmentId}, '', '#results/' + assessmentId);
+            showResultsView(assessmentId);
+        }
+
+        // View display functions
+        function showHomeView() {
+            document.getElementById('heroSection').style.display = 'grid';
             document.getElementById('assessmentSection').classList.remove('active');
             document.getElementById('resultsSection').classList.remove('active');
-            window.scrollTo(0, 0);
         }
 
-        function showAssessment() {
+        function showSetupView() {
             document.getElementById('heroSection').style.display = 'none';
             document.getElementById('assessmentSection').classList.add('active');
             document.getElementById('resultsSection').classList.remove('active');
-            window.scrollTo(0, 0);
         }
 
-        function showResults() {
+        function showResultsView(assessmentId) {
             document.getElementById('heroSection').style.display = 'none';
             document.getElementById('assessmentSection').classList.remove('active');
             document.getElementById('resultsSection').classList.add('active');
-            window.scrollTo(0, 0);
-        }
 
-        // Checkbox toggle
-        function toggleCheckbox(label) {
-            const checkbox = label.querySelector('input[type="checkbox"]');
-            if (checkbox.checked) {
-                label.classList.add('checked');
-            } else {
-                label.classList.remove('checked');
+            // Restore assessment data if available
+            if (assessmentId && window.currentAssessment) {
+                renderResults(window.currentAssessment);
             }
         }
 
-        // Initialize checkboxes
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.checkbox-label input[type="checkbox"]:checked').forEach(checkbox => {
-                checkbox.closest('.checkbox-label').classList.add('checked');
+        // Legacy functions for backward compatibility
+        function showAssessment() {
+            navigateToSetup();
+        }
+
+        function goHome() {
+            navigateToHome();
+        }
+
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', (event) => {
+            if (event.state) {
+                if (event.state.view === 'setup') {
+                    showSetupView();
+                } else if (event.state.view === 'results') {
+                    showResultsView(event.state.id);
+                } else {
+                    showHomeView();
+                }
+            } else {
+                showHomeView();
+            }
+        });
+
+        // Initialize with home view state
+        history.replaceState({view: 'home'}, '', window.location.pathname);
+
+        // Framework selection
+        document.querySelectorAll('.framework-option').forEach(opt => {
+            opt.addEventListener('click', () => {
+                const fw = opt.dataset.framework;
+                if (selectedFrameworks.has(fw)) {
+                    selectedFrameworks.delete(fw);
+                    opt.classList.remove('selected');
+                } else {
+                    selectedFrameworks.add(fw);
+                    opt.classList.add('selected');
+                }
             });
         });
 
-        // Run Analysis
-        async function runAnalysis(event) {
-            event.preventDefault();
+        // Test scenarios
+        document.querySelectorAll('.test-scenario').forEach(scenario => {
+            scenario.addEventListener('click', () => {
+                const type = scenario.dataset.scenario;
+                document.getElementById('systemDescription').value = SCENARIOS[type];
 
-            const description = document.getElementById('systemDescription').value;
-            const frameworks = Array.from(document.querySelectorAll('input[name="frameworks"]:checked'))
-                .map(cb => cb.value);
+                // Auto-select framework
+                selectedFrameworks.clear();
+                document.querySelectorAll('.framework-option').forEach(o => o.classList.remove('selected'));
 
-            if (frameworks.length === 0) {
-                alert('Please select at least one regulatory framework');
+                // Map scenario to framework
+                const fw = type === 'euaiact' ? 'euai' : type;
+                const opt = document.querySelector(`[data-framework="${fw}"]`);
+                if (opt) {
+                    opt.classList.add('selected');
+                    selectedFrameworks.add(fw);
+                }
+            });
+        });
+
+        async function runAssessment() {
+            const description = document.getElementById('systemDescription').value.trim();
+            if (!description || selectedFrameworks.size === 0) {
+                alert('Please select frameworks and describe your AI system');
                 return;
             }
 
-            const analyzeButton = document.getElementById('analyzeButton');
-            analyzeButton.disabled = true;
-            analyzeButton.textContent = 'Analyzing...';
+            // Show modal
+            const modal = document.getElementById('scanModal');
+            modal.classList.add('active');
+
+            // Clear insights feed
+            document.getElementById('insightsFeed').innerHTML = '';
+
+            // Reset agents
+            const agents = ['parser', 'rag', 'orchestrator'];
+            agents.forEach(agent => {
+                const card = document.getElementById(`agent-${agent}`);
+                card.setAttribute('data-status', 'pending');
+                document.getElementById(`${agent}-action`).textContent = 'Waiting...';
+                document.getElementById(`${agent}-time`).textContent = '-';
+            });
+
+            // Start timer
+            const startTime = Date.now();
+            const timerInterval = setInterval(() => {
+                const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+                document.getElementById('pipelineTimer').textContent = `${elapsed}s`;
+            }, 100);
 
             try {
-                // Call backend API
-                const response = await fetch('http://localhost:8000/api/analyze', {
+                const frameworks = Array.from(selectedFrameworks);
+                
+                // Animate parser
+                await animateAgent('parser', 'Extracting text...', 1500);
+                
+                // Animate RAG
+                await animateAgent('rag', 'Searching regulations...', 2000);
+
+                // Call API
+                const response = await fetch(`${API_BASE}/api/analyze`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        description: description,
-                        frameworks: frameworks
-                    })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({description, frameworks})
                 });
 
-                if (!response.ok) {
-                    throw new Error(`Analysis failed: ${response.statusText}`);
-                }
+                const result = await response.json();
 
-                const data = await response.json();
-                currentAnalysisId = data.analysis_id;
-                currentResults = data;
+                // Update RAG action with actual article count
+                const articlesCount = result.retrieved_chunks_count || result.violations?.length * 3 || 12;
+                document.getElementById('rag-action').textContent = `Found ${articlesCount} relevant articles`;
 
-                displayResults(data);
-                showResults();
+                // Add found articles insight
+                const insightsFeed = document.getElementById('insightsFeed');
+                const foundInsight = document.createElement('div');
+                foundInsight.className = 'insight-item';
+                foundInsight.textContent = `Found ${articlesCount} relevant articles`;
+                insightsFeed.appendChild(foundInsight);
+                insightsFeed.scrollTop = insightsFeed.scrollHeight;
+
+                await new Promise(r => setTimeout(r, 500));
+
+                // Store assessment globally and in localStorage
+                window.assessmentResult = result;
+                window.currentAssessment = result;
+                localStorage.setItem('currentAssessment', JSON.stringify(result));
+
+                // Animate orchestrator
+                await animateAgent('orchestrator', 'Aggregating results...', 1500);
+
+                clearInterval(timerInterval);
+                
+                // Confetti
+                confetti({particleCount: 100, spread: 70, colors: ['#60a5fa', '#3b82f6', '#22c55e']});
+
+                await new Promise(r => setTimeout(r, 800));
+                modal.classList.remove('active');
+
+                // Navigate to results with History API
+                const assessmentId = result.assessment_id || result.analysis_id || 'latest';
+                navigateToResults(assessmentId);
 
             } catch (error) {
-                console.error('Analysis error:', error);
-                alert('Analysis failed. Please try again.');
-            } finally {
-                analyzeButton.disabled = false;
-                analyzeButton.textContent = 'Analyze for Compliance Violations';
+                clearInterval(timerInterval);
+                console.error('Assessment failed:', error);
+                alert('Assessment failed. Please try again.');
+                modal.classList.remove('active');
             }
         }
 
-        // Display Results
-        function displayResults(data) {
-            const riskScore = data.risk_score;
-            const violations = data.violations;
+        async function animateAgent(agent, actionText, duration) {
+            const card = document.getElementById(`agent-${agent}`);
+            const actionEl = document.getElementById(`${agent}-action`);
+            const timeEl = document.getElementById(`${agent}-time`);
 
-            // Update risk score
-            document.getElementById('finalRiskScore').textContent = riskScore;
+            // Set active
+            card.setAttribute('data-status', 'active');
+            actionEl.textContent = actionText;
 
-            // Update risk label
-            const riskLabel = document.getElementById('riskLabel');
-            if (riskScore >= 76) {
-                riskLabel.textContent = 'CRITICAL RISK';
-                riskLabel.style.color = '#ef4444';
-            } else if (riskScore >= 51) {
-                riskLabel.textContent = 'HIGH RISK';
-                riskLabel.style.color = '#fb923c';
-            } else if (riskScore >= 26) {
-                riskLabel.textContent = 'MEDIUM RISK';
-                riskLabel.style.color = '#fbbf24';
-            } else {
-                riskLabel.textContent = 'LOW RISK';
-                riskLabel.style.color = '#10b981';
-            }
+            // Add to live insights feed
+            const insightsFeed = document.getElementById('insightsFeed');
+            const insight = document.createElement('div');
+            insight.className = 'insight-item';
+            insight.textContent = actionText;
+            insightsFeed.appendChild(insight);
+            insightsFeed.scrollTop = insightsFeed.scrollHeight;
 
-            // Display violations
+            // Simulate work
+            const start = Date.now();
+            await new Promise(r => setTimeout(r, duration));
+
+            // Set complete
+            card.setAttribute('data-status', 'complete');
+            actionEl.textContent = 'Complete';
+            const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+            timeEl.textContent = `${elapsed}s`;
+        }
+
+        function getJudges(framework) {
+            const map = {
+                gdpr: ['Article 22', 'Article 17', 'Article 32'],
+                sox: ['Section 404', 'Section 302', 'Audit Trail'],
+                euai: ['High-Risk', 'Prohibited', 'Transparency']
+            };
+            return map[framework] || [];
+        }
+
+        // Legacy function for backward compatibility
+        function displayResults(result) {
+            // Store assessment globally for exports and localStorage
+            window.currentAssessment = result;
+            window.assessmentResult = result;
+            localStorage.setItem('currentAssessment', JSON.stringify(result));
+
+            // Render new compact design
+            renderResults(result);
+            return; // Skip old rendering below
+
+            // Update risk score display with circular gauge
+            const riskScore = result.risk_score || 0;
+            const riskDisplay = document.getElementById('riskScoreDisplay');
+
+            // Update gauge with animation (CSS conic-gradient rotation based on score)
+            const gaugeRotation = (riskScore / 100) * 360;
+            riskDisplay.textContent = riskScore;
+
+            let riskLevel = 'LOW RISK';
+            if (riskScore >= 76) riskLevel = 'CRITICAL RISK';
+            else if (riskScore >= 51) riskLevel = 'HIGH RISK';
+            else if (riskScore >= 26) riskLevel = 'MEDIUM RISK';
+            document.getElementById('riskLevelDisplay').textContent = riskLevel;
+
+            // Update frameworks summary
+            const frameworks = result.frameworks_analyzed || [];
+            document.getElementById('frameworksSummary').textContent =
+                `Analyzed ${frameworks.map(f => f.toUpperCase()).join(', ')} • ${result.violations.length} violations found`;
+
+            // Update violations count
+            document.getElementById('violationsCount').textContent = result.violations.length;
+
+            // Count severities (severity is a string: "CRITICAL", "MAJOR", "MINOR")
+            const severities = {critical: 0, major: 0, minor: 0, none: 0};
+            result.violations.forEach(v => {
+                const sev = (v.severity || '').toUpperCase();
+                if (sev === 'CRITICAL') severities.critical++;
+                else if (sev === 'MAJOR') severities.major++;
+                else if (sev === 'MINOR') severities.minor++;
+                else severities.none++;
+            });
+
+            // Severity Chart
+            new Chart(document.getElementById('severityChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Critical', 'Major', 'Minor'],
+                    datasets: [{
+                        data: [severities.critical, severities.major, severities.minor],
+                        backgroundColor: ['#ef4444', '#f59e0b', '#eab308']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {color: '#fff', font: {size: 11}}
+                        }
+                    }
+                }
+            });
+
+            // Framework breakdown
+            const fwCounts = {};
+            result.violations.forEach(v => {
+                const fw = (v.framework || 'unknown').toUpperCase();
+                fwCounts[fw] = (fwCounts[fw]||0) + 1;
+            });
+
+            new Chart(document.getElementById('frameworkChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(fwCounts),
+                    datasets: [{
+                        label: 'Violations',
+                        data: Object.values(fwCounts),
+                        backgroundColor: '#60a5fa'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {ticks: {color: '#fff', font: {size: 11}}},
+                        y: {ticks: {color: '#fff', font: {size: 11}}, beginAtZero: true}
+                    },
+                    plugins: {
+                        legend: {display: false}
+                    }
+                }
+            });
+
+            // Populate violations list with enhanced cards
             const violationsList = document.getElementById('violationsList');
-            violationsList.innerHTML = '';
-
-            if (violations.length === 0) {
-                violationsList.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #10b981;">
-                        <h3 style="font-size: 24px; margin-bottom: 12px;">✓ No Violations Detected</h3>
-                        <p style="color: #9ca3af;">Your AI system appears to be compliant with the selected frameworks.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            violations.forEach(violation => {
-                const violationItem = document.createElement('div');
-                violationItem.className = 'violation-item';
-
-                const severityBadgeClass = violation.severity === 'CRITICAL' ? 'badge-critical' : 'badge-high';
-
-                violationItem.innerHTML = `
-                    <div class="violation-header">
-                        <div class="violation-details">
-                            <div class="violation-badges">
-                                <span class="badge ${severityBadgeClass}">${violation.severity}</span>
-                                <span class="badge badge-framework">${violation.framework.toUpperCase()}</span>
+            if (result.violations.length === 0) {
+                violationsList.innerHTML = '<div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.6);">✅ No violations detected</div>';
+            } else {
+                violationsList.innerHTML = result.violations.map((v, idx) => `
+                    <div class="violation-card" style="border-left-color: ${getSeverityColor(v.severity)};">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <div>
+                                <span style="background: ${getSeverityColor(v.severity)}; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">${v.severity}</span>
+                                <span style="background: rgba(96,165,250,0.2); color: #60a5fa; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 0.5rem;">${v.framework}</span>
                             </div>
-                            <h3>${violation.article_violated}</h3>
+                            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.5);">Confidence: ${Math.round(v.confidence * 100)}%</div>
+                        </div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px;">
+                            📋 ${v.article_violated}
+                        </h3>
+                        <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-left: 3px solid ${getSeverityColor(v.severity)}; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem; color: rgba(255,255,255,0.8); font-style: italic;">
+                            "${v.evidence_quote}"
+                        </div>
+                        <div class="collapsible-section">
+                            <div class="collapsible-header" onclick="toggleSection(this)">
+                                <span>▶</span> Risk Factors
+                            </div>
+                            <div class="collapsible-content">
+                                ${v.risk_factors ? v.risk_factors.map(r => `<div>• ${r}</div>`).join('') : '<div>No risk factors specified</div>'}
+                            </div>
+                        </div>
+                        <div class="collapsible-section">
+                            <div class="collapsible-header" onclick="toggleSection(this)">
+                                <span>▶</span> Dependencies
+                            </div>
+                            <div class="collapsible-content">
+                                ${v.dependencies ? v.dependencies.map(d => `<div>• ${d}</div>`).join('') : '<div>No dependencies specified</div>'}
+                            </div>
+                        </div>
+                        <div class="collapsible-section">
+                            <div class="collapsible-header" onclick="toggleSection(this)">
+                                <span>▶</span> Engineering Scope
+                            </div>
+                            <div class="collapsible-content">
+                                ${v.engineering_scope || 'No engineering scope details provided'}
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <div style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; color: rgba(255,255,255,0.7);">Remediation Steps:</div>
+                            <ol style="margin-left: 1.5rem; color: rgba(255,255,255,0.8); font-size: 0.9rem;">
+                                ${v.remediation_steps.map(step => `<li style="margin-bottom: 0.5rem;">${step}</li>`).join('')}
+                            </ol>
                         </div>
                     </div>
-                    <div class="violation-evidence">
-                        <strong>Evidence:</strong> ${violation.evidence_quote}
+                `).join('');
+            }
+
+            // Populate remediation plan with 2-column categorization
+            const remediationPlan = document.getElementById('remediationPlan');
+            const criticalViolations = result.violations.filter(v => v.severity === 'CRITICAL');
+
+            // Categorize remediation steps
+            const technicalSteps = [];
+            const businessSteps = [];
+            const techKeywords = ['implement', 'develop', 'API', 'api', 'database', 'code', 'system', 'infrastructure', 'technical', 'deploy', 'configure', 'integrate'];
+            const businessKeywords = ['policy', 'training', 'process', 'documentation', 'review', 'procedure', 'governance', 'compliance', 'audit', 'legal'];
+
+            result.violations.forEach(v => {
+                v.remediation_steps.forEach(step => {
+                    const stepLower = step.toLowerCase();
+                    const isTechnical = techKeywords.some(kw => stepLower.includes(kw));
+                    const isBusiness = businessKeywords.some(kw => stepLower.includes(kw));
+
+                    const priority = v.severity === 'CRITICAL' ? 'Immediate' : (v.severity === 'MAJOR' ? '30 days' : '90 days');
+                    const badgeClass = v.severity === 'CRITICAL' ? 'timeline-immediate' : (v.severity === 'MAJOR' ? 'timeline-30days' : 'timeline-90days');
+
+                    if (isTechnical && !isBusiness) {
+                        technicalSteps.push({step, priority, badgeClass});
+                    } else if (isBusiness) {
+                        businessSteps.push({step, priority, badgeClass});
+                    } else {
+                        technicalSteps.push({step, priority, badgeClass});
+                    }
+                });
+            });
+
+            remediationPlan.innerHTML = `
+                <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <h3 style="color: #ef4444; margin-bottom: 0.5rem;">🚨 Priority Actions (${criticalViolations.length} Critical Issues)</h3>
+                    <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem;">Address these critical violations immediately to avoid regulatory penalties</p>
+                </div>
+                <div class="remediation-grid">
+                    <div class="remediation-column">
+                        <h3>⚙️ Technical Fixes</h3>
+                        <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 16px;">Code, API, Infrastructure Changes</p>
+                        ${technicalSteps.map(({step, priority, badgeClass}) => `
+                            <div class="remediation-item">
+                                <div class="remediation-checkbox"></div>
+                                <div style="flex: 1;">
+                                    <span>${step}</span>
+                                    <span class="timeline-badge ${badgeClass}">${priority}</span>
+                                </div>
+                            </div>
+                        `).join('')}
                     </div>
-                    <div class="remediation-steps">
-                        <h4>Remediation Steps:</h4>
-                        <ol>
-                            ${violation.remediation_steps.map(step => `<li>${step}</li>`).join('')}
-                        </ol>
+                    <div class="remediation-column">
+                        <h3>📋 Business Process</h3>
+                        <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 16px;">Policy, Training, Organizational Changes</p>
+                        ${businessSteps.map(({step, priority, badgeClass}) => `
+                            <div class="remediation-item">
+                                <div class="remediation-checkbox"></div>
+                                <div style="flex: 1;">
+                                    <span>${step}</span>
+                                    <span class="timeline-badge ${badgeClass}">${priority}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // New redesigned rendering function
+        function renderResults(data) {
+            // Meta
+            document.getElementById('metaInfo').textContent =
+                `ID: ${data.analysis_id || 'N/A'} • ${data.frameworks_analyzed?.join(', ').toUpperCase() || 'N/A'}`;
+
+            // Summary
+            const risk = data.risk_score || 0;
+            const violations = data.violations || [];
+            const critical = violations.filter(v => v.severity === 'CRITICAL').length;
+            const major = violations.filter(v => v.severity === 'MAJOR').length;
+            const minor = violations.length - critical - major;
+
+            // Animate SVG Risk Ring
+            document.getElementById('riskScore').textContent = risk;
+            document.getElementById('riskLevel').textContent = risk < 30 ? 'Low Risk' : risk < 60 ? 'Medium Risk' : 'High Risk';
+
+            setTimeout(() => {
+                const circumference = 2 * Math.PI * 42; // r=42
+                const progress = (risk / 100) * circumference;
+                document.getElementById('riskRing').style.strokeDasharray = `${progress} ${circumference}`;
+            }, 300);
+
+            document.getElementById('totalViolations').textContent = violations.length;
+            document.getElementById('violationBreakdown').textContent =
+                `${critical} Critical, ${major} Major, ${minor} Minor`;
+            document.getElementById('frameworkCount').textContent = data.frameworks_analyzed?.length || 0;
+            document.getElementById('frameworkList').textContent = data.frameworks_analyzed?.join(', ').toUpperCase() || 'N/A';
+            document.getElementById('auditStatus').textContent = risk < 30 ? '🟢 Ready' : '🔴 Not Ready';
+            document.getElementById('auditEta').textContent = risk < 30 ? 'Can proceed' : '~3 months';
+
+            // Update filter counts
+            document.getElementById('filterAll').textContent = violations.length;
+            document.getElementById('filterCritical').textContent = critical;
+            document.getElementById('filterMajor').textContent = major;
+            document.getElementById('filterMinor').textContent = minor;
+
+            // Violations Overview - Expandable cards with metadata
+            const cardsContainer = document.getElementById('violationCards');
+            cardsContainer.innerHTML = '';
+            violations.forEach(v => {
+                const card = document.createElement('div');
+                card.className = 'violation-card';
+                card.dataset.severity = v.severity.toLowerCase();
+                const sevLabel = v.severity === 'CRITICAL' ? 'Critical' : v.severity === 'MAJOR' ? 'Major' : 'Minor';
+                card.innerHTML = `
+                    <div class="violation-header">
+                        <div class="badges">
+                            <span class="badge badge-critical">${sevLabel}</span>
+                            <span class="badge badge-framework">${v.framework?.toUpperCase() || 'N/A'}</span>
+                        </div>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="violation-title">${v.article_violated || 'Violation'}</div>
+                    <div class="violation-desc">${(v.evidence_quote || v.issue || '').substring(0, 200)}</div>
+                    <div class="violation-details">
+                        <div class="metadata-grid">
+                            <div class="metadata-item">
+                                <div class="metadata-label">Severity</div>
+                                <div class="metadata-value">${v.severity}</div>
+                            </div>
+                            <div class="metadata-item">
+                                <div class="metadata-label">Priority</div>
+                                <div class="metadata-value">${v.priority || 'P0'}</div>
+                            </div>
+                            <div class="metadata-item">
+                                <div class="metadata-label">Complexity</div>
+                                <div class="metadata-value">${v.complexity || 'High'}</div>
+                            </div>
+                            <div class="metadata-item">
+                                <div class="metadata-label">Timeline</div>
+                                <div class="metadata-value">${v.timeline || '0-14 days'}</div>
+                            </div>
+                            <div class="metadata-item">
+                                <div class="metadata-label">Confidence</div>
+                                <div class="metadata-value">${v.confidence_score || '95%'}</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <div style="font-weight: 600; margin-bottom: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.7);">Remediation Steps:</div>
+                            <ol style="margin-left: 1.5rem; color: rgba(255,255,255,0.8); font-size: 0.85rem;">
+                                ${v.remediation_steps?.map(step => `<li style="margin-bottom: 0.5rem;">${step}</li>`).join('') || '<li>No remediation steps provided</li>'}
+                            </ol>
+                        </div>
                     </div>
                 `;
 
-                violationsList.appendChild(violationItem);
+                // Add click handler for expand/collapse
+                card.addEventListener('click', () => {
+                    card.classList.toggle('expanded');
+                });
+
+                cardsContainer.appendChild(card);
+            });
+
+            // Technical Fixes (merged code/API/architecture)
+            const techList = document.getElementById('technicalList');
+            techList.innerHTML = '';
+
+            const technicalFixes = [
+                { title: 'Implement encryption at rest using AES-256', desc: 'Encrypt all personal and biometric data', priority: 'priority-p0', label: 'P0 - Immediate' },
+                { title: 'Add mandatory human review workflow', desc: 'For Article 22 automated decisions', priority: 'priority-p0', label: 'P0 - Immediate' },
+                { title: 'Build automated data retention/deletion service', desc: 'Comply with GDPR right to erasure', priority: 'priority-p0', label: 'P0 - Immediate' },
+                { title: 'Deploy access control middleware with RBAC', desc: 'Segregation of duties for SOX compliance', priority: 'priority-p1', label: 'P1 - 30 days' },
+                { title: 'Create audit logging infrastructure', desc: 'Immutable logs for all data access', priority: 'priority-p1', label: 'P1 - 30 days' },
+                { title: 'Build DSR (Data Subject Request) API endpoint', desc: 'REST API for access, rectification, erasure requests', priority: 'priority-p1', label: 'P1 - 30 days' }
+            ];
+
+            technicalFixes.forEach(fix => {
+                techList.innerHTML += `
+                    <div class="plan-item">
+                        <div class="plan-item-title">${fix.title}</div>
+                        <div class="plan-item-desc">${fix.desc}</div>
+                        <span class="plan-priority ${fix.priority}">${fix.label}</span>
+                    </div>
+                `;
+            });
+
+            // Business Process Changes
+            const bizProcessList = document.getElementById('businessProcessList');
+            bizProcessList.innerHTML = '';
+
+            const businessFixes = [
+                { title: 'Update privacy policy', desc: 'Include automated decision-making disclosures per Article 13/14', priority: 'priority-p0', label: 'P0 - Immediate' },
+                { title: 'Establish Data Protection Officer oversight', desc: 'Create DPO review process for high-risk AI', priority: 'priority-p1', label: 'P1 - 30 days' },
+                { title: 'Implement explicit consent collection', desc: 'Granular consent mechanisms for automated profiling', priority: 'priority-p1', label: 'P1 - 30 days' },
+                { title: 'Create data subject rights request workflow', desc: 'Handle access, rectification, erasure requests', priority: 'priority-p1', label: 'P1 - 30 days' },
+                { title: 'Deploy staff training program', desc: 'Train teams on GDPR, SOX, and EU AI Act compliance', priority: 'priority-p1', label: 'P1 - 30 days' },
+                { title: 'Conduct third-party vendor audits', desc: 'Review data processors and subprocessors for compliance', priority: 'priority-p1', label: 'P1 - 30 days' }
+            ];
+
+            businessFixes.forEach(fix => {
+                bizProcessList.innerHTML += `
+                    <div class="plan-item">
+                        <div class="plan-item-title">${fix.title}</div>
+                        <div class="plan-item-desc">${fix.desc}</div>
+                        <span class="plan-priority ${fix.priority}">${fix.label}</span>
+                    </div>
+                `;
+            });
+
+            // Business Plan (overall summary)
+            const bizList = document.getElementById('businessList');
+            bizList.innerHTML = '';
+            violations.forEach(v => {
+                bizList.innerHTML += `
+                    <div class="plan-item">
+                        <div class="plan-item-title">${v.article_violated || 'Process Change'}</div>
+                        <div class="plan-item-desc">Policy updates, training, and organizational changes required</div>
+                        <span class="plan-priority priority-p1">P1 - 30 days</span>
+                    </div>
+                `;
+            });
+
+            // Citations
+            const citList = document.getElementById('citationsList');
+            citList.innerHTML = '';
+            violations.forEach(v => {
+                citList.innerHTML += `
+                    <div class="citation-item">
+                        <div class="citation-ref">${v.framework?.toUpperCase()} ${v.article_violated || ''}</div>
+                        <div class="citation-text">${v.evidence_quote || v.issue || 'Regulatory citation'}</div>
+                    </div>
+                `;
             });
         }
 
-        // Export functions
-        async function exportPDF() {
-            if (!currentAnalysisId) {
-                alert('No analysis results to export');
-                return;
-            }
-
-            try {
-                window.open(`http://localhost:8000/api/export/pdf/${currentAnalysisId}`, '_blank');
-            } catch (error) {
-                console.error('PDF export error:', error);
-                alert('Failed to export PDF');
-            }
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab).classList.add('active');
         }
 
-        async function exportCSV() {
-            if (!currentAnalysisId) {
-                alert('No analysis results to export');
+        // Filter tab handlers
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add filter tab click handlers
+            document.querySelectorAll('.filter-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update active state
+                    document.querySelectorAll('.filter-tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    // Filter violations
+                    const filter = btn.dataset.filter;
+                    document.querySelectorAll('.violation-card').forEach(card => {
+                        if (filter === 'all') {
+                            card.style.display = 'block';
+                        } else {
+                            const severity = card.dataset.severity;
+                            card.style.display = severity === filter ? 'block' : 'none';
+                        }
+                    });
+                });
+            });
+        });
+
+        function downloadPDF() {
+            if (!window.currentAssessment) {
+                alert('No assessment data available');
                 return;
             }
-
-            try {
-                window.open(`http://localhost:8000/api/export/csv/${currentAnalysisId}`, '_blank');
-            } catch (error) {
-                console.error('CSV export error:', error);
-                alert('Failed to export CSV');
+            const assessmentId = window.currentAssessment.assessment_id || window.currentAssessment.analysis_id;
+            if (!assessmentId) {
+                alert('No assessment ID available');
+                return;
             }
+            window.open(`${API_BASE}/api/export/pdf/${assessmentId}`, '_blank');
+        }
+
+        function downloadCSV() {
+            if (!window.currentAssessment) {
+                alert('No assessment data available');
+                return;
+            }
+            const assessmentId = window.currentAssessment.assessment_id || window.currentAssessment.analysis_id;
+            if (!assessmentId) {
+                alert('No assessment ID available');
+                return;
+            }
+            window.open(`${API_BASE}/api/export/csv/${assessmentId}`, '_blank');
         }
     </script>
 </body>

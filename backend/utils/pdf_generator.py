@@ -809,7 +809,7 @@ def generate_compliance_report(data, output_path=None):
         return output_path
     else:
         buffer.seek(0)
-        return buffer.getvalue()
+        return buffer
 
 
 # ============================================

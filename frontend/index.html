@@ -709,27 +709,27 @@
         .summary-bar {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
         .summary-item {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 8px;
-            padding: 16px 20px;
+            padding: 12px 16px;
         }
 
         .summary-label {
-            font-size: 10px;
+            font-size: 9px;
             color: rgba(255,255,255,0.5);
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             text-transform: uppercase;
             letter-spacing: 0.08em;
         }
 
         .summary-value {
-            font-size: 36px;
+            font-size: 28px;
             font-weight: 800;
         }
 
@@ -744,7 +744,7 @@
 
         /* Violations Overview */
         .violations-overview {
-            margin-bottom: 12px;
+            margin-bottom: 20px;
         }
 
         .section-title {
@@ -2395,22 +2395,52 @@
             const card = document.getElementById(`agent-${agent}`);
             const actionEl = document.getElementById(`${agent}-action`);
             const timeEl = document.getElementById(`${agent}-time`);
+            const insightsFeed = document.getElementById('insightsFeed');
 
             // Set active
             card.setAttribute('data-status', 'active');
             actionEl.textContent = actionText;
 
-            // Add to live insights feed
-            const insightsFeed = document.getElementById('insightsFeed');
-            const insight = document.createElement('div');
-            insight.className = 'insight-item';
-            insight.textContent = actionText;
-            insightsFeed.appendChild(insight);
-            insightsFeed.scrollTop = insightsFeed.scrollHeight;
+            // Add initial insight
+            const addInsight = (text) => {
+                const insight = document.createElement('div');
+                insight.className = 'insight-item';
+                insight.textContent = text;
+                insightsFeed.appendChild(insight);
+                insightsFeed.scrollTop = insightsFeed.scrollHeight;
+            };
 
-            // Simulate work
+            addInsight(actionText);
+
+            // Simulate work with progressive insights
             const start = Date.now();
-            await new Promise(r => setTimeout(r, duration));
+
+            if (agent === 'parser') {
+                await new Promise(r => setTimeout(r, duration * 0.3));
+                addInsight('📄 Detected document type: Policy document');
+                await new Promise(r => setTimeout(r, duration * 0.3));
+                addInsight('🔍 Extracted 47 pages, 12,340 words');
+                await new Promise(r => setTimeout(r, duration * 0.4));
+                addInsight('✓ Text extraction complete');
+            } else if (agent === 'rag') {
+                await new Promise(r => setTimeout(r, duration * 0.25));
+                addInsight('🔎 Searching GDPR regulations...');
+                await new Promise(r => setTimeout(r, duration * 0.25));
+                addInsight('📊 Matching SOX compliance rules...');
+                await new Promise(r => setTimeout(r, duration * 0.25));
+                addInsight('🤖 Cross-referencing EU AI Act...');
+                await new Promise(r => setTimeout(r, duration * 0.25));
+                addInsight(`✓ Retrieved ${9 + Math.floor(Math.random() * 6)} highly relevant articles`);
+            } else if (agent === 'orchestrator') {
+                await new Promise(r => setTimeout(r, duration * 0.3));
+                addInsight('⚖️ Analyzing violations across frameworks...');
+                await new Promise(r => setTimeout(r, duration * 0.35));
+                addInsight('🎯 Calculating risk scores and severity levels...');
+                await new Promise(r => setTimeout(r, duration * 0.35));
+                addInsight('✓ Assessment complete');
+            } else {
+                await new Promise(r => setTimeout(r, duration));
+            }
 
             // Set complete
             card.setAttribute('data-status', 'complete');

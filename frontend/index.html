@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOVEREIGN - The Compliance Whisperer</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <title>Sovereign - AI Compliance Intelligence Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -14,20 +15,84 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
-            background: #0a1628;
-            color: #fff;
-            line-height: 1.6;
+            font-family: 'Inter', sans-serif;
+            background: #0a0f1a;
+            color: #ffffff;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Animated Mesh Background */
+        .bg-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            background: linear-gradient(135deg, #0a0f1a 0%, #0f1729 50%, #1a1f35 100%);
+            overflow: hidden;
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .floating-circle:nth-child(1) {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(15, 76, 129, 0.6) 0%, transparent 70%);
+            top: -200px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .floating-circle:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(26, 90, 142, 0.5) 0%, transparent 70%);
+            top: 50%;
+            right: -150px;
+            animation-delay: 7s;
+        }
+
+        .floating-circle:nth-child(3) {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
+            bottom: -250px;
+            left: 30%;
+            animation-delay: 14s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(50px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-30px, 30px) scale(0.9);
+            }
         }
 
         /* Header */
         .header {
-            padding: 16px 32px;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 20px 40px;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 15, 26, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .logo {
@@ -49,7 +114,6 @@
         .logo-text {
             display: flex;
             flex-direction: column;
-            gap: 2px;
         }
 
         .logo-title {
@@ -73,43 +137,55 @@
             transition: all 0.2s ease;
         }
 
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
         /* Hero Section */
         .hero {
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 100px;
+            padding-bottom: 60px;
+        }
+
+        .hero-grid {
             display: grid;
             grid-template-columns: 60% 40%;
-            gap: 4rem;
-            padding: 24px 3rem 40px 3rem;
+            gap: 60px;
             align-items: center;
         }
 
+        /* Left Side - Hero Content */
         .hero-content h1 {
-            font-size: 3.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 52px;
             font-weight: 700;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            color: #ffffff;
         }
 
-        .hero-content h1 .highlight {
-            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+        .hero-content .highlight {
+            display: block;
+            background: linear-gradient(135deg, #0f4c81 0%, #3b82f6 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
-
-        .hero-content p {
-            font-size: 1.25rem;
-            color: rgba(255,255,255,0.7);
-            margin-bottom: 2rem;
+            background-clip: text;
         }
 
         .typewriter-container {
             min-height: 60px;
-            margin-bottom: 2rem;
+            margin-bottom: 40px;
         }
 
         .typewriter {
-            font-size: 1.25rem;
-            color: rgba(255,255,255,0.7);
+            font-size: 20px;
+            color: #9ca3af;
             font-weight: 500;
             min-height: 30px;
         }
@@ -130,1931 +206,585 @@
         }
 
         .cta-button {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 32px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            background: linear-gradient(135deg, #0f4c81 0%, #1a5a8e 100%);
             border: none;
-            color: #fff;
-            padding: 14px 28px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
-            display: inline-block;
-            width: auto;
-            transition: transform 0.2s;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(15, 76, 129, 0.4);
+            margin-bottom: 40px;
         }
 
         .cta-button:hover {
             transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(15, 76, 129, 0.6);
         }
 
-        .built-for {
-            margin-top: 3rem;
+        .cta-button:active {
+            transform: translateY(0);
+        }
+
+        .social-proof {
             display: flex;
-            gap: 1rem;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .social-proof-label {
+            font-size: 14px;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+
+        .tags {
+            display: flex;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
-        .built-for span {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.5);
+        .tag {
+            padding: 8px 16px;
+            font-size: 13px;
+            color: #d1d5db;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
         }
 
-        .audience-badge {
-            background: rgba(255,255,255,0.05);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            border: 1px solid rgba(255,255,255,0.1);
+        /* Right Side - Interactive Demo */
+        .demo-container {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Example Cards */
-        .example-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
+        .scanning-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #10b981 50%, transparent 100%);
+            animation: scan 2s ease-in-out infinite;
         }
 
-        .example-card {
-            background: rgba(255,255,255,0.03);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
+        @keyframes scan {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .demo-title {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .violation-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 16px;
+            margin-bottom: 12px;
             opacity: 0;
             transform: translateY(20px);
-            animation: fadeInUp 0.6s ease forwards;
-            box-shadow: 0 0 20px rgba(6,182,212,0.3);
         }
 
-        .example-card:nth-child(1) {
-            animation-delay: 0.2s;
+        .violation-card.animate {
+            animation: slideInUp 0.5s ease-out forwards;
         }
 
-        .example-card:nth-child(2) {
-            animation-delay: 0.8s;
-        }
-
-        .example-card:nth-child(3) {
-            animation-delay: 1.4s;
-        }
-
-        .example-card.hidden {
-            display: none;
-        }
-
-        @keyframes fadeInUp {
+        @keyframes slideInUp {
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-        .example-header {
+        .violation-badges {
             display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
-        .severity-badge {
-            padding: 0.35rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
+        .badge {
+            padding: 4px 10px;
+            font-size: 11px;
             font-weight: 700;
+            border-radius: 6px;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .severity-badge.critical {
+        .badge-critical {
             background: rgba(239, 68, 68, 0.2);
             color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
-        .severity-badge.high {
-            background: rgba(245, 158, 11, 0.2);
-            color: #f59e0b;
+        .badge-high {
+            background: rgba(251, 146, 60, 0.2);
+            color: #fb923c;
+            border: 1px solid rgba(251, 146, 60, 0.3);
         }
 
-        .framework-badge {
+        .badge-framework {
             background: rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
-            padding: 0.35rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
         }
 
-        .example-title {
-            font-weight: 600;
-            margin-bottom: 0.75rem;
+        .violation-text {
+            font-size: 13px;
+            color: #d1d5db;
+            margin-bottom: 8px;
+            line-height: 1.5;
         }
 
-        .example-quote {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.6);
-            padding-left: 1rem;
-            border-left: 2px solid rgba(96, 165, 250, 0.3);
+        .citation {
+            font-size: 11px;
+            color: #6b7280;
             font-style: italic;
         }
 
-        .risk-indicator {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(255,255,255,0.05);
+        .risk-calculation {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            opacity: 0;
+        }
+
+        .risk-calculation.animate {
+            animation: slideInUp 0.5s ease-out 1.5s forwards;
         }
 
         .risk-label {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 0.5rem;
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .risk-bar-container {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
         }
 
         .risk-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .risk-fill {
             height: 100%;
-            background: linear-gradient(90deg, #f59e0b, #ef4444);
+            width: 0%;
+            background: linear-gradient(90deg, #fb923c 0%, #ef4444 100%);
+            transition: width 1s ease-out;
             border-radius: 4px;
         }
 
-        .risk-score {
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #f59e0b;
-            opacity: 0;
-            animation: fadeIn 0.8s ease forwards;
-            animation-delay: 2.5s;
+        .risk-bar.animate {
+            width: 78%;
         }
 
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-            }
+        .risk-score-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fb923c;
+            text-align: right;
         }
 
         /* Assessment Section */
         .assessment-section {
-            min-height: 100vh;
-            padding: 4rem 3rem;
             display: none;
+            min-height: 100vh;
+            padding-top: 100px;
+            padding-bottom: 60px;
         }
 
         .assessment-section.active {
             display: block;
         }
 
-        .assessment-title {
-            text-align: center;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 3rem;
-        }
-
-        .assessment-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
         .assessment-card {
-            background: rgba(255,255,255,0.03);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
-            padding: 2rem;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            backdrop-filter: blur(10px);
         }
 
-        .card-title {
-            font-size: 1.5rem;
+        .assessment-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 36px;
             font-weight: 700;
-            margin-bottom: 2rem;
+            margin-bottom: 12px;
+            color: #ffffff;
         }
 
-        /* Framework Selection */
-        .framework-options {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+        .assessment-subtitle {
+            font-size: 16px;
+            color: #9ca3af;
+            margin-bottom: 32px;
         }
 
-        .framework-option {
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #d1d5db;
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 15px;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .checkbox-label {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
+            gap: 10px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
         }
 
-        .framework-option:hover {
-            background: rgba(96, 165, 250, 0.05);
-            border-color: #60a5fa;
+        .checkbox-label:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(59, 130, 246, 0.3);
         }
 
-        .framework-option.selected {
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-label.checked {
             background: rgba(59, 130, 246, 0.1);
             border-color: #3b82f6;
         }
 
-        .framework-checkbox {
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .framework-option.selected .framework-checkbox {
-            background: #3b82f6;
-            border-color: #3b82f6;
-        }
-
-        .framework-checkbox::after {
-            content: '✓';
-            color: #fff;
+        .analyze-button {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
             font-weight: 700;
-            display: none;
-        }
-
-        .framework-option.selected .framework-checkbox::after {
-            display: block;
-        }
-
-        .framework-icon {
-            font-size: 1.5rem;
-        }
-
-        .framework-info {
-            flex: 1;
-        }
-
-        .framework-name {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .framework-desc {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.6);
-        }
-
-        /* Upload Zone */
-        .upload-zone {
-            border: 2px dashed rgba(255,255,255,0.2);
+            color: #ffffff;
+            background: linear-gradient(135deg, #0f4c81 0%, #1a5a8e 100%);
+            border: none;
             border-radius: 12px;
-            padding: 3rem 2rem;
-            text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(15, 76, 129, 0.4);
         }
 
-        .upload-zone:hover {
-            border-color: #60a5fa;
-            background: rgba(96, 165, 250, 0.02);
+        .analyze-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(15, 76, 129, 0.6);
         }
 
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+        .analyze-button:disabled {
             opacity: 0.5;
+            cursor: not-allowed;
         }
 
-        .upload-text {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .upload-hint {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.5);
-        }
-
-        /* Test Scenarios */
-        .test-scenarios {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .test-scenario {
-            display: flex;
+        .back-button {
+            display: inline-flex;
             align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.1);
+            gap: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            color: #9ca3af;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .test-scenario:hover {
-            background: rgba(96, 165, 250, 0.05);
-            border-color: #60a5fa;
-        }
-
-        .scenario-icon {
-            font-size: 1.5rem;
-        }
-
-        .scenario-name {
-            font-weight: 600;
-        }
-
-        .textarea-section {
-            grid-column: span 3;
-            margin-top: 1rem;
-        }
-
-        .textarea {
-            width: 100%;
-            min-height: 200px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 1.5rem;
-            color: #fff;
-            font-family: inherit;
-            font-size: 1rem;
-            resize: vertical;
-        }
-
-        .textarea:focus {
-            outline: none;
-            border-color: #60a5fa;
-        }
-
-        .run-button {
-            width: auto;
-            max-width: 280px;
-            background: linear-gradient(135deg, #60a5fa, #3b82f6);
-            border: none;
-            color: #fff;
-            padding: 14px 48px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 12px;
-            cursor: pointer;
-            margin: 24px auto 0;
-            display: block;
-            transition: transform 0.2s;
-        }
-
-        .run-button:hover {
-            transform: translateY(-2px);
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(10, 22, 40, 0.95);
-            backdrop-filter: blur(30px);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 24px;
-            padding: 3rem;
-            max-width: 700px;
-            width: 90%;
-        }
-
-        .processing-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-        }
-
-        .processing-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .pipeline-timer {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.6);
-            font-family: monospace;
-        }
-
-        .agents-vertical {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-        }
-
-        .agent-card {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem 1.25rem;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 12px;
-            opacity: 1;
             transition: all 0.3s ease;
+            margin-bottom: 24px;
         }
 
-        .agent-card[data-status="active"] {
-            background: rgba(139, 92, 246, 0.08);
-            border-color: rgba(139, 92, 246, 0.3);
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        .back-button:hover {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
-        .agent-card[data-status="complete"] {
-            background: rgba(16, 185, 129, 0.05);
-            border-color: rgba(16, 185, 129, 0.2);
-        }
-
-        .agent-icon {
-            font-size: 24px;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            flex-shrink: 0;
-        }
-
-        .agent-card[data-status="active"] .agent-icon {
-            background: rgba(139, 92, 246, 0.15);
-            animation: iconPulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes iconPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .agent-content {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .agent-name {
-            font-size: 15px;
-            font-weight: 600;
-            color: #f8fafc;
-            min-width: 120px;
-        }
-
-        .agent-action {
-            font-size: 13px;
-            color: #94a3b8;
-            flex: 1;
-        }
-
-        .agent-card[data-status="active"] .agent-action {
-            color: #c4b5fd;
-        }
-
-        .agent-progress {
-            position: relative;
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-        }
-
-        .progress-spinner,
-        .progress-checkmark {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .progress-spinner {
-            opacity: 0;
-        }
-
-        .agent-card[data-status="active"] .progress-spinner {
-            opacity: 1;
-        }
-
-        .progress-spinner::before {
-            content: '';
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(139, 92, 246, 0.2);
-            border-top-color: #8b5cf6;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .progress-checkmark {
-            opacity: 0;
-            font-size: 16px;
-            color: #10b981;
-            font-weight: bold;
-        }
-
-        .agent-card[data-status="complete"] .progress-checkmark {
-            opacity: 1;
-            animation: checkmarkPop 0.3s ease-out;
-        }
-
-        @keyframes checkmarkPop {
-            0% { transform: scale(0); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        .agent-time {
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
-            font-family: monospace;
-            min-width: 40px;
-            text-align: right;
-        }
-
-        .pipeline-connector {
-            width: 2px;
-            height: 12px;
-            background: rgba(255,255,255,0.1);
-            margin: 0 auto;
-            margin-left: 2.75rem;
-        }
-
-        .live-insights {
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .insights-header {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: rgba(255,255,255,0.7);
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .insights-feed {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-
-        .insight-item {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.6);
-            padding: 0.5rem;
-            background: rgba(255,255,255,0.02);
-            border-radius: 6px;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .modal-title {
-            font-size: 1.75rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .scanning-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .judge-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-        }
-
-        .judge-card.active {
-            border-color: #60a5fa;
-            box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
-        }
-
-        .judge-card.complete {
-            background: rgba(34, 197, 94, 0.1);
-            border-color: #22c55e;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #60a5fa, #3b82f6);
-            width: 0%;
-            transition: width 0.3s;
-        }
-
-        /* Results - Redesigned Compact */
+        /* Results Section */
         .results-section {
             display: none;
-            padding: 16px 16px 40px 16px;
             min-height: 100vh;
+            padding-top: 100px;
+            padding-bottom: 60px;
         }
 
         .results-section.active {
             display: block;
         }
 
-        .container {
-            max-width: 1600px;
+        .results-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .results-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .risk-score-display {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 120px;
+            height: 120px;
+            margin: 20px auto;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(251, 146, 60, 0.2) 0%, rgba(239, 68, 68, 0.2) 100%);
+            border: 3px solid #fb923c;
+        }
+
+        .risk-score-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: #fb923c;
+        }
+
+        .violations-list {
+            max-width: 1000px;
             margin: 0 auto;
         }
 
-        /* Compact Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .violation-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
             margin-bottom: 16px;
-        }
-
-        .header h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .meta {
-            color: rgba(255,255,255,0.5);
-            font-size: 0.75rem;
-            margin-top: 4px;
-        }
-
-        .export-btns {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 13px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .btn-pdf {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-            color: white;
-            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
-        }
-
-        .btn-pdf:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
-        }
-
-        .btn-csv {
-            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-            color: white;
-            box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
-        }
-
-        .btn-csv:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
-        }
-
-        /* Compact Summary Bar */
-        .summary-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .summary-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            padding: 16px 20px;
-        }
-
-        .summary-label {
-            font-size: 10px;
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-
-        .summary-value {
-            font-size: 36px;
-            font-weight: 800;
-        }
-
-        .summary-value.green { color: #10b981; }
-        .summary-value.red { color: #ef4444; }
-
-        .summary-sub {
-            font-size: 11px;
-            color: rgba(255,255,255,0.5);
-            margin-top: 4px;
-        }
-
-        /* Violations Overview */
-        .violations-overview {
-            margin-bottom: 24px;
-        }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .violation-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 10px;
-        }
-
-        .violation-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-left: 3px solid #ef4444;
-            border-radius: 8px;
-            padding: 16px 20px;
         }
 
         .violation-header {
             display: flex;
             justify-content: space-between;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+
+        .violation-details h3 {
+            font-size: 18px;
+            color: #ffffff;
             margin-bottom: 8px;
         }
 
-        .badges {
-            display: flex;
-            gap: 6px;
-        }
-
-        .badge {
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 9px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .badge-critical {
-            background: rgba(239,68,68,0.2);
-            color: #ef4444;
-        }
-
-        .badge-framework {
-            background: rgba(96,165,250,0.2);
-            color: #60a5fa;
-        }
-
-        .violation-title {
+        .violation-evidence {
             font-size: 14px;
-            font-weight: 600;
+            color: #9ca3af;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .remediation-steps {
+            padding: 16px;
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 10px;
+        }
+
+        .remediation-steps h4 {
+            font-size: 14px;
+            color: #3b82f6;
+            margin-bottom: 10px;
+        }
+
+        .remediation-steps ol {
+            padding-left: 20px;
+        }
+
+        .remediation-steps li {
+            font-size: 13px;
+            color: #d1d5db;
             margin-bottom: 6px;
-        }
-
-        .violation-desc {
-            font-size: 12px;
-            color: rgba(255,255,255,0.7);
-            line-height: 1.4;
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
-        }
-
-        .tab {
-            padding: 10px 20px;
-            background: transparent;
-            border: none;
-            color: rgba(255,255,255,0.6);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
-        }
-
-        .tab.active {
-            color: #60a5fa;
-            border-bottom-color: #60a5fa;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Fix Plan Layout */
-        .fix-plan-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .plan-column {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            padding: 14px;
-        }
-
-        .plan-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .plan-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .plan-item {
-            background: rgba(255,255,255,0.05);
-            padding: 10px;
-            border-radius: 6px;
-            border-left: 3px solid #60a5fa;
-        }
-
-        .plan-item-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .plan-item-desc {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.7);
-        }
-
-        .plan-priority {
-            display: inline-block;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            margin-top: 4px;
-        }
-
-        .priority-p0 {
-            background: rgba(239,68,68,0.2);
-            color: #ef4444;
-        }
-
-        .priority-p1 {
-            background: rgba(245,158,11,0.2);
-            color: #f59e0b;
-        }
-
-        /* Citations */
-        .citations-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .citation-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            padding: 12px;
-        }
-
-        .citation-ref {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #60a5fa;
-            margin-bottom: 6px;
-        }
-
-        .citation-text {
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.7);
-            font-style: italic;
-        }
-
-        /* Animated SVG Risk Ring */
-        .risk-score-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .risk-score-ring {
-            position: relative;
-            width: 90px;
-            height: 90px;
-        }
-
-        .risk-score-ring svg {
-            transform: rotate(-90deg);
-            width: 90px;
-            height: 90px;
-        }
-
-        .risk-score-ring .bg-ring {
-            fill: none;
-            stroke: rgba(255,255,255,0.06);
-            stroke-width: 8;
-        }
-
-        .risk-score-ring .progress-ring {
-            fill: none;
-            stroke: url(#riskGradient);
-            stroke-width: 8;
-            stroke-linecap: round;
-            filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.4));
-            transition: stroke-dasharray 1s ease-out;
-        }
-
-        .risk-score-value-inner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            align-items: baseline;
-        }
-
-        .risk-number {
-            font-size: 28px;
-            font-weight: 700;
-            color: #f87171;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .risk-denom {
-            font-size: 12px;
-            color: rgba(248, 113, 113, 0.6);
-            margin-left: 1px;
-        }
-
-        .risk-label {
-            font-size: 11px;
-            color: #f87171;
-            font-weight: 500;
-            margin-top: 2px;
-        }
-
-        /* Expandable Violation Cards */
-        .violation-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-left: 3px solid #ef4444;
-            border-radius: 8px;
-            padding: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .violation-card:hover {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.15);
-            box-shadow: 0 0 20px rgba(6,182,212,0.15);
-        }
-
-        .violation-card.expanded {
-            background: rgba(255,255,255,0.06);
-        }
-
-        .expand-icon {
-            transition: transform 0.2s ease;
-            color: rgba(255,255,255,0.5);
-            font-size: 18px;
-        }
-
-        .violation-card.expanded .expand-icon {
-            transform: rotate(180deg);
-        }
-
-        .violation-details {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            display: none;
-        }
-
-        .violation-card.expanded .violation-details {
-            display: block;
-        }
-
-        .metadata-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .metadata-item {
-            background: rgba(255,255,255,0.03);
-            padding: 8px;
-            border-radius: 6px;
-        }
-
-        .metadata-label {
-            font-size: 0.7rem;
-            color: rgba(255,255,255,0.5);
-            text-transform: uppercase;
-            margin-bottom: 4px;
-        }
-
-        .metadata-value {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: rgba(255,255,255,0.9);
-        }
-
-        /* Filter Tabs */
-        .filter-tabs {
-            display: flex;
-            gap: 8px;
-            background: rgba(255,255,255,0.03);
-            padding: 4px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .filter-tab-btn {
-            padding: 6px 14px;
-            background: transparent;
-            border: none;
-            border-radius: 6px;
-            color: rgba(255,255,255,0.6);
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .filter-tab-btn:hover {
-            color: rgba(255,255,255,0.9);
-        }
-
-        .filter-tab-btn.active {
-            background: rgba(99, 102, 241, 0.2);
-            color: #a5b4fc;
-        }
-
-        /* Status Dot Animation */
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #ef4444;
-            box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* Card Hover Glows */
-        .summary-item:hover {
-            border-color: rgba(255,255,255,0.15);
-            box-shadow: 0 0 20px rgba(6,182,212,0.1);
-        }
-
-        /* Professional GRC Design System */
-        .glass-card {
-            backdrop-filter: blur(20px);
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 20px 50px rgba(0,0,0,0.3);
-        }
-
-        .circular-gauge {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: conic-gradient(from 0deg, #ef4444 0%, #f59e0b 50%, #eab308 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            box-shadow: 0 8px 32px rgba(239,68,68,0.3);
-        }
-
-        .circular-gauge::before {
-            content: '';
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            background: #0a1628;
-            border-radius: 50%;
-        }
-
-        /* Tooltips for technical terms */
-        .tooltip {
-            position: relative;
-            border-bottom: 1px dotted rgba(96,165,250,0.5);
-            cursor: help;
-            color: #60a5fa;
-        }
-
-        .tooltip::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(20,30,48,0.98);
-            color: #fff;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            border: 1px solid rgba(96,165,250,0.3);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-            z-index: 1000;
-            line-height: 1.4;
-            max-width: 250px;
-            white-space: normal;
-        }
-
-        .tooltip::before {
-            content: '';
-            position: absolute;
-            bottom: 110%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 6px solid transparent;
-            border-top-color: rgba(96,165,250,0.3);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .tooltip:hover::after,
-        .tooltip:hover::before {
-            opacity: 1;
-        }
-
-        .gauge-value {
-            position: relative;
-            z-index: 1;
-            font-size: 1.75rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #ef4444, #f59e0b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .violation-card {
-            background: rgba(255,255,255,0.03);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-left: 4px solid;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            transition: transform 0.2s;
-        }
-
-        .violation-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-        }
-
-        .collapsible-section {
-            margin-top: 16px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 16px;
-        }
-
-        .collapsible-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            color: rgba(255,255,255,0.9);
-            margin-bottom: 12px;
-        }
-
-        .collapsible-content {
-            display: none;
-            padding-left: 24px;
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9rem;
-        }
-
-        .collapsible-content.expanded {
-            display: block;
-        }
-
-        .remediation-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .remediation-column {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 24px;
-        }
-
-        .remediation-column h3 {
-            margin-bottom: 16px;
-            font-size: 1.1rem;
-            color: #60a5fa;
-        }
-
-        .remediation-item {
-            display: flex;
-            align-items: start;
-            gap: 12px;
-            margin-bottom: 12px;
-            padding: 12px;
-            background: rgba(255,255,255,0.02);
-            border-radius: 8px;
-        }
-
-        .remediation-checkbox {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(96,165,250,0.5);
-            border-radius: 4px;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .timeline-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-left: 8px;
-        }
-
-        .timeline-immediate {
-            background: rgba(239,68,68,0.2);
-            color: #ef4444;
-        }
-
-        .timeline-30days {
-            background: rgba(245,158,11,0.2);
-            color: #f59e0b;
-        }
-
-        .timeline-90days {
-            background: rgba(234,179,8,0.2);
-            color: #eab308;
-        }
-
-        /* Risk score summary card */
-        .risk-summary-card {
-            background: rgba(255,255,255,0.03);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 1.5rem;
-            text-align: center;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.6s ease forwards;
-            animation-delay: 2s;
-            box-shadow: 0 0 20px rgba(6,182,212,0.3);
-        }
-
-        .risk-summary-label {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 0.5rem;
-        }
-
-        .risk-summary-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #ef4444;
-            margin-bottom: 0.5rem;
-            opacity: 0;
-            animation: fadeIn 0.8s ease forwards;
-            animation-delay: 2.5s;
-        }
-
-        .risk-summary-desc {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.6);
-            opacity: 0;
-            animation: fadeIn 0.8s ease forwards;
-            animation-delay: 2.5s;
-        }
-
-        /* ============================================
-           COMPACT UI FIXES - Production Polish
-           ============================================ */
-
-        /* FIX: Compact metric cards */
-        .metrics-grid {
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .metric-card {
-            padding: 16px 20px;
-        }
-
-        .metric-header {
-            margin-bottom: 12px;
-        }
-
-        .metric-label {
-            font-size: 10px;
-            letter-spacing: 0.08em;
-        }
-
-        /* FIX: Export buttons - larger and better positioned */
-        .assessment-header {
-            align-items: center;
-            margin-bottom: 24px;
+            line-height: 1.5;
         }
 
         .export-buttons {
             display: flex;
-            gap: 8px;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 40px;
         }
 
-        .export-btn,
-        .export-btn-pdf,
-        .export-btn-csv {
-            padding: 10px 20px;
-            font-size: 13px;
+        .export-button {
+            padding: 12px 24px;
+            font-size: 14px;
             font-weight: 600;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        /* FIX: Compact compliance section */
-        .compliance-section {
-            margin-bottom: 24px;
+        .export-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
-        .compliance-grid {
-            gap: 16px;
+        /* Loading Spinner */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            min-height: 300px;
         }
 
-        .compliance-card {
-            padding: 16px 20px;
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(59, 130, 246, 0.2);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
 
-        .compliance-card-title {
-            font-size: 13px;
-            margin-bottom: 14px;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        .stat-number {
-            font-size: 24px;
-        }
-
-        .stat-label {
-            font-size: 11px;
-        }
-
-        /* FIX: Compact violations section */
-        .violations-section {
-            margin-bottom: 24px;
-        }
-
-        .violations-header {
-            margin-bottom: 16px;
-        }
-
-        .violation-card-header {
-            margin-bottom: 10px;
-        }
-
-        /* Priority List Compact */
-        .priority-list {
-            gap: 10px;
-        }
-
-        .priority-dot {
-            width: 10px;
-            height: 10px;
-        }
-
-        .priority-count {
+        .loading-text {
             font-size: 16px;
+            color: #9ca3af;
         }
 
-        .priority-label {
-            font-size: 13px;
-        }
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
 
-        .priority-sla {
-            font-size: 11px;
-        }
+            .hero-content h1 {
+                font-size: 40px;
+            }
 
-        /* Big Number Styling */
-        .big-number {
-            font-size: 36px;
-        }
+            .typewriter {
+                font-size: 18px;
+            }
 
-        .total-label {
-            font-size: 11px;
-        }
-
-        /* Violations Breakdown Compact */
-        .violation-bars {
-            gap: 6px;
-        }
-
-        .violation-bar {
-            height: 5px;
-        }
-
-        .violation-bar-label {
-            font-size: 11px;
-        }
-
-        /* FIX: Responsive - maintain compactness */
-        @media (max-width: 1200px) {
-            .metrics-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .demo-container {
+                max-width: 600px;
+                margin: 0 auto;
             }
         }
 
         @media (max-width: 768px) {
-            .metrics-grid,
-            .compliance-grid {
+            .container {
+                padding: 0 20px;
+            }
+
+            .header {
+                padding: 16px 20px;
+            }
+
+            .hero {
+                padding-top: 80px;
+            }
+
+            .hero-content h1 {
+                font-size: 32px;
+            }
+
+            .typewriter {
+                font-size: 16px;
+            }
+
+            .cta-button {
+                font-size: 16px;
+                padding: 14px 28px;
+            }
+
+            .assessment-card {
+                padding: 24px;
+            }
+
+            .assessment-title {
+                font-size: 28px;
+            }
+
+            .checkbox-group {
                 grid-template-columns: 1fr;
             }
-
-            .assessment-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .export-buttons {
-                width: 100%;
-            }
-
-            .export-btn {
-                flex: 1;
-                justify-content: center;
-            }
-        }
-
-        /* ============================================
-           HERO ANIMATION - Impressive Scanning Effect
-           ============================================ */
-
-        /* Hero Animation Container */
-        .hero-animation {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-            height: 450px;
-        }
-
-        .scan-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(30, 41, 59, 0.4) 100%);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-        }
-
-        /* Scanning line effect */
-        .scan-line {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #3b82f6, #8b5cf6, transparent);
-            box-shadow: 0 0 20px #3b82f6, 0 0 40px #3b82f6;
-            animation: scanDown 3s ease-in-out infinite;
-        }
-
-        @keyframes scanDown {
-            0% { top: 0; opacity: 1; }
-            50% { top: 100%; opacity: 0.5; }
-            51% { top: 0; opacity: 0; }
-            52% { opacity: 1; }
-            100% { top: 0; opacity: 1; }
-        }
-
-        /* Floating violation cards */
-        .detected-violations {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .violation-float {
-            background: rgba(15, 23, 42, 0.9);
-            border-radius: 12px;
-            padding: 14px 16px;
-            border-left: 3px solid #ef4444;
-            opacity: 0;
-            transform: translateX(-20px);
-            animation: slideInViolation 0.5s ease forwards;
-        }
-
-        .violation-float.v1 { animation-delay: 0.5s; }
-        .violation-float.v2 { animation-delay: 1.2s; border-left-color: #f97316; }
-        .violation-float.v3 { animation-delay: 1.9s; }
-
-        @keyframes slideInViolation {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .v-badges {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .v-badge {
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .v-badge.critical {
-            background: rgba(239, 68, 68, 0.2);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .v-badge.high {
-            background: rgba(249, 115, 22, 0.2);
-            color: #fb923c;
-            border: 1px solid rgba(249, 115, 22, 0.3);
-        }
-
-        .v-badge.framework {
-            background: rgba(99, 102, 241, 0.2);
-            color: #a5b4fc;
-            border: 1px solid rgba(99, 102, 241, 0.3);
-        }
-
-        .v-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #f1f5f9;
-            margin-bottom: 4px;
-        }
-
-        .v-citation {
-            font-size: 11px;
-            color: #64748b;
-            font-style: italic;
-        }
-
-        /* Risk Gauge */
-        .risk-display {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            text-align: center;
-            background: rgba(15, 23, 42, 0.95);
-            border-radius: 16px;
-            padding: 16px 24px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .risk-label-top {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: #64748b;
-            margin-bottom: 8px;
-        }
-
-        .risk-gauge {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            margin: 0 auto;
-        }
-
-        .gauge-svg {
-            transform: rotate(-90deg);
-            width: 100%;
-            height: 100%;
-        }
-
-        .gauge-bg {
-            fill: none;
-            stroke: rgba(255, 255, 255, 0.1);
-            stroke-width: 8;
-        }
-
-        .gauge-fill {
-            fill: none;
-            stroke: url(#gaugeGradient);
-            stroke-width: 8;
-            stroke-linecap: round;
-            stroke-dasharray: 339.292;
-            stroke-dashoffset: 339.292;
-            animation: fillGauge 2s ease-out 2.5s forwards;
-            filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5));
-        }
-
-        @keyframes fillGauge {
-            to {
-                stroke-dashoffset: 50;
-            }
-        }
-
-        .risk-value {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            align-items: baseline;
-        }
-
-        .risk-num {
-            font-size: 28px;
-            font-weight: 700;
-            color: #f87171;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .risk-max {
-            font-size: 12px;
-            color: rgba(248, 113, 113, 0.6);
-        }
-
-        .risk-status {
-            font-size: 11px;
-            font-weight: 600;
-            color: #f87171;
-            margin-top: 8px;
-            animation: pulse 1s ease-in-out infinite;
-        }
-
-        /* Floating particles */
-        .particles {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .particles span {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: #3b82f6;
-            border-radius: 50%;
-            opacity: 0.6;
-            animation: float 4s ease-in-out infinite;
-        }
-
-        .particles span:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
-        .particles span:nth-child(2) { top: 60%; left: 80%; animation-delay: 1s; }
-        .particles span:nth-child(3) { top: 80%; left: 30%; animation-delay: 2s; }
-        .particles span:nth-child(4) { top: 40%; left: 60%; animation-delay: 0.5s; }
-        .particles span:nth-child(5) { top: 10%; left: 70%; animation-delay: 1.5s; }
-        .particles span:nth-child(6) { top: 70%; left: 50%; animation-delay: 2.5s; }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
-            50% { transform: translateY(-20px) scale(1.5); opacity: 1; }
-        }
-
-        /* ============================================
-           ANIMATED BACKGROUND MESH
-           ============================================ */
-
-        /* Animated Background Mesh */
-        .bg-mesh {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: -1;
-            background: #0a0f1a;
-            overflow: hidden;
-        }
-
-        .bg-mesh::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background:
-                radial-gradient(ellipse 80% 50% at 20% 40%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-                radial-gradient(ellipse 60% 40% at 80% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
-                radial-gradient(ellipse 50% 60% at 60% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-                radial-gradient(ellipse 40% 40% at 30% 70%, rgba(168, 85, 247, 0.08) 0%, transparent 50%);
-            animation: meshFloat 20s ease-in-out infinite;
-        }
-
-        .bg-mesh::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background:
-                radial-gradient(ellipse 70% 50% at 70% 60%, rgba(34, 197, 94, 0.05) 0%, transparent 50%),
-                radial-gradient(ellipse 50% 70% at 10% 90%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);
-            animation: meshFloat 25s ease-in-out infinite reverse;
-        }
-
-        @keyframes meshFloat {
-            0%, 100% {
-                transform: translate(0, 0) scale(1);
-                opacity: 1;
-            }
-            25% {
-                transform: translate(2%, -3%) scale(1.02);
-                opacity: 0.9;
-            }
-            50% {
-                transform: translate(-1%, 2%) scale(0.98);
-                opacity: 1;
-            }
-            75% {
-                transform: translate(-2%, -1%) scale(1.01);
-                opacity: 0.95;
-            }
-        }
-
-        /* Floating orbs for depth */
-        .bg-mesh .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(60px);
-            animation: orbFloat 15s ease-in-out infinite;
-        }
-
-        .orb-1 {
-            width: 400px;
-            height: 400px;
-            background: rgba(99, 102, 241, 0.15);
-            top: 10%;
-            left: 15%;
-            animation-delay: 0s;
-        }
-
-        .orb-2 {
-            width: 300px;
-            height: 300px;
-            background: rgba(139, 92, 246, 0.12);
-            top: 50%;
-            right: 10%;
-            animation-delay: -5s;
-        }
-
-        .orb-3 {
-            width: 350px;
-            height: 350px;
-            background: rgba(59, 130, 246, 0.1);
-            bottom: 10%;
-            left: 30%;
-            animation-delay: -10s;
-        }
-
-        @keyframes orbFloat {
-            0%, 100% {
-                transform: translate(0, 0) scale(1);
-            }
-            33% {
-                transform: translate(30px, -40px) scale(1.1);
-            }
-            66% {
-                transform: translate(-20px, 20px) scale(0.95);
-            }
-        }
-
-        /* Grid lines overlay for tech feel */
-        .bg-mesh .grid-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image:
-                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-            animation: gridPulse 8s ease-in-out infinite;
-        }
-
-        @keyframes gridPulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.6; }
         }
     </style>
 </head>
 <body>
-    <!-- Animated Background Mesh -->
+    <!-- Animated Mesh Background -->
     <div class="bg-mesh">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-        <div class="grid-overlay"></div>
+        <div class="floating-circle"></div>
+        <div class="floating-circle"></div>
+        <div class="floating-circle"></div>
     </div>
 
     <!-- Header -->
     <div class="header">
-        <a href="#" class="logo" onclick="navigateToHome(); return false;">
+        <a href="#" class="logo" onclick="goHome(); return false;">
             <img src="logo.png" alt="Sovereign" class="logo-img">
             <div class="logo-text">
                 <span class="logo-title">SOVEREIGN</span>
@@ -2065,88 +795,74 @@
 
     <!-- Hero Section -->
     <section class="hero" id="heroSection">
-        <div class="hero-content">
-            <h1>
-                Catch AI Compliance Violations
-                <span class="highlight">Before Regulators Do</span>
-            </h1>
-            <div class="typewriter-container">
-                <div class="typewriter" id="typewriter">
-                    <span id="typewriterText"></span><span class="cursor"></span>
-                </div>
-            </div>
-            <button class="cta-button" onclick="navigateToSetup()">
-                Analyze Your AI System →
-            </button>
-            <div class="built-for">
-                <span>Built for:</span>
-                <span class="audience-badge">AI Platform Teams</span>
-                <span class="audience-badge">Risk & Compliance Officers</span>
-                <span class="audience-badge">Legal Counsel</span>
-            </div>
-        </div>
+        <div class="container">
+            <div class="hero-grid">
+                <!-- Left Side - Hero Content -->
+                <div class="hero-content">
+                    <h1>
+                        Catch AI Compliance Violations
+                        <span class="highlight">Before Regulators Do</span>
+                    </h1>
 
-        <div class="hero-animation">
-            <!-- Scanning Effect Container -->
-            <div class="scan-container">
-                <div class="scan-line"></div>
-
-                <!-- Floating violation cards that appear during scan -->
-                <div class="detected-violations">
-                    <div class="violation-float v1">
-                        <div class="v-badges">
-                            <span class="v-badge critical">CRITICAL</span>
-                            <span class="v-badge framework">GDPR</span>
+                    <div class="typewriter-container">
+                        <div class="typewriter" id="typewriter">
+                            <span id="typewriterText"></span><span class="cursor"></span>
                         </div>
-                        <div class="v-title">Automated profiling without Article 22(2) exemption</div>
-                        <div class="v-citation">Article 22(2): "...shall not apply if..."</div>
                     </div>
 
-                    <div class="violation-float v2">
-                        <div class="v-badges">
-                            <span class="v-badge high">HIGH</span>
-                            <span class="v-badge framework">HIPAA</span>
-                        </div>
-                        <div class="v-title">Unencrypted PHI storage detected</div>
-                        <div class="v-citation">§164.312(a)(2)(iv): Encryption required</div>
-                    </div>
+                    <button class="cta-button" onclick="showAssessment()">
+                        Analyze Your AI System →
+                    </button>
 
-                    <div class="violation-float v3">
-                        <div class="v-badges">
-                            <span class="v-badge critical">CRITICAL</span>
-                            <span class="v-badge framework">SOX</span>
+                    <div class="social-proof">
+                        <div class="social-proof-label">Built for:</div>
+                        <div class="tags">
+                            <span class="tag">AI Platform Teams</span>
+                            <span class="tag">Risk & Compliance Officers</span>
+                            <span class="tag">Legal Counsel</span>
                         </div>
-                        <div class="v-title">Inadequate segregation of duties</div>
-                        <div class="v-citation">Section 404: Internal control requirements</div>
                     </div>
                 </div>
 
-                <!-- Animated Risk Score -->
-                <div class="risk-display">
-                    <div class="risk-label-top">Risk Assessment</div>
-                    <div class="risk-gauge">
-                        <svg viewBox="0 0 120 120" class="gauge-svg">
-                            <defs>
-                                <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" stop-color="#dc2626" />
-                                    <stop offset="100%" stop-color="#f87171" />
-                                </linearGradient>
-                            </defs>
-                            <circle class="gauge-bg" cx="60" cy="60" r="54" />
-                            <circle class="gauge-fill" cx="60" cy="60" r="54" />
-                        </svg>
-                        <div class="risk-value">
-                            <span class="risk-num">0</span>
-                            <span class="risk-max">/100</span>
+                <!-- Right Side - Interactive Demo -->
+                <div class="demo-container">
+                    <div class="scanning-line"></div>
+
+                    <div class="demo-title">Live Compliance Scan</div>
+
+                    <div class="violation-card" id="violationCard1">
+                        <div class="violation-badges">
+                            <span class="badge badge-critical">CRITICAL</span>
+                            <span class="badge badge-framework">GDPR</span>
+                        </div>
+                        <div class="violation-text">
+                            Automated profiling without Article 22(2) exemption
+                        </div>
+                        <div class="citation">
+                            📄 Article 22(2): "...shall not apply if..."
                         </div>
                     </div>
-                    <div class="risk-status">ANALYZING...</div>
-                </div>
 
-                <!-- Connection lines / particles -->
-                <div class="particles">
-                    <span></span><span></span><span></span>
-                    <span></span><span></span><span></span>
+                    <div class="violation-card" id="violationCard2">
+                        <div class="violation-badges">
+                            <span class="badge badge-high">HIGH</span>
+                            <span class="badge badge-framework">HIPAA</span>
+                        </div>
+                        <div class="violation-text">
+                            Unencrypted PHI storage detected
+                        </div>
+                        <div class="citation">
+                            📄 §164.312(a)(2)(iv): Encryption required
+                        </div>
+                    </div>
+
+                    <div class="risk-calculation" id="riskCalculation">
+                        <div class="risk-label">Calculating Risk Score...</div>
+                        <div class="risk-bar-container">
+                            <div class="risk-bar" id="riskBar"></div>
+                        </div>
+                        <div class="risk-score-text" id="riskScoreText">0/100</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2154,261 +870,82 @@
 
     <!-- Assessment Section -->
     <section class="assessment-section" id="assessmentSection">
-        <h2 class="assessment-title">Compliance Assessment Setup</h2>
-        <div class="assessment-grid">
-            <!-- Select Frameworks -->
+        <div class="container">
+            <button class="back-button" onclick="goHome()">← Back to Home</button>
+
             <div class="assessment-card">
-                <h3 class="card-title">Select Frameworks</h3>
-                <div class="framework-options">
-                    <div class="framework-option" data-framework="gdpr">
-                        <div class="framework-checkbox"></div>
-                        <span class="framework-icon">🔒</span>
-                        <div class="framework-info">
-                            <div class="framework-name"><span class="tooltip" data-tooltip="General Data Protection Regulation - EU data privacy law enforced since May 2018">GDPR</span></div>
-                            <div class="framework-desc">EU data privacy</div>
+                <h2 class="assessment-title">AI System Compliance Assessment</h2>
+                <p class="assessment-subtitle">Describe your AI system and select applicable frameworks for analysis</p>
+
+                <form id="assessmentForm" onsubmit="runAnalysis(event)">
+                    <div class="form-group">
+                        <label class="form-label">System Description</label>
+                        <textarea
+                            class="form-textarea"
+                            id="systemDescription"
+                            placeholder="Describe your AI system, its purpose, data processing activities, and decision-making capabilities..."
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Regulatory Frameworks</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="frameworks" value="gdpr" checked>
+                                <span>GDPR</span>
+                            </label>
+                            <label class="checkbox-label" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="frameworks" value="sox">
+                                <span>SOX</span>
+                            </label>
+                            <label class="checkbox-label" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="frameworks" value="euai">
+                                <span>EU AI Act</span>
+                            </label>
                         </div>
                     </div>
-                    <div class="framework-option" data-framework="sox">
-                        <div class="framework-checkbox"></div>
-                        <span class="framework-icon">📊</span>
-                        <div class="framework-info">
-                            <div class="framework-name"><span class="tooltip" data-tooltip="Sarbanes-Oxley Act - US financial reporting and corporate governance law">SOX</span></div>
-                            <div class="framework-desc">Financial controls</div>
-                        </div>
-                    </div>
-                    <div class="framework-option" data-framework="euai">
-                        <div class="framework-checkbox"></div>
-                        <span class="framework-icon">🤖</span>
-                        <div class="framework-info">
-                            <div class="framework-name"><span class="tooltip" data-tooltip="European Union Artificial Intelligence Act - regulates AI systems based on risk levels">EU AI Act</span></div>
-                            <div class="framework-desc">AI risk classification</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Upload Document -->
-            <div class="assessment-card">
-                <h3 class="card-title">Upload Document</h3>
-                <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
-                    <input type="file" id="fileInput" style="display:none" accept=".pdf,.docx,.txt">
-                    <div class="upload-icon">📁</div>
-                    <div class="upload-text">Drop file or browse</div>
-                    <div class="upload-hint">PDF, DOCX, TXT</div>
-                </div>
-            </div>
-
-            <!-- Quick Test Scenarios -->
-            <div class="assessment-card">
-                <h3 class="card-title">Quick Test Scenarios</h3>
-                <div class="test-scenarios">
-                    <div class="test-scenario" data-scenario="gdpr">
-                        <span class="scenario-icon">🔒</span>
-                        <span class="scenario-name">GDPR Severe</span>
-                    </div>
-                    <div class="test-scenario" data-scenario="sox">
-                        <span class="scenario-icon">📊</span>
-                        <span class="scenario-name">SOX Controls</span>
-                    </div>
-                    <div class="test-scenario" data-scenario="euaiact">
-                        <span class="scenario-icon">🤖</span>
-                        <span class="scenario-name">EU AI Act</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Textarea -->
-            <div class="textarea-section">
-                <textarea class="textarea" id="systemDescription" placeholder="Describe your AI system here..."></textarea>
-                <button class="run-button" onclick="runAssessment()">🔍 Run Assessment</button>
+                    <button type="submit" class="analyze-button" id="analyzeButton">
+                        Analyze for Compliance Violations
+                    </button>
+                </form>
             </div>
         </div>
     </section>
 
-    <!-- Processing Modal -->
-    <div class="modal" id="scanModal">
-        <div class="modal-content">
-            <div class="processing-header">
-                <h2 class="processing-title">Processing Assessment</h2>
-                <div class="pipeline-timer" id="pipelineTimer">0.0s</div>
-            </div>
-
-            <!-- Agent Pipeline -->
-            <div class="agents-vertical" id="agentPipeline">
-                <!-- Document Parser -->
-                <div class="agent-card" id="agent-parser" data-status="pending">
-                    <div class="agent-icon">📄</div>
-                    <div class="agent-content">
-                        <div class="agent-name">Document Parser</div>
-                        <div class="agent-action" id="parser-action">Waiting...</div>
-                        <div class="agent-progress">
-                            <div class="progress-spinner"></div>
-                            <div class="progress-checkmark">✓</div>
-                        </div>
-                    </div>
-                    <div class="agent-time" id="parser-time">-</div>
-                </div>
-
-                <!-- Connection Line -->
-                <div class="pipeline-connector"></div>
-
-                <!-- RAG Retriever -->
-                <div class="agent-card" id="agent-rag" data-status="pending">
-                    <div class="agent-icon">🔍</div>
-                    <div class="agent-content">
-                        <div class="agent-name">RAG Retriever</div>
-                        <div class="agent-action" id="rag-action">Waiting...</div>
-                        <div class="agent-progress">
-                            <div class="progress-spinner"></div>
-                            <div class="progress-checkmark">✓</div>
-                        </div>
-                    </div>
-                    <div class="agent-time" id="rag-time">-</div>
-                </div>
-
-                <!-- Connection Line -->
-                <div class="pipeline-connector"></div>
-
-                <!-- Orchestrator -->
-                <div class="agent-card" id="agent-orchestrator" data-status="pending">
-                    <div class="agent-icon">📊</div>
-                    <div class="agent-content">
-                        <div class="agent-name">Orchestrator</div>
-                        <div class="agent-action" id="orchestrator-action">Waiting...</div>
-                        <div class="agent-progress">
-                            <div class="progress-spinner"></div>
-                            <div class="progress-checkmark">✓</div>
-                        </div>
-                    </div>
-                    <div class="agent-time" id="orchestrator-time">-</div>
-                </div>
-            </div>
-
-            <!-- Live Insights -->
-            <div class="live-insights" id="liveInsights">
-                <div class="insights-header">Live Insights</div>
-                <div class="insights-feed" id="insightsFeed"></div>
-            </div>
-        </div>
-    </div>
-
     <!-- Results Section -->
     <section class="results-section" id="resultsSection">
         <div class="container">
-            <div class="header">
-                <div>
-                    <h1>Assessment Results</h1>
-                    <div class="meta" id="metaInfo">Loading...</div>
+            <button class="back-button" onclick="showAssessment()">← Back to Assessment</button>
+
+            <div class="results-header">
+                <h2 class="results-title">Compliance Analysis Results</h2>
+                <div class="risk-score-display">
+                    <span class="risk-score-number" id="finalRiskScore">0</span>
                 </div>
-                <div class="export-btns">
-                    <button class="btn btn-pdf" onclick="downloadPDF()">PDF</button>
-                    <button class="btn btn-csv" onclick="downloadCSV()">CSV</button>
-                </div>
+                <p id="riskLabel" style="color: #9ca3af; font-size: 16px;">Risk Level</p>
             </div>
 
-            <!-- Compact Summary -->
-            <div class="summary-bar">
-                <div class="summary-item">
-                    <div class="summary-label">RISK SCORE <span class="status-dot"></span></div>
-                    <div class="risk-score-container">
-                        <div class="risk-score-ring">
-                            <svg width="100" height="100" viewBox="0 0 100 100">
-                                <defs>
-                                    <linearGradient id="riskGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stop-color="#dc2626"/>
-                                        <stop offset="100%" stop-color="#f87171"/>
-                                    </linearGradient>
-                                </defs>
-                                <circle class="bg-ring" cx="50" cy="50" r="42"/>
-                                <circle class="progress-ring" cx="50" cy="50" r="42"
-                                    stroke-dasharray="0 264" id="riskRing"/>
-                            </svg>
-                            <div class="risk-score-value-inner">
-                                <span class="risk-number" id="riskScore">0</span>
-                                <span class="risk-denom">/100</span>
-                            </div>
-                        </div>
-                        <span class="risk-label" id="riskLevel">-</span>
-                    </div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-label">Total Violations</div>
-                    <div class="summary-value red" id="totalViolations">-</div>
-                    <div class="summary-sub" id="violationBreakdown">-</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-label">Frameworks Analyzed</div>
-                    <div class="summary-value" id="frameworkCount">-</div>
-                    <div class="summary-sub" id="frameworkList">-</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-label">Audit Readiness</div>
-                    <div class="summary-value red" id="auditStatus">🔴 Not Ready</div>
-                    <div class="summary-sub" id="auditEta">-</div>
-                </div>
+            <div class="violations-list" id="violationsList">
+                <!-- Violations will be inserted here -->
             </div>
 
-            <!-- Violations Overview -->
-            <div class="violations-overview">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <div class="section-title">Violations Overview</div>
-                    <div class="filter-tabs" id="filterTabs">
-                        <button class="filter-tab-btn active" data-filter="all">All (<span id="filterAll">0</span>)</button>
-                        <button class="filter-tab-btn" data-filter="critical">Critical (<span id="filterCritical">0</span>)</button>
-                        <button class="filter-tab-btn" data-filter="major">Major (<span id="filterMajor">0</span>)</button>
-                        <button class="filter-tab-btn" data-filter="minor">Minor (<span id="filterMinor">0</span>)</button>
-                    </div>
-                </div>
-                <div class="violation-cards" id="violationCards"></div>
-            </div>
-
-            <!-- Tabs -->
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('technical')">Technical Fix Plan</button>
-                <button class="tab" onclick="switchTab('business')">Business Plan</button>
-                <button class="tab" onclick="switchTab('citations')">Citations</button>
-            </div>
-
-            <!-- Tab 1: Technical Fix Plan -->
-            <div class="tab-content active" id="technical">
-                <div class="fix-plan-grid">
-                    <div class="plan-column">
-                        <div class="plan-title">🔧 Technical Fixes (Code/API/Architecture)</div>
-                        <div class="plan-list" id="technicalList"></div>
-                    </div>
-                    <div class="plan-column">
-                        <div class="plan-title">📋 Business Process Changes</div>
-                        <div class="plan-list" id="businessProcessList"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tab 2: Business Plan -->
-            <div class="tab-content" id="business">
-                <div class="plan-column">
-                    <div class="plan-title">📋 Process & Policy Changes</div>
-                    <div class="plan-list" id="businessList"></div>
-                </div>
-            </div>
-
-            <!-- Tab 3: Citations -->
-            <div class="tab-content" id="citations">
-                <div class="citations-list" id="citationsList"></div>
+            <div class="export-buttons">
+                <button class="export-button" onclick="exportPDF()">
+                    📄 Export PDF Report
+                </button>
+                <button class="export-button" onclick="exportCSV()">
+                    📊 Export CSV
+                </button>
             </div>
         </div>
     </section>
 
     <script>
-        const API_BASE = 'https://sovereign-v5.onrender.com';
-        
-        const SCENARIOS = {
-            gdpr: 'Automated hiring system that analyzes candidate resumes, facial expressions during video interviews, and makes final hiring decisions without human review.',
-            sox: 'Financial reporting AI that automatically generates quarterly statements and makes adjustments without human oversight, violating internal control requirements.',
-            euaiact: 'Biometric identification system used in public spaces without required conformity assessment, technical documentation, or human oversight mechanisms.'
-        };
-
-        let selectedFrameworks = new Set();
-        let currentAssessment = null;
+        // Global state
+        let currentAnalysisId = null;
+        let currentResults = null;
 
         // Typewriter Effect
         const taglines = [
@@ -2426,7 +963,6 @@
         function typeWriter() {
             const currentTagline = taglines[taglineIndex];
             const textElement = document.getElementById('typewriterText');
-            if (!textElement) return;
 
             if (!isDeleting) {
                 textElement.textContent = currentTagline.substring(0, charIndex + 1);
@@ -2453,745 +989,236 @@
         }
 
         // Start typewriter on load
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', typeWriter);
-        } else {
+        window.addEventListener('load', () => {
             typeWriter();
-        }
+            animateDemo();
+        });
 
-        // Animate risk score number in hero
-        function animateRiskScore() {
-            const riskNum = document.querySelector('.hero-animation .risk-num');
-            const riskStatus = document.querySelector('.hero-animation .risk-status');
-            if (!riskNum) return;
-
-            let current = 0;
-            const target = 87;
-            const duration = 2000;
-            const startTime = performance.now();
-            const startDelay = 2500; // Start after gauge animation begins
+        // Animate demo cards and risk bar
+        function animateDemo() {
+            setTimeout(() => {
+                document.getElementById('violationCard1').classList.add('animate');
+            }, 500);
 
             setTimeout(() => {
-                function update(currentTime) {
-                    const elapsed = currentTime - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    const easeProgress = 1 - Math.pow(1 - progress, 3);
-                    current = Math.round(target * easeProgress);
-                    riskNum.textContent = current;
+                document.getElementById('violationCard2').classList.add('animate');
+            }, 1000);
 
-                    if (progress < 1) {
-                        requestAnimationFrame(update);
-                    } else {
-                        riskStatus.textContent = 'HIGH RISK';
-                        riskStatus.style.animation = 'none';
-                    }
+            setTimeout(() => {
+                const riskCalc = document.getElementById('riskCalculation');
+                riskCalc.classList.add('animate');
+
+                setTimeout(() => {
+                    document.getElementById('riskBar').classList.add('animate');
+                    animateRiskScore();
+                }, 100);
+            }, 1500);
+        }
+
+        function animateRiskScore() {
+            const scoreElement = document.getElementById('riskScoreText');
+            let score = 0;
+            const target = 78;
+            const duration = 1000;
+            const increment = target / (duration / 16);
+
+            const interval = setInterval(() => {
+                score += increment;
+                if (score >= target) {
+                    score = target;
+                    clearInterval(interval);
+                    scoreElement.textContent = `${target}/100 HIGH RISK`;
+                } else {
+                    scoreElement.textContent = `${Math.round(score)}/100`;
                 }
-                requestAnimationFrame(update);
-            }, startDelay);
+            }, 16);
         }
 
-        // Restart animation periodically
-        function loopHeroAnimation() {
-            animateRiskScore();
-
-            // Reset and replay every 8 seconds
-            setInterval(() => {
-                const violations = document.querySelectorAll('.violation-float');
-                const gaugeFill = document.querySelector('.gauge-fill');
-                const riskNum = document.querySelector('.hero-animation .risk-num');
-                const riskStatus = document.querySelector('.hero-animation .risk-status');
-
-                // Reset violations
-                violations.forEach(v => {
-                    v.style.animation = 'none';
-                    v.offsetHeight; // Trigger reflow
-                    v.style.animation = '';
-                });
-
-                // Reset gauge
-                if (gaugeFill) {
-                    gaugeFill.style.animation = 'none';
-                    gaugeFill.offsetHeight;
-                    gaugeFill.style.animation = '';
-                }
-
-                // Reset number
-                if (riskNum) riskNum.textContent = '0';
-                if (riskStatus) {
-                    riskStatus.textContent = 'ANALYZING...';
-                    riskStatus.style.animation = '';
-                }
-
-                animateRiskScore();
-            }, 8000);
-        }
-
-        // Start hero animation on page load
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loopHeroAnimation);
-        } else {
-            loopHeroAnimation();
-        }
-
-        // Navigation functions with History API
-        function navigateToHome() {
-            history.pushState({view: 'home'}, '', '/');
-            showHomeView();
-        }
-
-        function navigateToSetup() {
-            history.pushState({view: 'setup'}, '', '#setup');
-            showSetupView();
-        }
-
-        function navigateToResults(assessmentId) {
-            history.pushState({view: 'results', id: assessmentId}, '', '#results/' + assessmentId);
-            showResultsView(assessmentId);
-        }
-
-        // View display functions
-        function showHomeView() {
-            document.getElementById('heroSection').style.display = 'grid';
+        // Navigation
+        function goHome() {
+            document.getElementById('heroSection').style.display = 'flex';
             document.getElementById('assessmentSection').classList.remove('active');
             document.getElementById('resultsSection').classList.remove('active');
+            window.scrollTo(0, 0);
         }
 
-        function showSetupView() {
+        function showAssessment() {
             document.getElementById('heroSection').style.display = 'none';
             document.getElementById('assessmentSection').classList.add('active');
             document.getElementById('resultsSection').classList.remove('active');
+            window.scrollTo(0, 0);
         }
 
-        function showResultsView(assessmentId) {
+        function showResults() {
             document.getElementById('heroSection').style.display = 'none';
             document.getElementById('assessmentSection').classList.remove('active');
             document.getElementById('resultsSection').classList.add('active');
-
-            // Restore assessment data if available
-            if (assessmentId && window.currentAssessment) {
-                renderResults(window.currentAssessment);
-            }
+            window.scrollTo(0, 0);
         }
 
-        // Legacy function for backward compatibility
-        function showAssessment() {
-            navigateToSetup();
-        }
-
-        // Handle browser back/forward buttons
-        window.addEventListener('popstate', (event) => {
-            if (event.state) {
-                if (event.state.view === 'setup') {
-                    showSetupView();
-                } else if (event.state.view === 'results') {
-                    showResultsView(event.state.id);
-                } else {
-                    showHomeView();
-                }
+        // Checkbox toggle
+        function toggleCheckbox(label) {
+            const checkbox = label.querySelector('input[type="checkbox"]');
+            if (checkbox.checked) {
+                label.classList.add('checked');
             } else {
-                showHomeView();
+                label.classList.remove('checked');
             }
-        });
+        }
 
-        // Initialize with home view state
-        history.replaceState({view: 'home'}, '', window.location.pathname);
-
-        // Framework selection
-        document.querySelectorAll('.framework-option').forEach(opt => {
-            opt.addEventListener('click', () => {
-                const fw = opt.dataset.framework;
-                if (selectedFrameworks.has(fw)) {
-                    selectedFrameworks.delete(fw);
-                    opt.classList.remove('selected');
-                } else {
-                    selectedFrameworks.add(fw);
-                    opt.classList.add('selected');
-                }
+        // Initialize checkboxes
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.checkbox-label input[type="checkbox"]:checked').forEach(checkbox => {
+                checkbox.closest('.checkbox-label').classList.add('checked');
             });
         });
 
-        // Test scenarios
-        document.querySelectorAll('.test-scenario').forEach(scenario => {
-            scenario.addEventListener('click', () => {
-                const type = scenario.dataset.scenario;
-                document.getElementById('systemDescription').value = SCENARIOS[type];
+        // Run Analysis
+        async function runAnalysis(event) {
+            event.preventDefault();
 
-                // Auto-select framework
-                selectedFrameworks.clear();
-                document.querySelectorAll('.framework-option').forEach(o => o.classList.remove('selected'));
+            const description = document.getElementById('systemDescription').value;
+            const frameworks = Array.from(document.querySelectorAll('input[name="frameworks"]:checked'))
+                .map(cb => cb.value);
 
-                // Map scenario to framework
-                const fw = type === 'euaiact' ? 'euai' : type;
-                const opt = document.querySelector(`[data-framework="${fw}"]`);
-                if (opt) {
-                    opt.classList.add('selected');
-                    selectedFrameworks.add(fw);
-                }
-            });
-        });
-
-        async function runAssessment() {
-            const description = document.getElementById('systemDescription').value.trim();
-            if (!description || selectedFrameworks.size === 0) {
-                alert('Please select frameworks and describe your AI system');
+            if (frameworks.length === 0) {
+                alert('Please select at least one regulatory framework');
                 return;
             }
 
-            // Show modal
-            const modal = document.getElementById('scanModal');
-            modal.classList.add('active');
-
-            // Clear insights feed
-            document.getElementById('insightsFeed').innerHTML = '';
-
-            // Reset agents
-            const agents = ['parser', 'rag', 'orchestrator'];
-            agents.forEach(agent => {
-                const card = document.getElementById(`agent-${agent}`);
-                card.setAttribute('data-status', 'pending');
-                document.getElementById(`${agent}-action`).textContent = 'Waiting...';
-                document.getElementById(`${agent}-time`).textContent = '-';
-            });
-
-            // Start timer
-            const startTime = Date.now();
-            const timerInterval = setInterval(() => {
-                const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-                document.getElementById('pipelineTimer').textContent = `${elapsed}s`;
-            }, 100);
+            const analyzeButton = document.getElementById('analyzeButton');
+            analyzeButton.disabled = true;
+            analyzeButton.textContent = 'Analyzing...';
 
             try {
-                const frameworks = Array.from(selectedFrameworks);
-                
-                // Animate parser
-                await animateAgent('parser', 'Extracting text...', 1500);
-                
-                // Animate RAG
-                await animateAgent('rag', 'Searching regulations...', 2000);
-
-                // Call API
-                const response = await fetch(`${API_BASE}/api/analyze`, {
+                // Call backend API
+                const response = await fetch('http://localhost:8000/api/analyze', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({description, frameworks})
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        description: description,
+                        frameworks: frameworks
+                    })
                 });
 
-                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(`Analysis failed: ${response.statusText}`);
+                }
 
-                // Update RAG action with actual article count
-                const articlesCount = result.retrieved_chunks_count || result.violations?.length * 3 || 12;
-                document.getElementById('rag-action').textContent = `Found ${articlesCount} relevant articles`;
+                const data = await response.json();
+                currentAnalysisId = data.analysis_id;
+                currentResults = data;
 
-                // Add found articles insight
-                const insightsFeed = document.getElementById('insightsFeed');
-                const foundInsight = document.createElement('div');
-                foundInsight.className = 'insight-item';
-                foundInsight.textContent = `Found ${articlesCount} relevant articles`;
-                insightsFeed.appendChild(foundInsight);
-                insightsFeed.scrollTop = insightsFeed.scrollHeight;
-
-                await new Promise(r => setTimeout(r, 500));
-
-                // Store assessment globally and in localStorage
-                window.assessmentResult = result;
-                window.currentAssessment = result;
-                localStorage.setItem('currentAssessment', JSON.stringify(result));
-
-                // Animate orchestrator
-                await animateAgent('orchestrator', 'Aggregating results...', 1500);
-
-                clearInterval(timerInterval);
-                
-                // Confetti
-                confetti({particleCount: 100, spread: 70, colors: ['#60a5fa', '#3b82f6', '#22c55e']});
-
-                await new Promise(r => setTimeout(r, 800));
-                modal.classList.remove('active');
-
-                // Navigate to results with History API
-                const assessmentId = result.assessment_id || result.analysis_id || 'latest';
-                navigateToResults(assessmentId);
+                displayResults(data);
+                showResults();
 
             } catch (error) {
-                clearInterval(timerInterval);
-                console.error('Assessment failed:', error);
-                alert('Assessment failed. Please try again.');
-                modal.classList.remove('active');
+                console.error('Analysis error:', error);
+                alert('Analysis failed. Please try again.');
+            } finally {
+                analyzeButton.disabled = false;
+                analyzeButton.textContent = 'Analyze for Compliance Violations';
             }
         }
 
-        async function animateAgent(agent, actionText, duration) {
-            const card = document.getElementById(`agent-${agent}`);
-            const actionEl = document.getElementById(`${agent}-action`);
-            const timeEl = document.getElementById(`${agent}-time`);
+        // Display Results
+        function displayResults(data) {
+            const riskScore = data.risk_score;
+            const violations = data.violations;
 
-            // Set active
-            card.setAttribute('data-status', 'active');
-            actionEl.textContent = actionText;
+            // Update risk score
+            document.getElementById('finalRiskScore').textContent = riskScore;
 
-            // Add to live insights feed
-            const insightsFeed = document.getElementById('insightsFeed');
-            const insight = document.createElement('div');
-            insight.className = 'insight-item';
-            insight.textContent = actionText;
-            insightsFeed.appendChild(insight);
-            insightsFeed.scrollTop = insightsFeed.scrollHeight;
-
-            // Simulate work
-            const start = Date.now();
-            await new Promise(r => setTimeout(r, duration));
-
-            // Set complete
-            card.setAttribute('data-status', 'complete');
-            actionEl.textContent = 'Complete';
-            const elapsed = ((Date.now() - start) / 1000).toFixed(1);
-            timeEl.textContent = `${elapsed}s`;
-        }
-
-        function getJudges(framework) {
-            const map = {
-                gdpr: ['Article 22', 'Article 17', 'Article 32'],
-                sox: ['Section 404', 'Section 302', 'Audit Trail'],
-                euai: ['High-Risk', 'Prohibited', 'Transparency']
-            };
-            return map[framework] || [];
-        }
-
-        // Legacy function for backward compatibility
-        function displayResults(result) {
-            // Store assessment globally for exports and localStorage
-            window.currentAssessment = result;
-            window.assessmentResult = result;
-            localStorage.setItem('currentAssessment', JSON.stringify(result));
-
-            // Render new compact design
-            renderResults(result);
-            return; // Skip old rendering below
-
-            // Update risk score display with circular gauge
-            const riskScore = result.risk_score || 0;
-            const riskDisplay = document.getElementById('riskScoreDisplay');
-
-            // Update gauge with animation (CSS conic-gradient rotation based on score)
-            const gaugeRotation = (riskScore / 100) * 360;
-            riskDisplay.textContent = riskScore;
-
-            let riskLevel = 'LOW RISK';
-            if (riskScore >= 76) riskLevel = 'CRITICAL RISK';
-            else if (riskScore >= 51) riskLevel = 'HIGH RISK';
-            else if (riskScore >= 26) riskLevel = 'MEDIUM RISK';
-            document.getElementById('riskLevelDisplay').textContent = riskLevel;
-
-            // Update frameworks summary
-            const frameworks = result.frameworks_analyzed || [];
-            document.getElementById('frameworksSummary').textContent =
-                `Analyzed ${frameworks.map(f => f.toUpperCase()).join(', ')} • ${result.violations.length} violations found`;
-
-            // Update violations count
-            document.getElementById('violationsCount').textContent = result.violations.length;
-
-            // Count severities (severity is a string: "CRITICAL", "MAJOR", "MINOR")
-            const severities = {critical: 0, major: 0, minor: 0, none: 0};
-            result.violations.forEach(v => {
-                const sev = (v.severity || '').toUpperCase();
-                if (sev === 'CRITICAL') severities.critical++;
-                else if (sev === 'MAJOR') severities.major++;
-                else if (sev === 'MINOR') severities.minor++;
-                else severities.none++;
-            });
-
-            // Severity Chart
-            new Chart(document.getElementById('severityChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Critical', 'Major', 'Minor'],
-                    datasets: [{
-                        data: [severities.critical, severities.major, severities.minor],
-                        backgroundColor: ['#ef4444', '#f59e0b', '#eab308']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {color: '#fff', font: {size: 11}}
-                        }
-                    }
-                }
-            });
-
-            // Framework breakdown
-            const fwCounts = {};
-            result.violations.forEach(v => {
-                const fw = (v.framework || 'unknown').toUpperCase();
-                fwCounts[fw] = (fwCounts[fw]||0) + 1;
-            });
-
-            new Chart(document.getElementById('frameworkChart'), {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(fwCounts),
-                    datasets: [{
-                        label: 'Violations',
-                        data: Object.values(fwCounts),
-                        backgroundColor: '#60a5fa'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {ticks: {color: '#fff', font: {size: 11}}},
-                        y: {ticks: {color: '#fff', font: {size: 11}}, beginAtZero: true}
-                    },
-                    plugins: {
-                        legend: {display: false}
-                    }
-                }
-            });
-
-            // Populate violations list with enhanced cards
-            const violationsList = document.getElementById('violationsList');
-            if (result.violations.length === 0) {
-                violationsList.innerHTML = '<div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.6);">✅ No violations detected</div>';
+            // Update risk label
+            const riskLabel = document.getElementById('riskLabel');
+            if (riskScore >= 76) {
+                riskLabel.textContent = 'CRITICAL RISK';
+                riskLabel.style.color = '#ef4444';
+            } else if (riskScore >= 51) {
+                riskLabel.textContent = 'HIGH RISK';
+                riskLabel.style.color = '#fb923c';
+            } else if (riskScore >= 26) {
+                riskLabel.textContent = 'MEDIUM RISK';
+                riskLabel.style.color = '#fbbf24';
             } else {
-                violationsList.innerHTML = result.violations.map((v, idx) => `
-                    <div class="violation-card" style="border-left-color: ${getSeverityColor(v.severity)};">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                            <div>
-                                <span style="background: ${getSeverityColor(v.severity)}; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">${v.severity}</span>
-                                <span style="background: rgba(96,165,250,0.2); color: #60a5fa; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 0.5rem;">${v.framework}</span>
-                            </div>
-                            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.5);">Confidence: ${Math.round(v.confidence * 100)}%</div>
-                        </div>
-                        <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px;">
-                            📋 ${v.article_violated}
-                        </h3>
-                        <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-left: 3px solid ${getSeverityColor(v.severity)}; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem; color: rgba(255,255,255,0.8); font-style: italic;">
-                            "${v.evidence_quote}"
-                        </div>
-                        <div class="collapsible-section">
-                            <div class="collapsible-header" onclick="toggleSection(this)">
-                                <span>▶</span> Risk Factors
-                            </div>
-                            <div class="collapsible-content">
-                                ${v.risk_factors ? v.risk_factors.map(r => `<div>• ${r}</div>`).join('') : '<div>No risk factors specified</div>'}
-                            </div>
-                        </div>
-                        <div class="collapsible-section">
-                            <div class="collapsible-header" onclick="toggleSection(this)">
-                                <span>▶</span> Dependencies
-                            </div>
-                            <div class="collapsible-content">
-                                ${v.dependencies ? v.dependencies.map(d => `<div>• ${d}</div>`).join('') : '<div>No dependencies specified</div>'}
-                            </div>
-                        </div>
-                        <div class="collapsible-section">
-                            <div class="collapsible-header" onclick="toggleSection(this)">
-                                <span>▶</span> Engineering Scope
-                            </div>
-                            <div class="collapsible-content">
-                                ${v.engineering_scope || 'No engineering scope details provided'}
-                            </div>
-                        </div>
-                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
-                            <div style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; color: rgba(255,255,255,0.7);">Remediation Steps:</div>
-                            <ol style="margin-left: 1.5rem; color: rgba(255,255,255,0.8); font-size: 0.9rem;">
-                                ${v.remediation_steps.map(step => `<li style="margin-bottom: 0.5rem;">${step}</li>`).join('')}
-                            </ol>
-                        </div>
-                    </div>
-                `).join('');
+                riskLabel.textContent = 'LOW RISK';
+                riskLabel.style.color = '#10b981';
             }
 
-            // Populate remediation plan with 2-column categorization
-            const remediationPlan = document.getElementById('remediationPlan');
-            const criticalViolations = result.violations.filter(v => v.severity === 'CRITICAL');
+            // Display violations
+            const violationsList = document.getElementById('violationsList');
+            violationsList.innerHTML = '';
 
-            // Categorize remediation steps
-            const technicalSteps = [];
-            const businessSteps = [];
-            const techKeywords = ['implement', 'develop', 'API', 'api', 'database', 'code', 'system', 'infrastructure', 'technical', 'deploy', 'configure', 'integrate'];
-            const businessKeywords = ['policy', 'training', 'process', 'documentation', 'review', 'procedure', 'governance', 'compliance', 'audit', 'legal'];
-
-            result.violations.forEach(v => {
-                v.remediation_steps.forEach(step => {
-                    const stepLower = step.toLowerCase();
-                    const isTechnical = techKeywords.some(kw => stepLower.includes(kw));
-                    const isBusiness = businessKeywords.some(kw => stepLower.includes(kw));
-
-                    const priority = v.severity === 'CRITICAL' ? 'Immediate' : (v.severity === 'MAJOR' ? '30 days' : '90 days');
-                    const badgeClass = v.severity === 'CRITICAL' ? 'timeline-immediate' : (v.severity === 'MAJOR' ? 'timeline-30days' : 'timeline-90days');
-
-                    if (isTechnical && !isBusiness) {
-                        technicalSteps.push({step, priority, badgeClass});
-                    } else if (isBusiness) {
-                        businessSteps.push({step, priority, badgeClass});
-                    } else {
-                        technicalSteps.push({step, priority, badgeClass});
-                    }
-                });
-            });
-
-            remediationPlan.innerHTML = `
-                <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-                    <h3 style="color: #ef4444; margin-bottom: 0.5rem;">🚨 Priority Actions (${criticalViolations.length} Critical Issues)</h3>
-                    <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem;">Address these critical violations immediately to avoid regulatory penalties</p>
-                </div>
-                <div class="remediation-grid">
-                    <div class="remediation-column">
-                        <h3>⚙️ Technical Fixes</h3>
-                        <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 16px;">Code, API, Infrastructure Changes</p>
-                        ${technicalSteps.map(({step, priority, badgeClass}) => `
-                            <div class="remediation-item">
-                                <div class="remediation-checkbox"></div>
-                                <div style="flex: 1;">
-                                    <span>${step}</span>
-                                    <span class="timeline-badge ${badgeClass}">${priority}</span>
-                                </div>
-                            </div>
-                        `).join('')}
+            if (violations.length === 0) {
+                violationsList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #10b981;">
+                        <h3 style="font-size: 24px; margin-bottom: 12px;">✓ No Violations Detected</h3>
+                        <p style="color: #9ca3af;">Your AI system appears to be compliant with the selected frameworks.</p>
                     </div>
-                    <div class="remediation-column">
-                        <h3>📋 Business Process</h3>
-                        <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 16px;">Policy, Training, Organizational Changes</p>
-                        ${businessSteps.map(({step, priority, badgeClass}) => `
-                            <div class="remediation-item">
-                                <div class="remediation-checkbox"></div>
-                                <div style="flex: 1;">
-                                    <span>${step}</span>
-                                    <span class="timeline-badge ${badgeClass}">${priority}</span>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        }
+                `;
+                return;
+            }
 
-        // New redesigned rendering function
-        function renderResults(data) {
-            // Meta
-            document.getElementById('metaInfo').textContent =
-                `ID: ${data.analysis_id || 'N/A'} • ${data.frameworks_analyzed?.join(', ').toUpperCase() || 'N/A'}`;
+            violations.forEach(violation => {
+                const violationItem = document.createElement('div');
+                violationItem.className = 'violation-item';
 
-            // Summary
-            const risk = data.risk_score || 0;
-            const violations = data.violations || [];
-            const critical = violations.filter(v => v.severity === 'CRITICAL').length;
-            const major = violations.filter(v => v.severity === 'MAJOR').length;
-            const minor = violations.length - critical - major;
+                const severityBadgeClass = violation.severity === 'CRITICAL' ? 'badge-critical' : 'badge-high';
 
-            // Animate SVG Risk Ring
-            document.getElementById('riskScore').textContent = risk;
-            document.getElementById('riskLevel').textContent = risk < 30 ? 'Low Risk' : risk < 60 ? 'Medium Risk' : 'High Risk';
-
-            setTimeout(() => {
-                const circumference = 2 * Math.PI * 42; // r=42
-                const progress = (risk / 100) * circumference;
-                document.getElementById('riskRing').style.strokeDasharray = `${progress} ${circumference}`;
-            }, 300);
-
-            document.getElementById('totalViolations').textContent = violations.length;
-            document.getElementById('violationBreakdown').textContent =
-                `${critical} Critical, ${major} Major, ${minor} Minor`;
-            document.getElementById('frameworkCount').textContent = data.frameworks_analyzed?.length || 0;
-            document.getElementById('frameworkList').textContent = data.frameworks_analyzed?.join(', ').toUpperCase() || 'N/A';
-            document.getElementById('auditStatus').textContent = risk < 30 ? '🟢 Ready' : '🔴 Not Ready';
-            document.getElementById('auditEta').textContent = risk < 30 ? 'Can proceed' : '~3 months';
-
-            // Update filter counts
-            document.getElementById('filterAll').textContent = violations.length;
-            document.getElementById('filterCritical').textContent = critical;
-            document.getElementById('filterMajor').textContent = major;
-            document.getElementById('filterMinor').textContent = minor;
-
-            // Violations Overview - Expandable cards with metadata
-            const cardsContainer = document.getElementById('violationCards');
-            cardsContainer.innerHTML = '';
-            violations.forEach(v => {
-                const card = document.createElement('div');
-                card.className = 'violation-card';
-                card.dataset.severity = v.severity.toLowerCase();
-                const sevLabel = v.severity === 'CRITICAL' ? 'Critical' : v.severity === 'MAJOR' ? 'Major' : 'Minor';
-                card.innerHTML = `
+                violationItem.innerHTML = `
                     <div class="violation-header">
-                        <div class="badges">
-                            <span class="badge badge-critical">${sevLabel}</span>
-                            <span class="badge badge-framework">${v.framework?.toUpperCase() || 'N/A'}</span>
-                        </div>
-                        <span class="expand-icon">▼</span>
-                    </div>
-                    <div class="violation-title">${v.article_violated || 'Violation'}</div>
-                    <div class="violation-desc">${(v.evidence_quote || v.issue || '').substring(0, 200)}</div>
-                    <div class="violation-details">
-                        <div class="metadata-grid">
-                            <div class="metadata-item">
-                                <div class="metadata-label">Severity</div>
-                                <div class="metadata-value">${v.severity}</div>
+                        <div class="violation-details">
+                            <div class="violation-badges">
+                                <span class="badge ${severityBadgeClass}">${violation.severity}</span>
+                                <span class="badge badge-framework">${violation.framework.toUpperCase()}</span>
                             </div>
-                            <div class="metadata-item">
-                                <div class="metadata-label">Priority</div>
-                                <div class="metadata-value">${v.priority || 'P0'}</div>
-                            </div>
-                            <div class="metadata-item">
-                                <div class="metadata-label">Complexity</div>
-                                <div class="metadata-value">${v.complexity || 'High'}</div>
-                            </div>
-                            <div class="metadata-item">
-                                <div class="metadata-label">Timeline</div>
-                                <div class="metadata-value">${v.timeline || '0-14 days'}</div>
-                            </div>
-                            <div class="metadata-item">
-                                <div class="metadata-label">Confidence</div>
-                                <div class="metadata-value">${v.confidence_score || '95%'}</div>
-                            </div>
-                        </div>
-                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
-                            <div style="font-weight: 600; margin-bottom: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.7);">Remediation Steps:</div>
-                            <ol style="margin-left: 1.5rem; color: rgba(255,255,255,0.8); font-size: 0.85rem;">
-                                ${v.remediation_steps?.map(step => `<li style="margin-bottom: 0.5rem;">${step}</li>`).join('') || '<li>No remediation steps provided</li>'}
-                            </ol>
+                            <h3>${violation.article_violated}</h3>
                         </div>
                     </div>
-                `;
-
-                // Add click handler for expand/collapse
-                card.addEventListener('click', () => {
-                    card.classList.toggle('expanded');
-                });
-
-                cardsContainer.appendChild(card);
-            });
-
-            // Technical Fixes (merged code/API/architecture)
-            const techList = document.getElementById('technicalList');
-            techList.innerHTML = '';
-
-            const technicalFixes = [
-                { title: 'Implement encryption at rest using AES-256', desc: 'Encrypt all personal and biometric data', priority: 'priority-p0', label: 'P0 - Immediate' },
-                { title: 'Add mandatory human review workflow', desc: 'For Article 22 automated decisions', priority: 'priority-p0', label: 'P0 - Immediate' },
-                { title: 'Build automated data retention/deletion service', desc: 'Comply with GDPR right to erasure', priority: 'priority-p0', label: 'P0 - Immediate' },
-                { title: 'Deploy access control middleware with RBAC', desc: 'Segregation of duties for SOX compliance', priority: 'priority-p1', label: 'P1 - 30 days' },
-                { title: 'Create audit logging infrastructure', desc: 'Immutable logs for all data access', priority: 'priority-p1', label: 'P1 - 30 days' },
-                { title: 'Build DSR (Data Subject Request) API endpoint', desc: 'REST API for access, rectification, erasure requests', priority: 'priority-p1', label: 'P1 - 30 days' }
-            ];
-
-            technicalFixes.forEach(fix => {
-                techList.innerHTML += `
-                    <div class="plan-item">
-                        <div class="plan-item-title">${fix.title}</div>
-                        <div class="plan-item-desc">${fix.desc}</div>
-                        <span class="plan-priority ${fix.priority}">${fix.label}</span>
+                    <div class="violation-evidence">
+                        <strong>Evidence:</strong> ${violation.evidence_quote}
+                    </div>
+                    <div class="remediation-steps">
+                        <h4>Remediation Steps:</h4>
+                        <ol>
+                            ${violation.remediation_steps.map(step => `<li>${step}</li>`).join('')}
+                        </ol>
                     </div>
                 `;
-            });
 
-            // Business Process Changes
-            const bizProcessList = document.getElementById('businessProcessList');
-            bizProcessList.innerHTML = '';
-
-            const businessFixes = [
-                { title: 'Update privacy policy', desc: 'Include automated decision-making disclosures per Article 13/14', priority: 'priority-p0', label: 'P0 - Immediate' },
-                { title: 'Establish Data Protection Officer oversight', desc: 'Create DPO review process for high-risk AI', priority: 'priority-p1', label: 'P1 - 30 days' },
-                { title: 'Implement explicit consent collection', desc: 'Granular consent mechanisms for automated profiling', priority: 'priority-p1', label: 'P1 - 30 days' },
-                { title: 'Create data subject rights request workflow', desc: 'Handle access, rectification, erasure requests', priority: 'priority-p1', label: 'P1 - 30 days' },
-                { title: 'Deploy staff training program', desc: 'Train teams on GDPR, SOX, and EU AI Act compliance', priority: 'priority-p1', label: 'P1 - 30 days' },
-                { title: 'Conduct third-party vendor audits', desc: 'Review data processors and subprocessors for compliance', priority: 'priority-p1', label: 'P1 - 30 days' }
-            ];
-
-            businessFixes.forEach(fix => {
-                bizProcessList.innerHTML += `
-                    <div class="plan-item">
-                        <div class="plan-item-title">${fix.title}</div>
-                        <div class="plan-item-desc">${fix.desc}</div>
-                        <span class="plan-priority ${fix.priority}">${fix.label}</span>
-                    </div>
-                `;
-            });
-
-            // Business Plan (overall summary)
-            const bizList = document.getElementById('businessList');
-            bizList.innerHTML = '';
-            violations.forEach(v => {
-                bizList.innerHTML += `
-                    <div class="plan-item">
-                        <div class="plan-item-title">${v.article_violated || 'Process Change'}</div>
-                        <div class="plan-item-desc">Policy updates, training, and organizational changes required</div>
-                        <span class="plan-priority priority-p1">P1 - 30 days</span>
-                    </div>
-                `;
-            });
-
-            // Citations
-            const citList = document.getElementById('citationsList');
-            citList.innerHTML = '';
-            violations.forEach(v => {
-                citList.innerHTML += `
-                    <div class="citation-item">
-                        <div class="citation-ref">${v.framework?.toUpperCase()} ${v.article_violated || ''}</div>
-                        <div class="citation-text">${v.evidence_quote || v.issue || 'Regulatory citation'}</div>
-                    </div>
-                `;
+                violationsList.appendChild(violationItem);
             });
         }
 
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(tab).classList.add('active');
+        // Export functions
+        async function exportPDF() {
+            if (!currentAnalysisId) {
+                alert('No analysis results to export');
+                return;
+            }
+
+            try {
+                window.open(`http://localhost:8000/api/export/pdf/${currentAnalysisId}`, '_blank');
+            } catch (error) {
+                console.error('PDF export error:', error);
+                alert('Failed to export PDF');
+            }
         }
 
-        // Filter tab handlers
-        document.addEventListener('DOMContentLoaded', () => {
-            // Add filter tab click handlers
-            document.querySelectorAll('.filter-tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    // Update active state
-                    document.querySelectorAll('.filter-tab-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
+        async function exportCSV() {
+            if (!currentAnalysisId) {
+                alert('No analysis results to export');
+                return;
+            }
 
-                    // Filter violations
-                    const filter = btn.dataset.filter;
-                    document.querySelectorAll('.violation-card').forEach(card => {
-                        if (filter === 'all') {
-                            card.style.display = 'block';
-                        } else {
-                            const severity = card.dataset.severity;
-                            card.style.display = severity === filter ? 'block' : 'none';
-                        }
-                    });
-                });
-            });
-        });
-
-        function downloadPDF() {
-            if (!window.currentAssessment) {
-                alert('No assessment data available');
-                return;
+            try {
+                window.open(`http://localhost:8000/api/export/csv/${currentAnalysisId}`, '_blank');
+            } catch (error) {
+                console.error('CSV export error:', error);
+                alert('Failed to export CSV');
             }
-            const assessmentId = window.currentAssessment.assessment_id || window.currentAssessment.analysis_id;
-            if (!assessmentId) {
-                alert('No assessment ID available');
-                return;
-            }
-            window.open(`${API_BASE}/api/export/pdf/${assessmentId}`, '_blank');
-        }
-
-        function downloadCSV() {
-            if (!window.currentAssessment) {
-                alert('No assessment data available');
-                return;
-            }
-            const assessmentId = window.currentAssessment.assessment_id || window.currentAssessment.analysis_id;
-            if (!assessmentId) {
-                alert('No assessment ID available');
-                return;
-            }
-            window.open(`${API_BASE}/api/export/csv/${assessmentId}`, '_blank');
         }
     </script>
 </body>

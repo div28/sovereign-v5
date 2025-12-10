@@ -547,8 +547,10 @@ def create_remediation_roadmap(styles, data):
 
         phase1_data = [['#', 'Action Item', 'Framework', 'Timeline']]
         for i, v in enumerate(p0_violations, 1):
-            # Use Paragraph for text wrapping
-            action_text = Paragraph(v.get('title', 'N/A'), styles['BodyText'])
+            # Use first remediation step as action item
+            remediation = v.get('remediation_steps', ['Address violation'])
+            action_item = remediation[0] if remediation else 'Address violation'
+            action_text = Paragraph(action_item, styles['BodyText'])
             phase1_data.append([
                 str(i),
                 action_text,
@@ -585,7 +587,10 @@ def create_remediation_roadmap(styles, data):
 
         phase2_data = [['#', 'Action Item', 'Framework', 'Timeline']]
         for i, v in enumerate(p1_violations, 1):
-            action_text = Paragraph(v.get('title', 'N/A'), styles['BodyText'])
+            # Use first remediation step as action item
+            remediation = v.get('remediation_steps', ['Address violation'])
+            action_item = remediation[0] if remediation else 'Address violation'
+            action_text = Paragraph(action_item, styles['BodyText'])
             phase2_data.append([
                 str(i),
                 action_text,
@@ -622,7 +627,10 @@ def create_remediation_roadmap(styles, data):
 
         phase3_data = [['#', 'Action Item', 'Framework', 'Timeline']]
         for i, v in enumerate(p2_violations, 1):
-            action_text = Paragraph(v.get('title', 'N/A'), styles['BodyText'])
+            # Use first remediation step as action item
+            remediation = v.get('remediation_steps', ['Address violation'])
+            action_item = remediation[0] if remediation else 'Address violation'
+            action_text = Paragraph(action_item, styles['BodyText'])
             phase3_data.append([
                 str(i),
                 action_text,

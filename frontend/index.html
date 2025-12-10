@@ -1672,9 +1672,6 @@
                 await animateAgent('orchestrator', 'Aggregating results...', 1500);
 
                 clearInterval(timerInterval);
-                
-                // Confetti
-                confetti({particleCount: 100, spread: 70, colors: ['#60a5fa', '#3b82f6', '#22c55e']});
 
                 await new Promise(r => setTimeout(r, 800));
                 modal.classList.remove('active');

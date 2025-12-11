@@ -58,11 +58,11 @@ class ModelRouter:
     - EU AI Act: Sonnet (complex AI governance reasoning)
     """
 
-    # Framework to model mapping
+    # Framework to model mapping - ALL USE HAIKU FOR COST SAVINGS
     FRAMEWORK_MODEL_MAP = {
         "gdpr": "claude-3-5-haiku-20241022",
         "sox": "claude-3-5-haiku-20241022",
-        "euai": "claude-3-5-sonnet-20241022"
+        "euai": "claude-3-5-haiku-20241022"  # Changed from Sonnet to save 3x cost
     }
 
     def __init__(self):

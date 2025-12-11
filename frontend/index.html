@@ -710,26 +710,27 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 8px;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
         .summary-item {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 6px;
-            padding: 8px 12px;
+            padding: 10px 12px;
+            max-height: 110px;
         }
 
         .summary-label {
             font-size: 8px;
             color: rgba(255,255,255,0.5);
-            margin-bottom: 2px;
+            margin-bottom: 4px;
             text-transform: uppercase;
             letter-spacing: 0.08em;
         }
 
         .summary-value {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 800;
         }
 
@@ -806,6 +807,44 @@
             font-size: 12px;
             color: rgba(255,255,255,0.7);
             line-height: 1.4;
+        }
+
+        /* Business Impact Section */
+        .business-impact-section {
+            margin-bottom: 20px;
+        }
+
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .impact-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .impact-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .impact-label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .impact-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ef4444;
         }
 
         /* Tabs */
@@ -944,28 +983,28 @@
 
         .risk-score-ring {
             position: relative;
-            width: 90px;
-            height: 90px;
+            width: 70px;
+            height: 70px;
         }
 
         .risk-score-ring svg {
             transform: rotate(-90deg);
-            width: 90px;
-            height: 90px;
+            width: 70px;
+            height: 70px;
         }
 
         .risk-score-ring .bg-ring {
             fill: none;
             stroke: rgba(255,255,255,0.06);
-            stroke-width: 8;
+            stroke-width: 6;
         }
 
         .risk-score-ring .progress-ring {
             fill: none;
             stroke: url(#riskGradient);
-            stroke-width: 8;
+            stroke-width: 6;
             stroke-linecap: round;
-            filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.4));
+            filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.4));
             transition: stroke-dasharray 1s ease-out;
         }
 
@@ -979,20 +1018,20 @@
         }
 
         .risk-number {
-            font-size: 28px;
+            font-size: 20px;
             font-weight: 700;
             color: #f87171;
             font-variant-numeric: tabular-nums;
         }
 
         .risk-denom {
-            font-size: 12px;
+            font-size: 10px;
             color: rgba(248, 113, 113, 0.6);
             margin-left: 1px;
         }
 
         .risk-label {
-            font-size: 11px;
+            font-size: 9px;
             color: #f87171;
             font-weight: 500;
             margin-top: 2px;
@@ -1928,7 +1967,7 @@
                     <div class="summary-label">RISK SCORE <span class="status-dot"></span></div>
                     <div class="risk-score-container">
                         <div class="risk-score-ring">
-                            <svg width="100" height="100" viewBox="0 0 100 100">
+                            <svg width="70" height="70" viewBox="0 0 100 100">
                                 <defs>
                                     <linearGradient id="riskGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                                         <stop offset="0%" stop-color="#dc2626"/>
@@ -1976,6 +2015,33 @@
                     </div>
                 </div>
                 <div class="violation-cards" id="violationCards"></div>
+            </div>
+
+            <!-- Business Impact Grid -->
+            <div class="business-impact-section">
+                <div class="section-title" style="margin-bottom: 12px;">Business Impact Assessment</div>
+                <div class="impact-grid" id="impactGrid">
+                    <div class="impact-item">
+                        <div class="impact-icon">💰</div>
+                        <div class="impact-label">Financial Risk</div>
+                        <div class="impact-value" id="financialRisk">-</div>
+                    </div>
+                    <div class="impact-item">
+                        <div class="impact-icon">⚙️</div>
+                        <div class="impact-label">Operational Impact</div>
+                        <div class="impact-value" id="operationalImpact">-</div>
+                    </div>
+                    <div class="impact-item">
+                        <div class="impact-icon">📢</div>
+                        <div class="impact-label">Reputational Damage</div>
+                        <div class="impact-value" id="reputationalDamage">-</div>
+                    </div>
+                    <div class="impact-item">
+                        <div class="impact-icon">⚖️</div>
+                        <div class="impact-label">Legal Exposure</div>
+                        <div class="impact-value" id="legalExposure">-</div>
+                    </div>
+                </div>
             </div>
 
             <!-- Tabs -->
@@ -2702,6 +2768,13 @@
             document.getElementById('frameworkList').textContent = data.frameworks_analyzed?.join(', ').toUpperCase() || 'N/A';
             document.getElementById('auditStatus').textContent = risk < 30 ? '🟢 Ready' : '🔴 Not Ready';
             document.getElementById('auditEta').textContent = risk < 30 ? 'Can proceed' : '~3 months';
+
+            // Business Impact Grid
+            const criticalCount = violations.filter(v => v.severity === 'CRITICAL').length;
+            document.getElementById('financialRisk').textContent = risk > 70 ? 'High' : risk > 40 ? 'Medium' : 'Low';
+            document.getElementById('operationalImpact').textContent = violations.length > 5 ? 'Severe' : violations.length > 2 ? 'Moderate' : 'Low';
+            document.getElementById('reputationalDamage').textContent = criticalCount > 2 ? 'High' : criticalCount > 0 ? 'Medium' : 'Low';
+            document.getElementById('legalExposure').textContent = data.frameworks_analyzed?.length > 1 ? 'Multi-jurisdictional' : 'Single jurisdiction';
 
             // Update filter counts
             document.getElementById('filterAll').textContent = violations.length;

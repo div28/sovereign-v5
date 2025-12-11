@@ -10,9 +10,11 @@ from fastapi.responses import StreamingResponse, Response
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
 import os
 import logging
 import uuid
+import json
 from datetime import datetime
 
 # Debug: Print SDK versions at startup
@@ -77,8 +79,50 @@ _judges = None
 # Thread pool for parallel judge execution
 _executor = ThreadPoolExecutor(max_workers=9)
 
+# Persistent cache directory
+CACHE_DIR = Path("cache/analyses")
+CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
 # Store analysis results temporarily (in production, use Redis or database)
 _analysis_cache: Dict[str, Dict[str, Any]] = {}
+
+
+def save_analysis_to_disk(analysis_id: str, data: Dict[str, Any]):
+    """Save analysis to disk for persistence across restarts."""
+    try:
+        cache_file = CACHE_DIR / f"{analysis_id}.json"
+        with open(cache_file, 'w') as f:
+            json.dump(data, f)
+    except Exception as e:
+        logger.error(f"Failed to save analysis to disk: {e}")
+
+
+def load_analysis_from_disk(analysis_id: str) -> Optional[Dict[str, Any]]:
+    """Load analysis from disk if not in memory."""
+    try:
+        cache_file = CACHE_DIR / f"{analysis_id}.json"
+        if cache_file.exists():
+            with open(cache_file, 'r') as f:
+                return json.load(f)
+    except Exception as e:
+        logger.error(f"Failed to load analysis from disk: {e}")
+    return None
+
+
+def get_analysis(analysis_id: str) -> Optional[Dict[str, Any]]:
+    """Get analysis from memory or disk."""
+    # Check memory first
+    if analysis_id in _analysis_cache:
+        return _analysis_cache[analysis_id]
+
+    # Try loading from disk
+    data = load_analysis_from_disk(analysis_id)
+    if data:
+        # Cache in memory for faster subsequent access
+        _analysis_cache[analysis_id] = data
+        return data
+
+    return None
 
 
 def get_rag_engine():
@@ -207,13 +251,20 @@ def store_analysis_result(
         Analysis ID.
     """
     analysis_id = str(uuid.uuid4())
-    _analysis_cache[analysis_id] = {
+    data = {
         "violations": violations,
         "risk_score": risk_score,
         "frameworks": frameworks,
         "description": description,
         "timestamp": datetime.utcnow().isoformat()
     }
+
+    # Store in memory
+    _analysis_cache[analysis_id] = data
+
+    # Persist to disk for reliability
+    save_analysis_to_disk(analysis_id, data)
+
     return analysis_id
 
 
@@ -421,14 +472,13 @@ async def export_pdf(analysis_id: str):
         PDF file download.
     """
     try:
-        # Retrieve analysis from cache
-        if analysis_id not in _analysis_cache:
+        # Retrieve analysis from memory or disk
+        analysis = get_analysis(analysis_id)
+        if not analysis:
             raise HTTPException(
                 status_code=404,
                 detail=f"Analysis {analysis_id} not found"
             )
-
-        analysis = _analysis_cache[analysis_id]
 
         # Generate PDF using professional report generator
         from backend.utils.pdf_generator import generate_compliance_report
@@ -471,14 +521,13 @@ async def export_csv(analysis_id: str):
         CSV file download.
     """
     try:
-        # Retrieve analysis from cache
-        if analysis_id not in _analysis_cache:
+        # Retrieve analysis from memory or disk
+        analysis = get_analysis(analysis_id)
+        if not analysis:
             raise HTTPException(
                 status_code=404,
                 detail=f"Analysis {analysis_id} not found"
             )
-
-        analysis = _analysis_cache[analysis_id]
 
         # Generate CSV
         from backend.exports.csv_generator import generate_compliance_csv

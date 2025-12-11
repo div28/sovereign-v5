@@ -49,6 +49,15 @@ def parse_severity(severity_value):
     return 5
 
 
+def get_violation_field(violation, *keys, default='N/A'):
+    """Try multiple field names and return first match"""
+    for key in keys:
+        value = violation.get(key)
+        if value and value != 'N/A' and str(value).strip():
+            return value
+    return default
+
+
 # ============================================
 # COLOR PALETTE
 # ============================================
@@ -374,7 +383,7 @@ def create_executive_summary(styles, data):
 
     framework_counts = {}
     for v in violations:
-        fw = v.get('framework', 'Unknown')
+        fw = get_violation_field(v, 'framework', 'regulation', default='Unknown')
         framework_counts[fw] = framework_counts.get(fw, 0) + 1
 
     fw_data = [['Framework', 'Count']]
@@ -406,13 +415,24 @@ def create_executive_summary(styles, data):
         severity = v.get('severity')
         severity_color, _, severity_label = get_severity_color(severity)
 
+        # Use helper for all fields
+        title = get_violation_field(v, 'title', 'violation', 'article_violated', 'article_title', 'name', 'issue')
+        article = get_violation_field(v, 'article', 'citation', 'article_violated', 'regulatory_citation', 'article_reference')
+        description = get_violation_field(v, 'description', 'details', 'violation_description', 'issue_description')
+        impact = get_violation_field(v, 'business_impact', 'impact', 'business_risk', default='Impact assessment required')
+        framework = get_violation_field(v, 'framework', 'regulation', default='Unknown')
+
+        # Get first remediation step
+        remediation = v.get('remediation_steps') or v.get('remediation') or v.get('steps') or []
+        first_step = remediation[0] if remediation else 'Review and address'
+
         issue_text = f"""
-        <b>{i}. {v.get('framework', 'Unknown')} Violation - {v.get('title', 'N/A')}</b><br/>
-        <font color="{COLORS['text_muted'].hexval()}">Regulatory Citation: {v.get('article', 'N/A')}</font><br/>
+        <b>{i}. {framework} Violation - {title}</b><br/>
+        <font color="{COLORS['text_muted'].hexval()}">Regulatory Citation: {article}</font><br/>
         <font color="{severity_color.hexval()}">Risk Level: {severity_label} (Severity: {severity}/10)</font><br/>
-        <b>Issue:</b> {v.get('description', 'N/A')}<br/>
-        <b>Business Impact:</b> {v.get('business_impact', 'Impact assessment required')}<br/>
-        <b>Immediate Action:</b> {v.get('remediation_steps', ['Review and address'])[0] if v.get('remediation_steps') else 'Review and address'}
+        <b>Issue:</b> {description}<br/>
+        <b>Business Impact:</b> {impact}<br/>
+        <b>Immediate Action:</b> {first_step}
         """
         elements.append(Paragraph(issue_text, styles['BodyText']))
         elements.append(Spacer(1, 0.15*inch))
@@ -425,6 +445,15 @@ def create_violation_page(styles, violation, index, total):
     """Generate a detailed violation page"""
     elements = []
 
+    # Use helper to get fields with fallbacks
+    title = get_violation_field(violation, 'title', 'violation', 'article_violated', 'article_title', 'name', 'issue')
+    description = get_violation_field(violation, 'description', 'details', 'violation_description', 'issue_description', 'finding')
+    article = get_violation_field(violation, 'article', 'citation', 'article_violated', 'regulatory_citation', 'article_reference', 'regulation')
+    framework = get_violation_field(violation, 'framework', 'regulation', 'framework_name', default='Unknown')
+    evidence = get_violation_field(violation, 'evidence', 'evidence_quote', 'evidence_text', 'supporting_evidence', default='See document analysis above')
+    business_impact = get_violation_field(violation, 'business_impact', 'impact', 'business_risk', default='Impact assessment required')
+    eng_scope = get_violation_field(violation, 'engineering_scope', 'scope', 'technical_scope', 'remediation_scope', default='1-2 engineers; review required')
+
     severity = violation.get('severity')
     severity_color, severity_bg, severity_label = get_severity_color(severity)
     priority, timeline = get_priority_label(severity)
@@ -434,7 +463,7 @@ def create_violation_page(styles, violation, index, total):
     elements.append(Paragraph(header_text, styles['Label']))
 
     # Framework and title
-    title_text = f"{violation.get('framework', 'Unknown')} - {violation.get('title', 'N/A')}"
+    title_text = f"{framework} - {title}"
     elements.append(Paragraph(title_text, styles['ViolationTitle']))
 
     # Severity badge
@@ -453,13 +482,13 @@ def create_violation_page(styles, violation, index, total):
 
     # Metadata grid
     metadata = [
-        ['Framework:', violation.get('framework', 'N/A'),
-         'Article:', violation.get('article', 'N/A')],
+        ['Framework:', framework,
+         'Article:', article],
         ['Severity:', f"{severity}/10",
          'Priority:', priority],
         ['Complexity:', violation.get('complexity', 'Medium'),
          'Timeline:', timeline],
-        ['Confidence:', f"{violation.get('confidence', 95)}%", '', ''],
+        ['Confidence:', f"{violation.get('confidence_score', violation.get('confidence', 95))}%", '', ''],
     ]
 
     meta_table = Table(metadata, colWidths=[1*inch, 1.8*inch, 1*inch, 1.8*inch])
@@ -480,26 +509,19 @@ def create_violation_page(styles, violation, index, total):
 
     # Description
     elements.append(Paragraph("<b>Description</b>", styles['Label']))
-    elements.append(Paragraph(violation.get('description', 'N/A'), styles['BodyText']))
+    elements.append(Paragraph(description, styles['BodyText']))
 
     # Evidence
     elements.append(Paragraph("<b>Evidence</b>", styles['Label']))
-    elements.append(Paragraph(
-        violation.get('evidence', 'See document analysis above'),
-        styles['BodyText']
-    ))
+    elements.append(Paragraph(evidence, styles['BodyText']))
 
     # Business Impact
     elements.append(Paragraph("<b>Business Impact</b>", styles['Label']))
-    elements.append(Paragraph(
-        violation.get('business_impact', 'Impact assessment required'),
-        styles['BodyText']
-    ))
+    elements.append(Paragraph(business_impact, styles['BodyText']))
 
     # Engineering Scope
     elements.append(Paragraph("<b>Engineering Scope</b>", styles['Label']))
-    scope = violation.get('engineering_scope', '1-2 engineers; review required')
-    elements.append(Paragraph(scope, styles['BodyText']))
+    elements.append(Paragraph(eng_scope, styles['BodyText']))
 
     # Remediation Steps
     elements.append(Paragraph("<b>Remediation Steps</b>", styles['Label']))
@@ -547,14 +569,18 @@ def create_remediation_roadmap(styles, data):
 
         phase1_data = [['#', 'Action Item', 'Framework', 'Timeline']]
         for i, v in enumerate(p0_violations, 1):
+            # Use helper to get fields with fallbacks
+            title = get_violation_field(v, 'title', 'violation', 'article_violated', 'article_title', 'name', 'issue')
+            framework = get_violation_field(v, 'framework', 'regulation', default='N/A')
+
             # Use first remediation step as action item
-            remediation = v.get('remediation_steps', ['Address violation'])
-            action_item = remediation[0] if remediation else 'Address violation'
+            remediation = v.get('remediation_steps') or v.get('remediation') or v.get('steps') or []
+            action_item = remediation[0] if remediation else title
             action_text = Paragraph(action_item, styles['BodyText'])
             phase1_data.append([
                 str(i),
                 action_text,
-                v.get('framework', 'N/A'),
+                framework,
                 '6-12 weeks'
             ])
 
@@ -587,14 +613,18 @@ def create_remediation_roadmap(styles, data):
 
         phase2_data = [['#', 'Action Item', 'Framework', 'Timeline']]
         for i, v in enumerate(p1_violations, 1):
+            # Use helper to get fields with fallbacks
+            title = get_violation_field(v, 'title', 'violation', 'article_violated', 'article_title', 'name', 'issue')
+            framework = get_violation_field(v, 'framework', 'regulation', default='N/A')
+
             # Use first remediation step as action item
-            remediation = v.get('remediation_steps', ['Address violation'])
-            action_item = remediation[0] if remediation else 'Address violation'
+            remediation = v.get('remediation_steps') or v.get('remediation') or v.get('steps') or []
+            action_item = remediation[0] if remediation else title
             action_text = Paragraph(action_item, styles['BodyText'])
             phase2_data.append([
                 str(i),
                 action_text,
-                v.get('framework', 'N/A'),
+                framework,
                 '3-6 weeks'
             ])
 
@@ -627,14 +657,18 @@ def create_remediation_roadmap(styles, data):
 
         phase3_data = [['#', 'Action Item', 'Framework', 'Timeline']]
         for i, v in enumerate(p2_violations, 1):
+            # Use helper to get fields with fallbacks
+            title = get_violation_field(v, 'title', 'violation', 'article_violated', 'article_title', 'name', 'issue')
+            framework = get_violation_field(v, 'framework', 'regulation', default='N/A')
+
             # Use first remediation step as action item
-            remediation = v.get('remediation_steps', ['Address violation'])
-            action_item = remediation[0] if remediation else 'Address violation'
+            remediation = v.get('remediation_steps') or v.get('remediation') or v.get('steps') or []
+            action_item = remediation[0] if remediation else title
             action_text = Paragraph(action_item, styles['BodyText'])
             phase3_data.append([
                 str(i),
                 action_text,
-                v.get('framework', 'N/A'),
+                framework,
                 '1-3 weeks'
             ])
 

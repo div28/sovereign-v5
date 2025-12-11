@@ -1069,14 +1069,24 @@
         }
 
         .violation-details {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            display: none;
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease;
+            overflow: hidden;
         }
 
         .violation-card.expanded .violation-details {
-            display: block;
+            grid-template-rows: 1fr;
+        }
+
+        .violation-details > div {
+            overflow: hidden;
+            margin-top: 12px;
+            padding-top: 12px;
+        }
+
+        .violation-card.expanded .violation-details > div {
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
 
         .metadata-grid {

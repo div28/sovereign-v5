@@ -2402,12 +2402,12 @@
 
             try {
                 const frameworks = Array.from(selectedFrameworks);
-                
+
                 // Animate parser
-                await animateAgent('parser', 'Extracting text...', 1500);
-                
+                await animateAgent('parser', 'Extracting text...', 1500, frameworks);
+
                 // Animate RAG
-                await animateAgent('rag', 'Searching regulations...', 2000);
+                await animateAgent('rag', 'Searching regulations...', 2000, frameworks);
 
                 // Call API
                 const response = await fetch(`${API_BASE}/api/analyze`, {
@@ -2438,7 +2438,7 @@
                 localStorage.setItem('currentAssessment', JSON.stringify(result));
 
                 // Animate orchestrator
-                await animateAgent('orchestrator', 'Aggregating results...', 1500);
+                await animateAgent('orchestrator', 'Aggregating results...', 1500, frameworks);
 
                 clearInterval(timerInterval);
 
@@ -2457,7 +2457,7 @@
             }
         }
 
-        async function animateAgent(agent, actionText, duration) {
+        async function animateAgent(agent, actionText, duration, frameworks = []) {
             const card = document.getElementById(`agent-${agent}`);
             const actionEl = document.getElementById(`${agent}-action`);
             const timeEl = document.getElementById(`${agent}-time`);
@@ -2489,13 +2489,22 @@
                 await new Promise(r => setTimeout(r, duration * 0.4));
                 addInsight('✓ Text extraction complete');
             } else if (agent === 'rag') {
-                await new Promise(r => setTimeout(r, duration * 0.25));
-                addInsight('🔎 Searching GDPR regulations...');
-                await new Promise(r => setTimeout(r, duration * 0.25));
-                addInsight('📊 Matching SOX compliance rules...');
-                await new Promise(r => setTimeout(r, duration * 0.25));
-                addInsight('🤖 Cross-referencing EU AI Act...');
-                await new Promise(r => setTimeout(r, duration * 0.25));
+                // Dynamic insights based on selected frameworks
+                const frameworkInsights = {
+                    'gdpr': '🔎 Searching GDPR regulations...',
+                    'sox': '📊 Matching SOX compliance rules...',
+                    'euai': '🤖 Cross-referencing EU AI Act...'
+                };
+
+                const selectedInsights = frameworks.map(fw => frameworkInsights[fw]).filter(Boolean);
+                const timePerInsight = duration / (selectedInsights.length + 1);
+
+                for (const insight of selectedInsights) {
+                    await new Promise(r => setTimeout(r, timePerInsight));
+                    addInsight(insight);
+                }
+
+                await new Promise(r => setTimeout(r, timePerInsight));
                 addInsight(`✓ Retrieved ${9 + Math.floor(Math.random() * 6)} highly relevant articles`);
             } else if (agent === 'orchestrator') {
                 await new Promise(r => setTimeout(r, duration * 0.3));

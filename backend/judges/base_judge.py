@@ -68,6 +68,10 @@ VIOLATION_SCHEMA = {
             "type": "string",
             "description": "Specific article or section violated (e.g., 'GDPR Article 22')"
         },
+        "issue": {
+            "type": "string",
+            "description": "Clear, concise description of what the violation is and why it's problematic (1-2 sentences)"
+        },
         "evidence_quote": {
             "type": "string",
             "description": "Direct quote from submission showing the violation"
@@ -106,6 +110,7 @@ VIOLATION_SCHEMA = {
         "complexity",
         "timeline",
         "article_violated",
+        "issue",
         "evidence_quote",
         "remediation_steps",
         "engineering_scope",

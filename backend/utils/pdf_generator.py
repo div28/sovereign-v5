@@ -416,9 +416,9 @@ def create_executive_summary(styles, data):
         severity_color, _, severity_label = get_severity_color(severity)
 
         # Use helper for all fields
-        title = get_violation_field(v, 'title', 'violation', 'article_violated', 'article_title', 'name', 'issue')
-        article = get_violation_field(v, 'article', 'citation', 'article_violated', 'regulatory_citation', 'article_reference')
-        description = get_violation_field(v, 'description', 'details', 'violation_description', 'issue_description')
+        title = get_violation_field(v, 'article_violated', 'title', 'violation', 'article_title', 'name')
+        article = get_violation_field(v, 'article_violated', 'article', 'citation', 'regulatory_citation', 'article_reference')
+        description = get_violation_field(v, 'issue', 'description', 'details', 'violation_description', 'issue_description')
         impact = get_violation_field(v, 'business_impact', 'impact', 'business_risk', default='Impact assessment required')
         framework = get_violation_field(v, 'framework', 'regulation', default='Unknown')
 
@@ -446,8 +446,8 @@ def create_violation_page(styles, violation, index, total):
     elements = []
 
     # Use helper to get fields with fallbacks
-    title = get_violation_field(violation, 'title', 'violation', 'article_violated', 'article_title', 'name', 'issue')
-    description = get_violation_field(violation, 'description', 'details', 'violation_description', 'issue_description', 'finding')
+    title = get_violation_field(violation, 'article_violated', 'title', 'violation', 'article_title', 'name')
+    description = get_violation_field(violation, 'issue', 'description', 'details', 'violation_description', 'issue_description', 'finding')
     article = get_violation_field(violation, 'article', 'citation', 'article_violated', 'regulatory_citation', 'article_reference', 'regulation')
     framework = get_violation_field(violation, 'framework', 'regulation', 'framework_name', default='Unknown')
     evidence = get_violation_field(violation, 'evidence', 'evidence_quote', 'evidence_text', 'supporting_evidence', default='See document analysis above')
@@ -570,7 +570,7 @@ def create_remediation_roadmap(styles, data):
         phase1_data = [['#', 'Action Item', 'Framework', 'Timeline']]
         for i, v in enumerate(p0_violations, 1):
             # Use helper to get fields with fallbacks
-            title = get_violation_field(v, 'title', 'violation', 'article_violated', 'article_title', 'name', 'issue')
+            title = get_violation_field(v, 'article_violated', 'title', 'violation', 'article_title', 'name')
             framework = get_violation_field(v, 'framework', 'regulation', default='N/A')
 
             # Use first remediation step as action item
@@ -614,7 +614,7 @@ def create_remediation_roadmap(styles, data):
         phase2_data = [['#', 'Action Item', 'Framework', 'Timeline']]
         for i, v in enumerate(p1_violations, 1):
             # Use helper to get fields with fallbacks
-            title = get_violation_field(v, 'title', 'violation', 'article_violated', 'article_title', 'name', 'issue')
+            title = get_violation_field(v, 'article_violated', 'title', 'violation', 'article_title', 'name')
             framework = get_violation_field(v, 'framework', 'regulation', default='N/A')
 
             # Use first remediation step as action item
@@ -658,7 +658,7 @@ def create_remediation_roadmap(styles, data):
         phase3_data = [['#', 'Action Item', 'Framework', 'Timeline']]
         for i, v in enumerate(p2_violations, 1):
             # Use helper to get fields with fallbacks
-            title = get_violation_field(v, 'title', 'violation', 'article_violated', 'article_title', 'name', 'issue')
+            title = get_violation_field(v, 'article_violated', 'title', 'violation', 'article_title', 'name')
             framework = get_violation_field(v, 'framework', 'regulation', default='N/A')
 
             # Use first remediation step as action item

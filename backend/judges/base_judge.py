@@ -72,6 +72,10 @@ VIOLATION_SCHEMA = {
             "type": "string",
             "description": "Clear, concise description of what the violation is and why it's problematic (1-2 sentences)"
         },
+        "reasoning": {
+            "type": "string",
+            "description": "Detailed 3-5 sentence explanation covering: (1) What activity in the AI system triggers this article? (2) What does the regulation require? (3) How does the system fall short? (4) What are the potential consequences?"
+        },
         "evidence_quote": {
             "type": "string",
             "description": "Direct quote from submission showing the violation"
@@ -111,6 +115,7 @@ VIOLATION_SCHEMA = {
         "timeline",
         "article_violated",
         "issue",
+        "reasoning",
         "evidence_quote",
         "remediation_steps",
         "engineering_scope",
@@ -295,9 +300,19 @@ class BaseComplianceJudge(ABC):
                         logger.info(f"{self.judge_id}: No violation detected")
                         return None
 
+                    # Add abstention logic for low-confidence verdicts
+                    confidence_score = result.get("confidence", 0)
+                    if confidence_score < 0.65:
+                        result["abstain"] = True
+                        result["abstain_reason"] = "Insufficient evidence in policy or system description to confidently assess this violation. Recommend expert human review."
+                    else:
+                        result["abstain"] = False
+                        result["abstain_reason"] = None
+
                     logger.info(
                         f"{self.judge_id}: Violation detected - "
-                        f"{result.get('severity', 'UNKNOWN')} severity"
+                        f"{result.get('severity', 'UNKNOWN')} severity, "
+                        f"confidence: {confidence_score:.2f}, abstain: {result.get('abstain', False)}"
                     )
                     return result
 

@@ -71,6 +71,8 @@ Analyze for EU AI Act High-Risk violations:
 
 ## Required Fields
 You must provide:
+- **issue**: 1-2 sentence summary of the violation
+- **reasoning**: Detailed 3-5 sentence explanation covering: (1) What high-risk AI activity is present? (2) What does the EU AI Act require for high-risk systems? (3) How does the system fall short? (4) What are the potential consequences? Example: "The AI system is used for resume screening (high-risk category) without conformity assessment. The EU AI Act requires high-risk AI systems to undergo conformity assessment and maintain technical documentation. The system fails because no risk assessment or documentation exists. Consequences include EU fines up to €35M, market access restrictions, and reputational damage."
 - **severity_score**: Numeric score 1-10
 - **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
 - **complexity**: Low (add disclosures), Medium (risk framework), High (complete conformity assessment)
@@ -156,6 +158,8 @@ Analyze for PROHIBITED AI practices:
 
 ## Required Fields
 You must provide:
+- **issue**: 1-2 sentence summary of the violation
+- **reasoning**: Detailed 3-5 sentence explanation covering: (1) What prohibited AI practice is present? (2) What does the EU AI Act Article 5 prohibit? (3) Why is this system in violation? (4) What are the potential consequences? Example: "The AI system uses real-time facial recognition in public spaces without authorization. Article 5 prohibits real-time remote biometric identification in publicly accessible spaces for law enforcement. The system violates this because it identifies individuals without the narrow exceptions permitted. Consequences include market ban, €35M fines, and potential criminal liability."
 - **severity_score**: Numeric score 1-10
 - **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
 - **complexity**: Low (disable feature), Medium (redesign system), High (complete pivot)
@@ -236,6 +240,8 @@ Analyze for EU AI Act Transparency violations:
 
 ## Required Fields
 You must provide:
+- **issue**: 1-2 sentence summary of the violation
+- **reasoning**: Detailed 3-5 sentence explanation covering: (1) What transparency requirement is missing? (2) What does EU AI Act Article 52 require? (3) How does the system fall short? (4) What are the potential consequences? Example: "The chatbot doesn't inform users they're interacting with AI. Article 52 requires users to be informed when interacting with AI systems. The system fails because there's no disclosure that responses are AI-generated. Consequences include regulatory fines, user trust erosion, and misinformation concerns."
 - **severity_score**: Numeric score 1-10
 - **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
 - **complexity**: Low (add AI disclosure), Medium (watermarking system), High (provenance infrastructure)

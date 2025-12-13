@@ -1,0 +1,10 @@
+test_id,framework,scenario_type,expected_verdict,actual_verdict,match,error_type,judge_confidence,judge_reasoning_present,severity_match,abstain,notes
+GDPR_ART22_V001,GDPR,violation,VIOLATION,,FALSE,PENDING,,,,,Run test and fill in actual results
+GDPR_ART22_V002,GDPR,violation,VIOLATION,,FALSE,PENDING,,,,,Run test and fill in actual results
+GDPR_ART22_V003,GDPR,violation,VIOLATION,,FALSE,PENDING,,,,,Run test and fill in actual results
+GDPR_ART22_V004,GDPR,violation,VIOLATION,,FALSE,PENDING,,,,,Run test and fill in actual results
+GDPR_ART22_GRAY001,GDPR,gray_area,COMPLIANT,,FALSE,PENDING,,,,,Run test and fill in actual results
+EXAMPLE_CORRECT,GDPR,violation,VIOLATION,VIOLATION,TRUE,NONE,0.92,YES,TRUE,FALSE,"Example: Correctly caught automated decision violation"
+EXAMPLE_FALSE_NEG,GDPR,violation,VIOLATION,COMPLIANT,FALSE,FALSE_NEGATIVE,0.45,YES,FALSE,TRUE,"Example: Missed violation - low confidence caused abstention"
+EXAMPLE_FALSE_POS,GDPR,compliant,COMPLIANT,VIOLATION,FALSE,FALSE_POSITIVE,0.78,YES,FALSE,FALSE,"Example: Flagged compliant system as violation"
+EXAMPLE_SEVERITY,GDPR,violation,CRITICAL,MAJOR,FALSE,SEVERITY_WRONG,0.88,YES,FALSE,FALSE,"Example: Found violation but wrong severity level"

@@ -61,6 +61,8 @@ Be thorough but precise. Only report a violation if the submission clearly indic
 
 ## Required Fields
 You must provide:
+- **issue**: 1-2 sentence summary of the violation
+- **reasoning**: Detailed 3-5 sentence explanation covering: (1) What activity in the AI system triggers this article? (2) What does GDPR Article 22 require? (3) How does the system fall short? (4) What are the potential consequences? Example: "The AI system automatically rejects candidates scoring below 50% without allowing appeals. Article 22(1) requires individuals have the right NOT to be subject to automated decisions affecting them significantly. The system fails this because there is no meaningful human review option. Consequences include regulatory fines up to €20M or 4% of annual turnover and legal liability."
 - **severity_score**: Numeric score 1-10
 - **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
 - **complexity**: Low (config changes), Medium (feature additions), High (architectural changes)
@@ -148,6 +150,8 @@ Analyze for Article 17 violations:
 
 ## Required Fields
 You must provide:
+- **issue**: 1-2 sentence summary of the violation
+- **reasoning**: Detailed 3-5 sentence explanation covering: (1) What data handling practice triggers this article? (2) What does GDPR Article 17 require? (3) How does the system fall short? (4) What are the potential consequences? Example: "The system stores user data indefinitely with no deletion mechanism. Article 17 grants users the right to erasure of personal data without undue delay. The system fails because users cannot request deletion. Consequences include GDPR fines up to €20M and loss of user trust."
 - **severity_score**: Numeric score 1-10
 - **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
 - **complexity**: Low (add delete endpoint), Medium (cascade deletions), High (data lake cleanup)
@@ -224,6 +228,8 @@ Analyze for Article 32 violations:
 
 ## Required Fields
 You must provide:
+- **issue**: 1-2 sentence summary of the violation
+- **reasoning**: Detailed 3-5 sentence explanation covering: (1) What security practice is deficient? (2) What does GDPR Article 32 require? (3) How does the system fall short? (4) What are the potential consequences? Example: "Personal data is stored unencrypted in the database. Article 32 requires appropriate technical measures including encryption. The system fails because sensitive data is exposed if the database is breached. Consequences include data breaches, GDPR fines, and reputational damage."
 - **severity_score**: Numeric score 1-10
 - **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
 - **complexity**: Low (enable TLS), Medium (implement encryption), High (zero-trust architecture)

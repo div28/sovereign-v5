@@ -64,6 +64,8 @@ Analyze for SOX Section 404 violations:
 
 ## Required Fields
 You must provide:
+- **issue**: 1-2 sentence summary of the violation
+- **reasoning**: Detailed 3-5 sentence explanation covering: (1) What financial control is deficient? (2) What does SOX Section 404 require? (3) How does the system fall short? (4) What are the potential consequences? Example: "The same employee can initiate and approve financial transactions. Section 404 requires segregation of duties to prevent fraud. The system fails because there's no separation between transaction initiation and approval. Consequences include audit failures, SEC penalties, and increased fraud risk."
 - **severity_score**: Numeric score 1-10
 - **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
 - **complexity**: Low (policy updates), Medium (workflow automation), High (system redesign)
@@ -140,6 +142,8 @@ Analyze for SOX Section 302 violations:
 
 ## Required Fields
 You must provide:
+- **issue**: 1-2 sentence summary of the violation
+- **reasoning**: Detailed 3-5 sentence explanation covering: (1) What disclosure or certification issue exists? (2) What does SOX Section 302 require? (3) How does the system fall short? (4) What are the potential consequences? Example: "Financial reports are published without executive certification of accuracy. Section 302 requires CEO/CFO certification that reports fairly present the company's financial condition. The system fails because there's no certification workflow. Consequences include SEC enforcement, executive personal liability, and investor lawsuits."
 - **severity_score**: Numeric score 1-10
 - **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
 - **complexity**: Low (add certifications), Medium (disclosure system), High (fraud detection AI)
@@ -222,6 +226,8 @@ Analyze for SOX Audit Trail violations:
 
 ## Required Fields
 You must provide:
+- **issue**: 1-2 sentence summary of the violation
+- **reasoning**: Detailed 3-5 sentence explanation covering: (1) What audit trail deficiency exists? (2) What does SOX require for audit trails? (3) How does the system fall short? (4) What are the potential consequences? Example: "Financial transactions have no audit logging. SOX requires complete, immutable audit trails for all financial transactions. The system fails because there's no record of who made changes or when. Consequences include forensic gaps, compliance failures, and inability to detect fraud."
 - **severity_score**: Numeric score 1-10
 - **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
 - **complexity**: Low (enable logging), Medium (immutable logs), High (centralized audit system)

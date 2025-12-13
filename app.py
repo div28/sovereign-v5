@@ -226,6 +226,17 @@ def run_judge(
             submission=submission,
             retrieved_chunks=chunks
         )
+        # Attach retrieved regulatory context for transparency
+        if result and result.get("violation_detected"):
+            result["retrieved_context"] = [
+                {
+                    "article": chunk.get("metadata", {}).get("article", "Unknown Article"),
+                    "text": chunk.get("text", "")[:500],  # First 500 chars
+                    "framework": chunk.get("framework", "Unknown"),
+                    "section": chunk.get("metadata", {}).get("section", ""),
+                }
+                for chunk in chunks[:3]  # Top 3 most relevant
+            ] if chunks else []
         return (judge.judge_id, result)
     except Exception as e:
         logger.error(f"Judge {judge.judge_id} failed: {e}")

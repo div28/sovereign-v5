@@ -2703,13 +2703,16 @@
             const businessKeywords = ['policy', 'training', 'process', 'documentation', 'review', 'procedure', 'governance', 'compliance', 'audit', 'legal'];
 
             result.violations.forEach(v => {
-                v.remediation_steps.forEach(step => {
+                const steps = v.remediation_steps || [];
+                const severity = v.severity || 'MAJOR';
+                steps.forEach(step => {
+                    if (!step) return;
                     const stepLower = step.toLowerCase();
                     const isTechnical = techKeywords.some(kw => stepLower.includes(kw));
                     const isBusiness = businessKeywords.some(kw => stepLower.includes(kw));
 
-                    const priority = v.severity === 'CRITICAL' ? 'Immediate' : (v.severity === 'MAJOR' ? '30 days' : '90 days');
-                    const badgeClass = v.severity === 'CRITICAL' ? 'timeline-immediate' : (v.severity === 'MAJOR' ? 'timeline-30days' : 'timeline-90days');
+                    const priority = severity === 'CRITICAL' ? 'Immediate' : (severity === 'MAJOR' ? '30 days' : '90 days');
+                    const badgeClass = severity === 'CRITICAL' ? 'timeline-immediate' : (severity === 'MAJOR' ? 'timeline-30days' : 'timeline-90days');
 
                     if (isTechnical && !isBusiness) {
                         technicalSteps.push({step, priority, badgeClass});
@@ -2807,8 +2810,9 @@
             violations.forEach(v => {
                 const card = document.createElement('div');
                 card.className = 'violation-card expanded';
-                card.dataset.severity = v.severity.toLowerCase();
-                const sevLabel = v.severity === 'CRITICAL' ? 'Critical' : v.severity === 'MAJOR' ? 'Major' : 'Minor';
+                const severity = v.severity || 'MAJOR';
+                card.dataset.severity = severity.toLowerCase();
+                const sevLabel = severity === 'CRITICAL' ? 'Critical' : severity === 'MAJOR' ? 'Major' : 'Minor';
                 card.innerHTML = `
                     <div class="violation-header">
                         <div class="badges">
@@ -2823,7 +2827,7 @@
                         <div class="metadata-grid">
                             <div class="metadata-item">
                                 <div class="metadata-label">Severity</div>
-                                <div class="metadata-value">${v.severity}</div>
+                                <div class="metadata-value">${severity}</div>
                             </div>
                             <div class="metadata-item">
                                 <div class="metadata-label">Priority</div>
@@ -2839,9 +2843,32 @@
                             </div>
                             <div class="metadata-item">
                                 <div class="metadata-label">Confidence</div>
-                                <div class="metadata-value">${v.confidence_score || '95%'}</div>
+                                <div class="metadata-value">${v.confidence ? Math.round(v.confidence * 100) + '%' : (v.confidence_score || 'N/A')}</div>
                             </div>
                         </div>
+                        ${v.abstain ? `
+                        <div style="margin-top: 12px; padding: 10px; background: rgba(255, 193, 7, 0.2); border-radius: 6px; border: 1px solid rgba(255, 193, 7, 0.4);">
+                            <div style="font-weight: 600; color: #FFC107; font-size: 0.85rem;">⚠️ Low Confidence - Abstaining</div>
+                            <div style="color: rgba(255,255,255,0.8); font-size: 0.8rem; margin-top: 4px;">${v.abstain_reason || 'Recommend expert human review'}</div>
+                        </div>
+                        ` : ''}
+                        ${v.reasoning ? `
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <div style="font-weight: 600; margin-bottom: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.7);">Judge Reasoning:</div>
+                            <div style="color: rgba(255,255,255,0.8); font-size: 0.85rem; line-height: 1.5;">${v.reasoning}</div>
+                        </div>
+                        ` : ''}
+                        ${v.retrieved_context?.length ? `
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <div style="font-weight: 600; margin-bottom: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.7);">Retrieved Regulatory Context:</div>
+                            ${v.retrieved_context.map(ctx => `
+                                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; margin-bottom: 8px;">
+                                    <div style="font-weight: 600; color: #60A5FA; font-size: 0.8rem;">${ctx.article || 'Unknown Article'} ${ctx.section ? '- ' + ctx.section : ''}</div>
+                                    <div style="color: rgba(255,255,255,0.7); font-size: 0.8rem; margin-top: 4px; font-style: italic;">"${(ctx.text || '').substring(0, 300)}${(ctx.text || '').length > 300 ? '...' : ''}"</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ` : ''}
                         <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
                             <div style="font-weight: 600; margin-bottom: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.7);">Remediation Steps:</div>
                             <ol style="margin-left: 1.5rem; color: rgba(255,255,255,0.8); font-size: 0.85rem;">

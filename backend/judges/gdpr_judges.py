@@ -52,12 +52,37 @@ Analyze the submission for GDPR Article 22 violations. Look specifically for:
 4. **Special Category Data**: Is sensitive personal data being processed automatically?
 5. **Lack of Transparency**: Is there no explanation of decision logic to data subjects?
 
+## CRITICAL: Thresholds for Meaningful Human Review
+A system is COMPLIANT if ANY of these are true:
+- **Human reviews ALL decisions** before they take effect (even if AI scores/recommends)
+- **Override rate >50%**: Humans override AI recommendations more than half the time
+- **Human makes final decision**: AI only recommends, human approves/rejects
+- **Appeal mechanism exists**: Data subjects can request and receive human review
+
+A system is a VIOLATION only if:
+- Decisions are **fully automated with no human review**
+- Human review rate is **<10%** of decisions
+- No mechanism for human intervention exists
+- AI decisions directly execute without human approval
+
+## COMPLIANT Examples (DO NOT flag these as violations):
+1. "AI scores candidates, HR reviews every score, HR makes all hiring decisions" → COMPLIANT (human reviews all)
+2. "AI recommends loans, officers override 60% of recommendations" → COMPLIANT (>50% override)
+3. "AI provides risk assessment, human approves all final decisions" → COMPLIANT (human final decision)
+4. "Automated scoring but candidates can request human review" → COMPLIANT (appeal mechanism)
+
+## VIOLATION Examples (flag these):
+1. "AI auto-rejects candidates, only 2% are reviewed" → VIOLATION (<10% review)
+2. "Loan decisions fully automated, no human review" → VIOLATION (no review)
+3. "AI denies claims automatically, customers cannot appeal" → VIOLATION (no appeal)
+
 Be thorough but precise. Only report a violation if the submission clearly indicates non-compliance.
 
 ## Severity Scoring Guidelines
-- **CRITICAL (8-10/10, P0)**: Automated decisions affecting employment/credit/legal status with no human review
-- **MAJOR (5-7/10, P1)**: Missing human review mechanism or transparency requirements
+- **CRITICAL (8-10/10, P0)**: Automated decisions affecting employment/credit/legal status with NO human review (<10%)
+- **MAJOR (5-7/10, P1)**: Missing transparency or inadequate appeal mechanism (but some review exists)
 - **MINOR (1-4/10, P2)**: Incomplete documentation or partial compliance gaps
+- **NO VIOLATION**: If meaningful human review exists (>50% override OR human final decision OR appeal available)
 
 ## Required Fields
 You must provide:
@@ -143,10 +168,35 @@ Analyze for Article 17 violations:
 3. **Third Party Notification**: Failure to propagate deletion to data recipients
 4. **Timing**: No process to ensure deletion within required timeframe
 
+## CRITICAL: Thresholds for Compliance
+A system is COMPLIANT if ALL of these are true:
+- **Deletion mechanism exists**: Users can request deletion (self-service OR support ticket)
+- **Reasonable timeframe**: Deletion completes within 30 days (1 month per GDPR)
+- **Third parties notified**: Recipients of data are informed of deletion
+- **Confirmation provided**: Users receive acknowledgment of deletion
+
+A system is a VIOLATION only if:
+- **No deletion possible**: Company explicitly refuses OR has no mechanism
+- **Excessive delays**: Deletion takes >6 months without valid legal reason
+- **Data retained indefinitely**: User data kept forever despite deletion request
+- **Third parties ignored**: Data shared with others but not propagated for deletion
+
+## COMPLIANT Examples (DO NOT flag these as violations):
+1. "Users can delete account. All data erased within 30 days. Third parties notified. Confirmation email sent." → COMPLIANT
+2. "Self-service deletion in settings. Processing takes 14 days. Email confirms completion." → COMPLIANT
+3. "Deletion request via support. Completed within 1 month. All integrations updated." → COMPLIANT
+4. "Data anonymized instead of deleted (with user consent)" → COMPLIANT (anonymization acceptable)
+
+## VIOLATION Examples (flag these):
+1. "No delete button. Support says 'we cannot delete your data'" → VIOLATION (no mechanism)
+2. "Deletion takes 6 months. No confirmation. Data stays in backups for 10 years" → VIOLATION (excessive)
+3. "Account deleted but data shared with partners is not removed" → VIOLATION (incomplete)
+
 ## Severity Scoring Guidelines
-- **CRITICAL (8-10/10, P0)**: No deletion mechanism or explicit retention against requests
-- **MAJOR (5-7/10, P1)**: Incomplete erasure or missing third-party notification
-- **MINOR (1-4/10, P2)**: Documentation gaps or unclear procedures
+- **CRITICAL (8-10/10, P0)**: No deletion mechanism at all OR explicit refusal to delete
+- **MAJOR (5-7/10, P1)**: Deletion exists but incomplete (backups retained >1 year) or no third-party notification
+- **MINOR (1-4/10, P2)**: Minor delays (30-60 days) or documentation gaps
+- **NO VIOLATION**: If deletion mechanism exists, completes within 30 days, and notifies third parties
 
 ## Required Fields
 You must provide:

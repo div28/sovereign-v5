@@ -57,10 +57,35 @@ Analyze for SOX Section 404 violations:
 4. **Segregation Issues**: Same person can initiate, approve, and record transactions
 5. **Access Control Gaps**: Unrestricted access to financial systems/data
 
+## CRITICAL: Thresholds for Compliance
+A system is COMPLIANT if ALL of these are true:
+- **Controls documented**: Written policies/procedures exist for financial processes
+- **Regular testing**: Controls tested at least annually (quarterly preferred)
+- **Segregation enforced**: Different people for initiation, approval, and recording
+- **Auditor attestation**: External auditor reviews controls (for public companies)
+
+A system is a VIOLATION only if:
+- **No controls exist**: Financial processes have zero documented controls
+- **No testing ever**: Controls never tested or tested >3 years ago
+- **Same person does everything**: One person initiates, approves, AND records
+- **No documentation**: Controls exist but completely undocumented
+
+## COMPLIANT Examples (DO NOT flag these as violations):
+1. "All controls documented. Quarterly testing. Segregation of duties enforced. Annual auditor attestation." → COMPLIANT
+2. "Controls documented in wiki. Annual testing. Maker-checker for all transactions." → COMPLIANT
+3. "Small company with compensating controls: daily manager review of all transactions" → COMPLIANT (compensating controls acceptable)
+4. "Two-person approval required for transactions >$10K. Documented in SOPs." → COMPLIANT
+
+## VIOLATION Examples (flag these):
+1. "No documented controls. Same person initiates and approves transactions." → VIOLATION
+2. "Controls exist but never tested. Last review was 3 years ago." → VIOLATION
+3. "CFO has direct database access to modify financial records without review." → VIOLATION
+
 ## Severity Scoring Guidelines
-- **CRITICAL (8-10/10, P0)**: No internal controls or complete lack of segregation of duties
-- **MAJOR (5-7/10, P1)**: Missing documentation or testing procedures
-- **MINOR (1-4/10, P2)**: Incomplete documentation or infrequent testing
+- **CRITICAL (8-10/10, P0)**: No controls at all OR same person performs ALL functions (initiate+approve+record)
+- **MAJOR (5-7/10, P1)**: Controls exist but undocumented OR untested for >2 years
+- **MINOR (1-4/10, P2)**: Minor documentation gaps OR testing slightly overdue
+- **NO VIOLATION**: If controls documented, tested regularly, and segregation enforced (or compensating controls exist)
 
 ## Required Fields
 You must provide:
@@ -135,10 +160,34 @@ Analyze for SOX Section 302 violations:
 4. **No Change Tracking**: No mechanism to detect/report control changes
 5. **Accuracy Issues**: Systems that could produce inaccurate financial data
 
+## CRITICAL: Thresholds for Compliance
+A system is COMPLIANT if ALL of these are true:
+- **Certification process exists**: CEO/CFO review and sign off on financial reports
+- **Disclosure controls documented**: Procedures ensure material info is captured
+- **Anti-fraud measures**: Cannot modify financial records without approval/audit trail
+- **Change tracking**: Material changes to controls are logged and reported
+
+A system is a VIOLATION only if:
+- **No certification at all**: Reports published without any executive review
+- **No disclosure controls**: Material information can be hidden from reports
+- **Fraud enablement**: System allows untracked modifications to financials
+- **Backdating allowed**: Can change historical entries without approval
+
+## COMPLIANT Examples (DO NOT flag these as violations):
+1. "CEO and CFO review and certify all quarterly reports. Certification tracked and documented." → COMPLIANT
+2. "All financial reports require executive sign-off before filing. Audit trail maintained." → COMPLIANT
+3. "Disclosure committee reviews material items. CEO/CFO certification workflow in place." → COMPLIANT
+
+## VIOLATION Examples (flag these):
+1. "Financial reports published without CEO/CFO review. No certification workflow." → VIOLATION
+2. "Managers can override financial entries without approval. No audit trail." → VIOLATION
+3. "System allows backdating entries. Used to smooth quarterly results." → VIOLATION
+
 ## Severity Scoring Guidelines
-- **CRITICAL (8-10/10, P0)**: No certification process or systems enabling fraud concealment
-- **MAJOR (5-7/10, P1)**: Missing disclosure controls or change tracking
-- **MINOR (1-4/10, P2)**: Incomplete disclosure procedures
+- **CRITICAL (8-10/10, P0)**: No certification process OR system enables fraud/backdating
+- **MAJOR (5-7/10, P1)**: Certification exists but incomplete OR weak disclosure controls
+- **MINOR (1-4/10, P2)**: Minor gaps in documentation or procedures
+- **NO VIOLATION**: If CEO/CFO certify reports, disclosure controls exist, and anti-fraud measures in place
 
 ## Required Fields
 You must provide:
@@ -219,10 +268,37 @@ Analyze for SOX Audit Trail violations:
 4. **Retention Issues**: Records not retained for required period
 5. **No Change Tracking**: Modifications to financial data not recorded
 
+## CRITICAL: Thresholds for Compliance
+A system is COMPLIANT if ALL of these are true:
+- **Logging exists**: All financial transactions are logged with timestamps
+- **User attribution**: Each action tied to specific user identity
+- **Immutability**: Logs cannot be modified/deleted (WORM storage, append-only, or equivalent)
+- **Retention**: Records kept for 7+ years
+- **Regular audits**: Logs reviewed periodically (at least annually)
+
+A system is a VIOLATION only if:
+- **No logging**: Financial transactions have zero audit trail
+- **Tamperable logs**: Admins can delete/modify audit records
+- **Short retention**: Logs deleted before 7 years
+- **Anonymous actions**: Cannot determine who performed transactions
+
+## COMPLIANT Examples (DO NOT flag these as violations):
+1. "All transactions logged with timestamps. Logs stored in WORM storage. 7-year retention. Regular audits." → COMPLIANT
+2. "Every financial action logged to immutable database. User IDs tracked. 10-year retention policy." → COMPLIANT
+3. "Centralized logging to Splunk. Write-once storage. Automated 7-year retention." → COMPLIANT
+4. "All transactions logged. Logs backed up to immutable archive. Annual audit review." → COMPLIANT
+
+## VIOLATION Examples (flag these):
+1. "Financial transactions have no logging. Cannot determine who made changes." → VIOLATION
+2. "Audit logs exist but admins can delete them. Logs stored locally." → VIOLATION
+3. "Logs auto-deleted after 1 year. SOX requires 7 years." → VIOLATION
+4. "Only successful transactions logged. Failed attempts not captured." → VIOLATION
+
 ## Severity Scoring Guidelines
-- **CRITICAL (8-10/10, P0)**: No audit logging or tamperable audit records
-- **MAJOR (5-7/10, P1)**: Incomplete logging or inadequate retention
-- **MINOR (1-4/10, P2)**: Missing some audit details or inconsistent logging
+- **CRITICAL (8-10/10, P0)**: No audit logging at all OR logs can be tampered with by anyone
+- **MAJOR (5-7/10, P1)**: Logging exists but retention <7 years OR incomplete (missing user/timestamps)
+- **MINOR (1-4/10, P2)**: Minor gaps (e.g., some events not logged) but core audit trail exists
+- **NO VIOLATION**: If logging exists, is immutable, has 7+ year retention, and ties actions to users
 
 ## Required Fields
 You must provide:

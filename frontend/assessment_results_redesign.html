@@ -9,37 +9,27 @@
            CSS VARIABLES & RESET
            ============================================ */
         :root {
-            --bg-primary: #0f1419;
-            --bg-secondary: #1a1f2e;
-            --bg-tertiary: #252d3d;
-            --bg-card: #1e2536;
-            --bg-hover: #2a3448;
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --bg-panel: #1e293b;
 
             --text-primary: #ffffff;
-            --text-secondary: #a0aec0;
-            --text-muted: #718096;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
 
-            --accent-primary: #6366f1;
-            --accent-secondary: #8b5cf6;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
 
-            --critical: #ef4444;
-            --critical-bg: rgba(239, 68, 68, 0.15);
-            --major: #f97316;
-            --major-bg: rgba(249, 115, 22, 0.15);
-            --medium: #eab308;
-            --medium-bg: rgba(234, 179, 8, 0.15);
-            --minor: #22c55e;
-            --minor-bg: rgba(34, 197, 94, 0.15);
+            --critical: #f87171;
+            --critical-bg: rgba(248, 113, 113, 0.1);
+            --major: #fb923c;
+            --major-bg: rgba(251, 146, 60, 0.1);
+            --blue: #60a5fa;
+            --blue-bg: rgba(96, 165, 250, 0.1);
 
-            --border-color: #2d3748;
-            --border-radius: 12px;
-            --border-radius-sm: 8px;
-
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
-
-            --transition: all 0.2s ease;
+            --border: #334155;
+            --radius: 8px;
         }
 
         * {
@@ -49,10 +39,10 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
-            line-height: 1.6;
+            line-height: 1.5;
             min-height: 100vh;
         }
 
@@ -60,155 +50,111 @@
            LAYOUT
            ============================================ */
         .container {
+            padding: 32px;
             max-width: 1400px;
             margin: 0 auto;
-            padding: 24px 32px;
+        }
+
+        h1 {
+            font-size: 30px;
+            font-weight: 700;
+            margin-bottom: 24px;
         }
 
         /* ============================================
-           HEADER SECTION
+           COMPACT HEADER - 5 COLUMNS
            ============================================ */
-        .results-header {
-            background: var(--bg-secondary);
-            border-radius: var(--border-radius);
-            padding: 32px;
-            margin-bottom: 24px;
-            border: 1px solid var(--border-color);
-        }
-
-        .header-content {
-            display: flex;
-            align-items: center;
-            gap: 48px;
-        }
-
-        /* Risk Gauge */
-        .risk-gauge {
-            flex-shrink: 0;
-            position: relative;
-            width: 160px;
-            height: 160px;
-        }
-
-        .gauge-circle {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(
-                var(--critical) 0deg 252deg,
-                var(--bg-tertiary) 252deg 360deg
-            );
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .gauge-circle::before {
-            content: '';
-            position: absolute;
-            width: 120px;
-            height: 120px;
-            background: var(--bg-secondary);
-            border-radius: 50%;
-        }
-
-        .gauge-value {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-        }
-
-        .gauge-score {
-            font-size: 42px;
-            font-weight: 700;
-            color: var(--critical);
-            line-height: 1;
-        }
-
-        .gauge-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 4px;
-        }
-
-        /* Key Metrics */
-        .key-metrics {
-            flex: 1;
+        .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
         }
 
         .metric-card {
-            background: var(--bg-tertiary);
-            border-radius: var(--border-radius-sm);
-            padding: 20px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+        }
+
+        .metric-card.center {
             text-align: center;
-            border: 1px solid var(--border-color);
+        }
+
+        .risk-gauge {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 8px;
+            border-radius: 50%;
+            border: 4px solid var(--critical);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .risk-gauge .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--critical);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
         }
 
         .metric-value {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 700;
-            color: var(--text-primary);
-            line-height: 1.2;
+        }
+
+        .metric-value.large {
+            font-size: 20px;
         }
 
         .metric-value.critical { color: var(--critical); }
-        .metric-value.major { color: var(--major); }
-        .metric-value.success { color: var(--minor); }
-
-        .metric-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 4px;
-        }
+        .metric-value.blue { color: var(--blue); }
 
         .metric-sublabel {
             font-size: 12px;
+            color: var(--critical);
+        }
+
+        .metric-sublabel.muted {
             color: var(--text-muted);
-            margin-top: 2px;
         }
 
         /* ============================================
-           TAB NAVIGATION
+           TABS
            ============================================ */
-        .tab-navigation {
+        .tabs {
             display: flex;
-            gap: 4px;
-            background: var(--bg-secondary);
-            padding: 6px;
-            border-radius: var(--border-radius);
+            gap: 32px;
+            border-bottom: 1px solid var(--border);
             margin-bottom: 24px;
-            border: 1px solid var(--border-color);
         }
 
         .tab-btn {
-            flex: 1;
-            padding: 14px 24px;
-            background: transparent;
+            background: none;
             border: none;
-            border-radius: var(--border-radius-sm);
-            color: var(--text-secondary);
+            padding: 12px 0;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
+            color: var(--text-muted);
             cursor: pointer;
-            transition: var(--transition);
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
         }
 
         .tab-btn:hover {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
+            color: var(--text-secondary);
         }
 
         .tab-btn.active {
-            background: var(--accent-primary);
             color: var(--text-primary);
+            border-bottom-color: var(--accent);
         }
 
         .tab-content {
@@ -220,88 +166,63 @@
         }
 
         /* ============================================
-           VIOLATIONS GRID
+           SECTION TITLE
            ============================================ */
         .section-title {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: 600;
-            color: var(--text-primary);
+            color: var(--text-muted);
             margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        .section-title .count {
-            background: var(--bg-tertiary);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
+        /* ============================================
+           VIOLATION CARDS - 3 COLUMNS
+           ============================================ */
         .violations-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 16px;
             margin-bottom: 32px;
         }
 
         .violation-card {
             background: var(--bg-card);
-            border-radius: var(--border-radius);
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            transition: var(--transition);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
         }
 
         .violation-card:hover {
-            border-color: var(--accent-primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
         }
 
-        .violation-card.critical { border-left: 4px solid var(--critical); }
-        .violation-card.major { border-left: 4px solid var(--major); }
-        .violation-card.medium { border-left: 4px solid var(--medium); }
-
         .card-header {
-            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 12px;
+            margin-bottom: 12px;
         }
 
-        .article-info {
-            flex: 1;
+        .card-article {
+            font-size: 12px;
+            color: var(--text-muted);
         }
 
-        .article-id {
-            font-size: 18px;
+        .card-title {
+            font-size: 14px;
             font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .article-name {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .badges {
-            display: flex;
-            gap: 6px;
-            flex-shrink: 0;
+            margin-top: 4px;
         }
 
         .badge {
-            padding: 4px 10px;
-            border-radius: 20px;
             font-size: 11px;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            padding: 4px 8px;
+            border-radius: 4px;
         }
 
         .badge.critical {
@@ -309,148 +230,289 @@
             color: var(--critical);
         }
 
-        .badge.major {
-            background: var(--major-bg);
-            color: var(--major);
-        }
-
-        .badge.medium {
-            background: var(--medium-bg);
-            color: var(--medium);
-        }
-
-        .badge.priority {
-            background: var(--bg-tertiary);
-            color: var(--text-secondary);
-        }
-
-        .card-body {
-            padding: 0 20px 16px;
-        }
-
-        .violation-description {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.6;
+        .card-description {
+            font-size: 12px;
+            color: var(--text-muted);
             margin-bottom: 12px;
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
 
         .card-footer {
-            padding: 12px 20px;
-            background: var(--bg-tertiary);
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .confidence {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .confidence-bar {
-            width: 60px;
-            height: 4px;
-            background: var(--bg-secondary);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .confidence-fill {
-            height: 100%;
-            background: var(--accent-primary);
-            border-radius: 2px;
-        }
-
-        .confidence-text {
             font-size: 12px;
+        }
+
+        .card-meta {
             color: var(--text-muted);
         }
 
-        .expand-btn {
-            background: none;
-            border: none;
-            color: var(--accent-primary);
-            font-size: 13px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            transition: var(--transition);
-        }
-
-        .expand-btn:hover {
-            color: var(--accent-secondary);
+        .card-arrow {
+            color: var(--accent);
         }
 
         /* ============================================
-           BUSINESS IMPACT TILES
+           BUSINESS IMPACT - 4 COLUMNS
            ============================================ */
-        .impact-section {
-            margin-top: 32px;
-        }
-
         .impact-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 16px;
         }
 
-        .impact-tile {
+        .impact-card {
             background: var(--bg-card);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-        }
-
-        .impact-tile:hover {
-            border-color: var(--accent-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
         }
 
         .impact-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--border-radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            margin-bottom: 12px;
+            width: 16px;
+            height: 16px;
+            margin-bottom: 8px;
         }
 
-        .impact-icon.financial { background: var(--critical-bg); }
-        .impact-icon.operational { background: var(--major-bg); }
-        .impact-icon.reputational { background: var(--critical-bg); }
-        .impact-icon.jurisdictional { background: var(--minor-bg); }
+        .impact-icon.critical { color: var(--critical); }
+        .impact-icon.major { color: var(--major); }
+        .impact-icon.blue { color: var(--blue); }
 
         .impact-label {
             font-size: 12px;
             color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
             margin-bottom: 4px;
         }
 
         .impact-value {
             font-size: 18px;
-            font-weight: 600;
-            color: var(--text-primary);
+            font-weight: 700;
             margin-bottom: 4px;
         }
 
-        .impact-value.high { color: var(--critical); }
-        .impact-value.moderate { color: var(--major); }
-        .impact-value.low { color: var(--minor); }
+        .impact-value.critical { color: var(--critical); }
+        .impact-value.major { color: var(--major); }
+        .impact-value.blue { color: var(--blue); }
 
-        .impact-description {
+        .impact-sublabel {
             font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ============================================
+           SLIDE-IN PANEL
+           ============================================ */
+        .panel-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.2);
+            z-index: 40;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .panel-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .panel {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            bottom: 0;
+            width: 384px;
+            background: var(--bg-panel);
+            border-left: 1px solid var(--border);
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.3);
+            z-index: 50;
+            overflow-y: auto;
+            transition: right 0.3s ease;
+        }
+
+        .panel.active {
+            right: 0;
+        }
+
+        .panel-content {
+            padding: 24px;
+        }
+
+        .panel-header {
+            margin-bottom: 24px;
+        }
+
+        .panel-badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .panel-priority {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .panel-article {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .panel-section {
+            margin-bottom: 24px;
+        }
+
+        .panel-section-title {
+            font-size: 12px;
+            font-weight: 600;
             color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .panel-section-text {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Confidence Bar */
+        .confidence-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .confidence-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        .confidence-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Steps List */
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .step-number {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(99, 102, 241, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .step-text {
+            color: var(--text-muted);
+        }
+
+        /* Timeline & Effort */
+        .panel-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .panel-metric {
+            background: rgba(51, 65, 85, 0.5);
+            border-radius: var(--radius);
+            padding: 12px;
+        }
+
+        .panel-metric-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .panel-metric-icon {
+            width: 14px;
+            height: 14px;
+        }
+
+        .panel-metric-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .panel-metric-value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .panel-metric-value.blue { color: var(--blue); }
+        .panel-metric-value.major { color: var(--major); }
+
+        /* Action Button */
+        .panel-action {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .panel-action:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Close button */
+        .panel-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .panel-close:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
         }
 
         /* ============================================
@@ -458,42 +520,43 @@
            ============================================ */
         .plan-section {
             background: var(--bg-card);
-            border-radius: var(--border-radius);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             padding: 24px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
+            margin-bottom: 16px;
         }
 
         .plan-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
         }
 
-        .plan-title .icon {
+        .plan-number {
             width: 24px;
             height: 24px;
-            background: var(--accent-primary);
+            background: var(--accent);
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 12px;
+            font-weight: 700;
         }
 
         .timeline-item {
             display: flex;
             gap: 16px;
             padding: 16px 0;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border);
         }
 
         .timeline-item:last-child {
             border-bottom: none;
+            padding-bottom: 0;
         }
 
         .timeline-phase {
@@ -511,23 +574,18 @@
         .phase-time {
             font-size: 14px;
             font-weight: 600;
-            color: var(--accent-primary);
+            color: var(--accent);
         }
 
-        .timeline-content {
-            flex: 1;
-        }
-
-        .timeline-title {
+        .timeline-content h4 {
             font-size: 14px;
             font-weight: 600;
-            color: var(--text-primary);
             margin-bottom: 4px;
         }
 
-        .timeline-description {
+        .timeline-content p {
             font-size: 13px;
-            color: var(--text-secondary);
+            color: var(--text-muted);
         }
 
         /* ============================================
@@ -535,23 +593,21 @@
            ============================================ */
         .citation-card {
             background: var(--bg-card);
-            border-radius: var(--border-radius);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             padding: 20px;
             margin-bottom: 12px;
-            border: 1px solid var(--border-color);
         }
 
         .citation-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
             margin-bottom: 12px;
         }
 
         .citation-source {
             font-size: 14px;
             font-weight: 600;
-            color: var(--text-primary);
         }
 
         .citation-relevance {
@@ -561,10 +617,10 @@
 
         .citation-text {
             font-size: 13px;
-            color: var(--text-secondary);
+            color: var(--text-muted);
             line-height: 1.7;
             padding-left: 12px;
-            border-left: 3px solid var(--accent-primary);
+            border-left: 3px solid var(--accent);
             font-style: italic;
         }
 
@@ -572,23 +628,24 @@
            RESPONSIVE
            ============================================ */
         @media (max-width: 1200px) {
+            .violations-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
             .impact-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 900px) {
-            .header-content {
-                flex-direction: column;
-                gap: 24px;
+            .metrics-grid {
+                grid-template-columns: repeat(3, 1fr);
             }
-
-            .key-metrics {
-                width: 100%;
-            }
-
             .violations-grid {
                 grid-template-columns: 1fr;
+            }
+            .panel {
+                width: 100%;
+                right: -100%;
             }
         }
 
@@ -596,389 +653,452 @@
             .container {
                 padding: 16px;
             }
-
-            .key-metrics {
-                grid-template-columns: 1fr;
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
-
             .impact-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .tab-btn {
-                padding: 12px 16px;
-                font-size: 13px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header with Risk Gauge and Key Metrics -->
-        <header class="results-header">
-            <div class="header-content">
+        <h1>Assessment Results</h1>
+
+        <!-- COMPACT HEADER - 5 COLUMNS -->
+        <div class="metrics-grid">
+            <div class="metric-card center">
                 <div class="risk-gauge">
-                    <div class="gauge-circle">
-                        <div class="gauge-value">
-                            <div class="gauge-score">70</div>
-                            <div class="gauge-label">Risk Score</div>
-                        </div>
-                    </div>
+                    <span class="value">70</span>
                 </div>
-                <div class="key-metrics">
-                    <div class="metric-card">
-                        <div class="metric-value critical">3</div>
-                        <div class="metric-label">Critical Violations</div>
-                        <div class="metric-sublabel">Immediate action required</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value major">High</div>
-                        <div class="metric-label">Risk Level</div>
-                        <div class="metric-sublabel">Based on severity analysis</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value">32%</div>
-                        <div class="metric-label">Audit Readiness</div>
-                        <div class="metric-sublabel">Compliance coverage</div>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Tab Navigation -->
-        <nav class="tab-navigation">
-            <button class="tab-btn active" data-tab="technical">Technical Fix Plan</button>
-            <button class="tab-btn" data-tab="business">Business Plan</button>
-            <button class="tab-btn" data-tab="citations">Citations</button>
-        </nav>
-
-        <!-- Technical Fix Plan Tab -->
-        <div class="tab-content active" id="technical">
-            <h2 class="section-title">
-                Violations Found
-                <span class="count">3 issues</span>
-            </h2>
-
-            <div class="violations-grid">
-                <!-- Violation 1: Article 22 -->
-                <div class="violation-card critical">
-                    <div class="card-header">
-                        <div class="article-info">
-                            <div class="article-id">GDPR Article 22</div>
-                            <div class="article-name">Automated Decision-Making</div>
-                        </div>
-                        <div class="badges">
-                            <span class="badge critical">Critical</span>
-                            <span class="badge priority">P1</span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <p class="violation-description">
-                            AI system makes fully automated decisions affecting user employment eligibility without meaningful human review. No appeal mechanism exists for affected individuals to contest decisions.
-                        </p>
-                    </div>
-                    <div class="card-footer">
-                        <div class="confidence">
-                            <div class="confidence-bar">
-                                <div class="confidence-fill" style="width: 92%"></div>
-                            </div>
-                            <span class="confidence-text">92% confidence</span>
-                        </div>
-                        <button class="expand-btn">
-                            View details
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18l6-6-6-6"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Violation 2: Article 17 -->
-                <div class="violation-card critical">
-                    <div class="card-header">
-                        <div class="article-info">
-                            <div class="article-id">GDPR Article 17</div>
-                            <div class="article-name">Right to Erasure</div>
-                        </div>
-                        <div class="badges">
-                            <span class="badge critical">Critical</span>
-                            <span class="badge priority">P1</span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <p class="violation-description">
-                            No data deletion mechanism exists. User requests for data erasure are not processed within the required 30-day timeframe. Backup retention exceeds legal requirements.
-                        </p>
-                    </div>
-                    <div class="card-footer">
-                        <div class="confidence">
-                            <div class="confidence-bar">
-                                <div class="confidence-fill" style="width: 88%"></div>
-                            </div>
-                            <span class="confidence-text">88% confidence</span>
-                        </div>
-                        <button class="expand-btn">
-                            View details
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18l6-6-6-6"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Violation 3: Article 32 -->
-                <div class="violation-card critical">
-                    <div class="card-header">
-                        <div class="article-info">
-                            <div class="article-id">GDPR Article 32</div>
-                            <div class="article-name">Security of Processing</div>
-                        </div>
-                        <div class="badges">
-                            <span class="badge critical">Critical</span>
-                            <span class="badge priority">P2</span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <p class="violation-description">
-                            Personal data stored without encryption at rest. Access controls not implemented for sensitive user data. No documented security testing procedures in place.
-                        </p>
-                    </div>
-                    <div class="card-footer">
-                        <div class="confidence">
-                            <div class="confidence-bar">
-                                <div class="confidence-fill" style="width: 85%"></div>
-                            </div>
-                            <span class="confidence-text">85% confidence</span>
-                        </div>
-                        <button class="expand-btn">
-                            View details
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18l6-6-6-6"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+                <p class="metric-label">Risk Score</p>
             </div>
 
-            <!-- Business Impact Section -->
-            <section class="impact-section">
-                <h2 class="section-title">Business Impact Assessment</h2>
-                <div class="impact-grid">
-                    <div class="impact-tile">
-                        <div class="impact-icon financial">$</div>
-                        <div class="impact-label">Financial Risk</div>
-                        <div class="impact-value high">High</div>
-                        <div class="impact-description">Up to 4% annual revenue exposure</div>
-                    </div>
-                    <div class="impact-tile">
-                        <div class="impact-icon operational">&#9881;</div>
-                        <div class="impact-label">Operational Impact</div>
-                        <div class="impact-value moderate">Moderate</div>
-                        <div class="impact-description">Process changes required</div>
-                    </div>
-                    <div class="impact-tile">
-                        <div class="impact-icon reputational">&#9733;</div>
-                        <div class="impact-label">Reputational Risk</div>
-                        <div class="impact-value high">High</div>
-                        <div class="impact-description">Public disclosure possible</div>
-                    </div>
-                    <div class="impact-tile">
-                        <div class="impact-icon jurisdictional">&#127760;</div>
-                        <div class="impact-label">Jurisdictional Scope</div>
-                        <div class="impact-value low">Single</div>
-                        <div class="impact-description">EU territory only</div>
-                    </div>
-                </div>
-            </section>
+            <div class="metric-card">
+                <p class="metric-label">Violations</p>
+                <p class="metric-value">3</p>
+                <p class="metric-sublabel">Critical</p>
+            </div>
+
+            <div class="metric-card">
+                <p class="metric-label">Risk Level</p>
+                <p class="metric-value large critical">HIGH</p>
+                <p class="metric-sublabel muted">Immediate</p>
+            </div>
+
+            <div class="metric-card">
+                <p class="metric-label">Audit Ready</p>
+                <p class="metric-value large">32%</p>
+                <p class="metric-sublabel muted">Coverage</p>
+            </div>
+
+            <div class="metric-card">
+                <p class="metric-label">Timeline</p>
+                <p class="metric-value large">3 mo</p>
+                <p class="metric-sublabel muted">Remediate</p>
+            </div>
         </div>
 
-        <!-- Business Plan Tab -->
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="violations">Technical Fix Plan</button>
+            <button class="tab-btn" data-tab="business">Business Plan</button>
+            <button class="tab-btn" data-tab="citations">Citations</button>
+        </div>
+
+        <!-- VIOLATIONS TAB -->
+        <div class="tab-content active" id="violations">
+            <h3 class="section-title">3 Issues Found</h3>
+
+            <div class="violations-grid">
+                <!-- Card 1 -->
+                <div class="violation-card" data-violation="0">
+                    <div class="card-header">
+                        <div>
+                            <p class="card-article">Article 22</p>
+                            <h3 class="card-title">Automated Decision-Making</h3>
+                        </div>
+                        <span class="badge critical">CRITICAL</span>
+                    </div>
+                    <p class="card-description">System makes final hiring decisions without human review</p>
+                    <div class="card-footer">
+                        <span class="card-meta">P0 • 92%</span>
+                        <span class="card-arrow">→</span>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="violation-card" data-violation="1">
+                    <div class="card-header">
+                        <div>
+                            <p class="card-article">Article 17</p>
+                            <h3 class="card-title">Right to Erasure</h3>
+                        </div>
+                        <span class="badge critical">CRITICAL</span>
+                    </div>
+                    <p class="card-description">No automated data deletion process for candidate data</p>
+                    <div class="card-footer">
+                        <span class="card-meta">P0 • 92%</span>
+                        <span class="card-arrow">→</span>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="violation-card" data-violation="2">
+                    <div class="card-header">
+                        <div>
+                            <p class="card-article">Article 32</p>
+                            <h3 class="card-title">Security of Processing</h3>
+                        </div>
+                        <span class="badge critical">CRITICAL</span>
+                    </div>
+                    <p class="card-description">Resume analysis without encryption at rest</p>
+                    <div class="card-footer">
+                        <span class="card-meta">P1 • 85%</span>
+                        <span class="card-arrow">→</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BUSINESS IMPACT -->
+            <h3 class="section-title">Business Impact</h3>
+            <div class="impact-grid">
+                <div class="impact-card">
+                    <svg class="impact-icon critical" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M23 6l-9.5 9.5-5-5L1 18"/>
+                        <path d="M17 6h6v6"/>
+                    </svg>
+                    <p class="impact-label">Financial Risk</p>
+                    <p class="impact-value critical">High</p>
+                    <p class="impact-sublabel">$2M+ exposure</p>
+                </div>
+
+                <div class="impact-card">
+                    <svg class="impact-icon major" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <p class="impact-label">Operational</p>
+                    <p class="impact-value major">Moderate</p>
+                    <p class="impact-sublabel">Process redesign</p>
+                </div>
+
+                <div class="impact-card">
+                    <svg class="impact-icon critical" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    <p class="impact-label">Reputation</p>
+                    <p class="impact-value critical">High</p>
+                    <p class="impact-sublabel">Trust impact</p>
+                </div>
+
+                <div class="impact-card">
+                    <svg class="impact-icon blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 3v18M3 12h18M5.5 5.5l13 13M18.5 5.5l-13 13"/>
+                    </svg>
+                    <p class="impact-label">Legal Scope</p>
+                    <p class="impact-value blue">EU Only</p>
+                    <p class="impact-sublabel">Single jurisdiction</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- BUSINESS PLAN TAB -->
         <div class="tab-content" id="business">
             <div class="plan-section">
                 <h3 class="plan-title">
-                    <span class="icon">1</span>
+                    <span class="plan-number">1</span>
                     Immediate Actions (0-30 Days)
                 </h3>
                 <div class="timeline-item">
                     <div class="timeline-phase">
-                        <div class="phase-label">Week 1-2</div>
-                        <div class="phase-time">Urgent</div>
+                        <p class="phase-label">Week 1-2</p>
+                        <p class="phase-time">Urgent</p>
                     </div>
                     <div class="timeline-content">
-                        <div class="timeline-title">Implement Human Review Process</div>
-                        <div class="timeline-description">
-                            Deploy manual review queue for automated decisions. Train compliance team on review criteria. Document all decisions with justification.
-                        </div>
+                        <h4>Implement Human Review Process</h4>
+                        <p>Deploy manual review queue for automated decisions. Train compliance team on review criteria.</p>
                     </div>
                 </div>
                 <div class="timeline-item">
                     <div class="timeline-phase">
-                        <div class="phase-label">Week 2-3</div>
-                        <div class="phase-time">High</div>
+                        <p class="phase-label">Week 2-3</p>
+                        <p class="phase-time">High</p>
                     </div>
                     <div class="timeline-content">
-                        <div class="timeline-title">Data Deletion Mechanism</div>
-                        <div class="timeline-description">
-                            Build self-service data deletion portal. Create support ticket workflow for erasure requests. Set up 30-day SLA monitoring.
-                        </div>
+                        <h4>Data Deletion Mechanism</h4>
+                        <p>Build self-service data deletion portal. Create support ticket workflow for erasure requests.</p>
                     </div>
                 </div>
                 <div class="timeline-item">
                     <div class="timeline-phase">
-                        <div class="phase-label">Week 3-4</div>
-                        <div class="phase-time">High</div>
+                        <p class="phase-label">Week 3-4</p>
+                        <p class="phase-time">High</p>
                     </div>
                     <div class="timeline-content">
-                        <div class="timeline-title">Security Hardening</div>
-                        <div class="timeline-description">
-                            Enable encryption at rest for all databases. Implement role-based access controls. Schedule penetration testing.
-                        </div>
+                        <h4>Security Hardening</h4>
+                        <p>Enable AES-256 encryption on database. Implement TLS 1.3 for data in transit.</p>
                     </div>
                 </div>
             </div>
 
             <div class="plan-section">
                 <h3 class="plan-title">
-                    <span class="icon">2</span>
-                    Short-Term Improvements (30-90 Days)
+                    <span class="plan-number">2</span>
+                    Short-Term (30-90 Days)
                 </h3>
                 <div class="timeline-item">
                     <div class="timeline-phase">
-                        <div class="phase-label">Month 2</div>
-                        <div class="phase-time">Medium</div>
+                        <p class="phase-label">Month 2</p>
+                        <p class="phase-time">Medium</p>
                     </div>
                     <div class="timeline-content">
-                        <div class="timeline-title">Appeal Mechanism Development</div>
-                        <div class="timeline-description">
-                            Build user-facing appeal portal. Create escalation workflow to human reviewers. Implement decision audit logging.
-                        </div>
+                        <h4>Appeal Mechanism Development</h4>
+                        <p>Build user-facing appeal portal. Create escalation workflow to human reviewers.</p>
                     </div>
                 </div>
                 <div class="timeline-item">
                     <div class="timeline-phase">
-                        <div class="phase-label">Month 3</div>
-                        <div class="phase-time">Medium</div>
+                        <p class="phase-label">Month 3</p>
+                        <p class="phase-time">Medium</p>
                     </div>
                     <div class="timeline-content">
-                        <div class="timeline-title">Compliance Documentation</div>
-                        <div class="timeline-description">
-                            Complete DPIA (Data Protection Impact Assessment). Update privacy policy. Create internal compliance playbook.
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="plan-section">
-                <h3 class="plan-title">
-                    <span class="icon">3</span>
-                    Long-Term Strategy (90+ Days)
-                </h3>
-                <div class="timeline-item">
-                    <div class="timeline-phase">
-                        <div class="phase-label">Q2</div>
-                        <div class="phase-time">Ongoing</div>
-                    </div>
-                    <div class="timeline-content">
-                        <div class="timeline-title">Continuous Compliance Monitoring</div>
-                        <div class="timeline-description">
-                            Deploy automated compliance scanning. Quarterly audit reviews. Annual third-party assessment.
-                        </div>
+                        <h4>Compliance Documentation</h4>
+                        <p>Complete DPIA. Update privacy policy. Create internal compliance playbook.</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Citations Tab -->
+        <!-- CITATIONS TAB -->
         <div class="tab-content" id="citations">
-            <h2 class="section-title">
-                Regulatory References
-                <span class="count">6 sources</span>
-            </h2>
+            <h3 class="section-title">Regulatory References</h3>
 
             <div class="citation-card">
                 <div class="citation-header">
-                    <div class="citation-source">GDPR Article 22(1)</div>
-                    <div class="citation-relevance">Relevance: 95%</div>
+                    <span class="citation-source">GDPR Article 22(1)</span>
+                    <span class="citation-relevance">Relevance: 95%</span>
                 </div>
-                <p class="citation-text">
-                    "The data subject shall have the right not to be subject to a decision based solely on automated processing, including profiling, which produces legal effects concerning him or her or similarly significantly affects him or her."
-                </p>
+                <p class="citation-text">"The data subject shall have the right not to be subject to a decision based solely on automated processing, including profiling, which produces legal effects concerning him or her or similarly significantly affects him or her."</p>
             </div>
 
             <div class="citation-card">
                 <div class="citation-header">
-                    <div class="citation-source">GDPR Article 22(3)</div>
-                    <div class="citation-relevance">Relevance: 92%</div>
+                    <span class="citation-source">GDPR Article 22(3)</span>
+                    <span class="citation-relevance">Relevance: 92%</span>
                 </div>
-                <p class="citation-text">
-                    "The data controller shall implement suitable measures to safeguard the data subject's rights and freedoms and legitimate interests, at least the right to obtain human intervention on the part of the controller, to express his or her point of view and to contest the decision."
-                </p>
+                <p class="citation-text">"The data controller shall implement suitable measures to safeguard the data subject's rights and freedoms and legitimate interests, at least the right to obtain human intervention on the part of the controller."</p>
             </div>
 
             <div class="citation-card">
                 <div class="citation-header">
-                    <div class="citation-source">GDPR Article 17(1)</div>
-                    <div class="citation-relevance">Relevance: 88%</div>
+                    <span class="citation-source">GDPR Article 17(1)</span>
+                    <span class="citation-relevance">Relevance: 88%</span>
                 </div>
-                <p class="citation-text">
-                    "The data subject shall have the right to obtain from the controller the erasure of personal data concerning him or her without undue delay and the controller shall have the obligation to erase personal data without undue delay."
-                </p>
+                <p class="citation-text">"The data subject shall have the right to obtain from the controller the erasure of personal data concerning him or her without undue delay and the controller shall have the obligation to erase personal data without undue delay."</p>
             </div>
 
             <div class="citation-card">
                 <div class="citation-header">
-                    <div class="citation-source">GDPR Article 32(1)(a)</div>
-                    <div class="citation-relevance">Relevance: 85%</div>
+                    <span class="citation-source">GDPR Article 32(1)(a)</span>
+                    <span class="citation-relevance">Relevance: 85%</span>
                 </div>
-                <p class="citation-text">
-                    "The controller and processor shall implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including as appropriate: the pseudonymisation and encryption of personal data."
-                </p>
-            </div>
-
-            <div class="citation-card">
-                <div class="citation-header">
-                    <div class="citation-source">EDPB Guidelines on Automated Decision-Making</div>
-                    <div class="citation-relevance">Relevance: 78%</div>
-                </div>
-                <p class="citation-text">
-                    "Controllers must ensure that individuals are able to obtain human intervention, express their point of view, and contest the decision. This means the review must be carried out by someone who has the authority and competence to change the decision."
-                </p>
-            </div>
-
-            <div class="citation-card">
-                <div class="citation-header">
-                    <div class="citation-source">ICO Guidance on Right to Erasure</div>
-                    <div class="citation-relevance">Relevance: 75%</div>
-                </div>
-                <p class="citation-text">
-                    "You must respond to a request for erasure without undue delay and at the latest within one month of receipt of the request. You can extend the time to respond by a further two months if the request is complex."
-                </p>
+                <p class="citation-text">"The controller and processor shall implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including as appropriate: the pseudonymisation and encryption of personal data."</p>
             </div>
         </div>
     </div>
 
+    <!-- SLIDE-IN PANEL OVERLAY -->
+    <div class="panel-overlay" id="panelOverlay"></div>
+
+    <!-- SLIDE-IN PANEL -->
+    <div class="panel" id="detailPanel">
+        <button class="panel-close" id="panelClose">✕</button>
+        <div class="panel-content">
+            <div class="panel-header">
+                <div class="panel-badges">
+                    <span class="badge critical" id="panelSeverity">CRITICAL</span>
+                    <span class="panel-priority" id="panelPriority">P0</span>
+                </div>
+                <h2 class="panel-title" id="panelTitle">Automated Decision-Making</h2>
+                <p class="panel-article" id="panelArticle">Article 22</p>
+            </div>
+
+            <div class="panel-section">
+                <p class="panel-section-title">Detection Confidence</p>
+                <div class="confidence-bar-bg">
+                    <div class="confidence-bar-fill" id="panelConfidenceBar" style="width: 92%"></div>
+                </div>
+                <p class="confidence-text"><span id="panelConfidence">92%</span> confidence</p>
+            </div>
+
+            <div class="panel-section">
+                <p class="panel-section-title">Risk Description</p>
+                <p class="panel-section-text" id="panelRisk">Candidates have no right to human review or explanation of automated rejection decisions.</p>
+            </div>
+
+            <div class="panel-section">
+                <p class="panel-section-title">Regulatory Requirement</p>
+                <p class="panel-section-text" id="panelRequirement">GDPR Article 22 requires human involvement in decisions with legal/similarly significant effects on individuals.</p>
+            </div>
+
+            <div class="panel-section">
+                <p class="panel-section-title">Remediation Plan</p>
+                <p class="panel-section-text" id="panelRemediation" style="margin-bottom: 12px;">Implement mandatory human review step before final hiring decision with appeal mechanism.</p>
+                <div class="steps-list" id="panelSteps">
+                    <!-- Steps injected by JS -->
+                </div>
+            </div>
+
+            <div class="panel-metrics">
+                <div class="panel-metric">
+                    <div class="panel-metric-header">
+                        <svg class="panel-metric-icon" style="color: var(--blue)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12,6 12,12 16,14"/>
+                        </svg>
+                        <p class="panel-metric-label">Timeline</p>
+                    </div>
+                    <p class="panel-metric-value blue" id="panelTimeline">30 days</p>
+                </div>
+                <div class="panel-metric">
+                    <div class="panel-metric-header">
+                        <svg class="panel-metric-icon" style="color: var(--major)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/>
+                        </svg>
+                        <p class="panel-metric-label">Effort</p>
+                    </div>
+                    <p class="panel-metric-value major" id="panelEffort">High</p>
+                </div>
+            </div>
+
+            <button class="panel-action">Create Remediation Task</button>
+        </div>
+    </div>
+
     <script>
-        // Tab switching functionality
+        // Violation data
+        const violations = [
+            {
+                article: 'Article 22',
+                title: 'Automated Decision-Making',
+                severity: 'CRITICAL',
+                priority: 'P0',
+                confidence: '92%',
+                risk: 'Candidates have no right to human review or explanation of automated rejection decisions.',
+                requirement: 'GDPR Article 22 requires human involvement in decisions with legal/similarly significant effects on individuals.',
+                remediation: 'Implement mandatory human review step before final hiring decision with appeal mechanism.',
+                timeline: '30 days',
+                effort: 'High',
+                steps: [
+                    'Add human review queue to hiring workflow',
+                    'Implement decision appeal process',
+                    'Update privacy policy disclosures',
+                    'Train hiring team on GDPR requirements'
+                ]
+            },
+            {
+                article: 'Article 17',
+                title: 'Right to Erasure',
+                severity: 'CRITICAL',
+                priority: 'P0',
+                confidence: '92%',
+                risk: 'Cannot fulfill data subject requests for erasure within 30-day GDPR window.',
+                requirement: 'GDPR Article 17 requires ability to delete personal data upon request within 30 days.',
+                remediation: 'Build automated data deletion pipeline for candidate records across all systems.',
+                timeline: '60 days',
+                effort: 'High',
+                steps: [
+                    'Audit all systems storing candidate data',
+                    'Build deletion automation in database',
+                    'Implement cascade deletion for related records',
+                    'Add erasure request tracking and reporting'
+                ]
+            },
+            {
+                article: 'Article 32',
+                title: 'Security of Processing',
+                severity: 'CRITICAL',
+                priority: 'P1',
+                confidence: '85%',
+                risk: 'Sensitive resume data exposed to unauthorized access or breaches.',
+                requirement: 'GDPR Article 32 requires encryption and security measures for personal data at rest and in transit.',
+                remediation: 'Enable AES-256 encryption for database and file storage with key rotation.',
+                timeline: '45 days',
+                effort: 'Medium',
+                steps: [
+                    'Enable AES-256 encryption on database',
+                    'Implement TLS 1.3 for data in transit',
+                    'Set up key rotation policy (90-day cycles)',
+                    'Add encryption status monitoring dashboard'
+                ]
+            }
+        ];
+
+        // Tab switching
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                // Remove active from all tabs and content
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-                // Add active to clicked tab
                 btn.classList.add('active');
-
-                // Show corresponding content
-                const tabId = btn.getAttribute('data-tab');
-                document.getElementById(tabId).classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
             });
         });
 
-        // Expand button functionality (placeholder)
-        document.querySelectorAll('.expand-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                alert('Detailed violation view would open here');
+        // Panel elements
+        const panelOverlay = document.getElementById('panelOverlay');
+        const detailPanel = document.getElementById('detailPanel');
+        const panelClose = document.getElementById('panelClose');
+
+        // Open panel
+        document.querySelectorAll('.violation-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const idx = parseInt(card.dataset.violation);
+                const v = violations[idx];
+
+                document.getElementById('panelSeverity').textContent = v.severity;
+                document.getElementById('panelPriority').textContent = v.priority;
+                document.getElementById('panelTitle').textContent = v.title;
+                document.getElementById('panelArticle').textContent = v.article;
+                document.getElementById('panelConfidence').textContent = v.confidence;
+                document.getElementById('panelConfidenceBar').style.width = v.confidence;
+                document.getElementById('panelRisk').textContent = v.risk;
+                document.getElementById('panelRequirement').textContent = v.requirement;
+                document.getElementById('panelRemediation').textContent = v.remediation;
+                document.getElementById('panelTimeline').textContent = v.timeline;
+                document.getElementById('panelEffort').textContent = v.effort;
+
+                // Render steps
+                const stepsContainer = document.getElementById('panelSteps');
+                stepsContainer.innerHTML = v.steps.map((step, i) => `
+                    <div class="step-item">
+                        <div class="step-number">${i + 1}</div>
+                        <p class="step-text">${step}</p>
+                    </div>
+                `).join('');
+
+                panelOverlay.classList.add('active');
+                detailPanel.classList.add('active');
             });
+        });
+
+        // Close panel
+        function closePanel() {
+            panelOverlay.classList.remove('active');
+            detailPanel.classList.remove('active');
+        }
+
+        panelClose.addEventListener('click', closePanel);
+        panelOverlay.addEventListener('click', closePanel);
+
+        // ESC key closes panel
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closePanel();
         });
     </script>
 </body>

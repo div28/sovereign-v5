@@ -3,6 +3,9 @@ SOX Compliance Judges for Sovereign V5
 
 Specialized judges for detecting Sarbanes-Oxley Act violations.
 Each judge focuses on a specific section or requirement.
+
+IMPORTANT: These judges use "SAFE CONDITIONS FIRST" logic.
+Check for compliance indicators BEFORE checking for violations.
 """
 
 import logging
@@ -26,21 +29,51 @@ class SOXSection404Judge(BaseComplianceJudge):
 
     EVALUATION_PROMPT = """You are a SOX compliance expert specializing in Section 404 (Internal Control Assessment).
 
-## SOX Section 404 Requirements
+## CRITICAL INSTRUCTION: CHECK SAFE CONDITIONS FIRST
 
-Section 404 requires:
-1. **Management Assessment**: Annual assessment of internal control over financial reporting (ICFR)
-2. **Control Documentation**: Documented policies and procedures for financial controls
-3. **Testing Procedures**: Regular testing of control effectiveness
-4. **Auditor Attestation**: External auditor must attest to management's assessment
-5. **Material Weakness Reporting**: Identification and disclosure of material weaknesses
+Before looking for violations, you MUST first check if ANY safe condition is met.
+If ANY safe condition is TRUE → Return violation_detected: false, confidence: 0.20
 
-Key controls include:
-- Segregation of duties
-- Access controls to financial systems
-- Change management procedures
-- Reconciliation processes
-- Approval workflows
+## STEP 1: SAFE CONDITIONS (Check these FIRST)
+
+IF ANY of these conditions are TRUE → NOT a violation:
+
+1. IF "internal controls tested at least annually"
+   → NOT a violation (confidence: 0.20)
+
+2. IF "compensating controls exist for any weaknesses"
+   → NOT a violation (confidence: 0.25)
+
+3. IF "segregation of duties OR maker-checker process in place"
+   → NOT a violation (confidence: 0.15)
+
+4. IF "controls documented in policies/procedures"
+   → NOT a violation (confidence: 0.20)
+
+5. IF "quarterly testing with documentation"
+   → NOT a violation (confidence: 0.15)
+
+## STEP 2: VIOLATION CONDITIONS (Only check if NO safe conditions met)
+
+IF ALL of these conditions are TRUE → VIOLATION:
+
+1. "No internal controls exist" (zero documented controls)
+   AND
+2. "No control testing in 2+ years" (controls never validated)
+   AND
+3. "No compensating controls" (no alternative mitigations)
+   AND
+4. "Material financial weakness present" (significant risk)
+
+→ VIOLATION (confidence: 0.92)
+
+## STEP 3: GRAY AREAS (ABSTAIN if uncertain)
+
+IF any of these → Set confidence: 0.50 and consider abstaining:
+- Controls exist but testing is overdue (1-2 years)
+- Documentation incomplete but controls operational
+- Small company with limited segregation but other controls exist
+- Annual testing scheduled but not yet complete
 
 ## Regulatory Context
 {regulatory_context}
@@ -48,56 +81,41 @@ Key controls include:
 ## Submission to Evaluate
 {submission}
 
-## Your Task
+## DECISION LOGIC (follow this exactly):
 
-Analyze for SOX Section 404 violations:
-1. **Missing Controls**: No documented internal controls for financial processes
-2. **Inadequate Documentation**: Controls exist but are not properly documented
-3. **No Testing**: Controls are not regularly tested for effectiveness
-4. **Segregation Issues**: Same person can initiate, approve, and record transactions
-5. **Access Control Gaps**: Unrestricted access to financial systems/data
+```
+IF controls_tested_annually:
+    return NOT_VIOLATION, confidence=0.20
+ELIF compensating_controls_exist:
+    return NOT_VIOLATION, confidence=0.25
+ELIF segregation_of_duties OR maker_checker:
+    return NOT_VIOLATION, confidence=0.15
+ELIF controls_documented:
+    return NOT_VIOLATION, confidence=0.20
+ELIF no_controls AND no_testing_2years AND no_compensating AND material_weakness:
+    return VIOLATION, confidence=0.92
+ELSE:
+    return ABSTAIN, confidence=0.50
+```
 
-## CRITICAL: Thresholds for Compliance
-A system is COMPLIANT if ALL of these are true:
-- **Controls documented**: Written policies/procedures exist for financial processes
-- **Regular testing**: Controls tested at least annually (quarterly preferred)
-- **Segregation enforced**: Different people for initiation, approval, and recording
-- **Auditor attestation**: External auditor reviews controls (for public companies)
+## IMPORTANT RULES:
 
-A system is a VIOLATION only if:
-- **No controls exist**: Financial processes have zero documented controls
-- **No testing ever**: Controls never tested or tested >3 years ago
-- **Same person does everything**: One person initiates, approves, AND records
-- **No documentation**: Controls exist but completely undocumented
+1. **Default to NOT a violation** if ANY control mechanism exists
+2. **Compensating controls are valid** - small companies may use alternatives
+3. **ABSTAIN** if controls exist but testing is slightly overdue
+4. **Only flag VIOLATION** if there are NO controls whatsoever
 
-## COMPLIANT Examples (DO NOT flag these as violations):
-1. "All controls documented. Quarterly testing. Segregation of duties enforced. Annual auditor attestation." → COMPLIANT
-2. "Controls documented in wiki. Annual testing. Maker-checker for all transactions." → COMPLIANT
-3. "Small company with compensating controls: daily manager review of all transactions" → COMPLIANT (compensating controls acceptable)
-4. "Two-person approval required for transactions >$10K. Documented in SOPs." → COMPLIANT
-
-## VIOLATION Examples (flag these):
-1. "No documented controls. Same person initiates and approves transactions." → VIOLATION
-2. "Controls exist but never tested. Last review was 3 years ago." → VIOLATION
-3. "CFO has direct database access to modify financial records without review." → VIOLATION
-
-## Severity Scoring Guidelines
-- **CRITICAL (8-10/10, P0)**: No controls at all OR same person performs ALL functions (initiate+approve+record)
-- **MAJOR (5-7/10, P1)**: Controls exist but undocumented OR untested for >2 years
-- **MINOR (1-4/10, P2)**: Minor documentation gaps OR testing slightly overdue
-- **NO VIOLATION**: If controls documented, tested regularly, and segregation enforced (or compensating controls exist)
+## Severity Guidelines (only if violation confirmed):
+- CRITICAL: Only if NO controls exist AND material weakness
+- MAJOR: Controls exist but completely untested for 2+ years
+- MINOR: Rarely use - prefer abstaining for documentation gaps
 
 ## Required Fields
-You must provide:
-- **issue**: 1-2 sentence summary of the violation
-- **reasoning**: Detailed 3-5 sentence explanation covering: (1) What financial control is deficient? (2) What does SOX Section 404 require? (3) How does the system fall short? (4) What are the potential consequences? Example: "The same employee can initiate and approve financial transactions. Section 404 requires segregation of duties to prevent fraud. The system fails because there's no separation between transaction initiation and approval. Consequences include audit failures, SEC penalties, and increased fraud risk."
-- **severity_score**: Numeric score 1-10
-- **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
-- **complexity**: Low (policy updates), Medium (workflow automation), High (system redesign)
-- **timeline**: Immediate (P0, 0-14 days), Short-term (P1, 15-30 days), Long-term (P2, 30-90 days)
-- **engineering_scope**: Technical implementation details
-- **risk_factors**: Audit failures, SEC penalties, financial misstatement
-- **dependencies**: ERP system access, audit firm coordination, policy approvals"""
+- **violation_detected**: false if ANY safe condition met
+- **confidence**: 0.15-0.25 for safe, 0.40-0.60 for gray, 0.85-0.95 for violations
+- **issue**: Brief description
+- **reasoning**: Explain which condition was determinative
+- **severity**: NONE if no violation"""
 
     def __init__(self, api_key: str = None):
         """Initialize the SOX Section 404 judge."""
@@ -115,7 +133,6 @@ You must provide:
     ) -> str:
         """Build the Section 404 evaluation prompt."""
         regulatory_context = self._format_chunks_for_prompt(retrieved_chunks)
-
         return self.EVALUATION_PROMPT.format(
             regulatory_context=regulatory_context,
             submission=submission
@@ -135,15 +152,46 @@ class SOXSection302Judge(BaseComplianceJudge):
 
     EVALUATION_PROMPT = """You are a SOX compliance expert specializing in Section 302 (Corporate Responsibility).
 
-## SOX Section 302 Requirements
+## CRITICAL INSTRUCTION: CHECK SAFE CONDITIONS FIRST
 
-Section 302 requires CEO and CFO to certify:
-1. **Report Accuracy**: Financial statements fairly present company's financial condition
-2. **Disclosure Controls**: Adequate controls ensure material information is disclosed
-3. **Control Design**: Disclosure controls are designed to ensure accuracy
-4. **Control Effectiveness**: Controls have been evaluated for effectiveness
-5. **Fraud Disclosure**: Any fraud involving management must be disclosed
-6. **Significant Changes**: Material changes in internal controls must be reported
+Before looking for violations, you MUST first check if ANY safe condition is met.
+If ANY safe condition is TRUE → Return violation_detected: false, confidence: 0.20
+
+## STEP 1: SAFE CONDITIONS (Check these FIRST)
+
+IF ANY of these conditions are TRUE → NOT a violation:
+
+1. IF "CEO/CFO certification process documented"
+   → NOT a violation (confidence: 0.20)
+
+2. IF "quarterly attestations on file"
+   → NOT a violation (confidence: 0.25)
+
+3. IF "certification workflow exists with executive reviews"
+   → NOT a violation (confidence: 0.15)
+
+4. IF "disclosure controls documented and followed"
+   → NOT a violation (confidence: 0.20)
+
+## STEP 2: VIOLATION CONDITIONS (Only check if NO safe conditions met)
+
+IF ALL of these conditions are TRUE → VIOLATION:
+
+1. "No CEO/CFO signature on financial filings"
+   AND
+2. "No certification process exists"
+   AND
+3. "No documented executive review of financials"
+
+→ VIOLATION (confidence: 0.92)
+
+## STEP 3: GRAY AREAS (ABSTAIN if uncertain)
+
+IF any of these → Set confidence: 0.50 and consider abstaining:
+- Certification process exists but documentation unclear
+- CEO reviews but formal certification not documented
+- Some executive oversight but process informal
+- Private company with different requirements
 
 ## Regulatory Context
 {regulatory_context}
@@ -151,55 +199,39 @@ Section 302 requires CEO and CFO to certify:
 ## Submission to Evaluate
 {submission}
 
-## Your Task
+## DECISION LOGIC (follow this exactly):
 
-Analyze for SOX Section 302 violations:
-1. **Missing Certifications**: No process for executive certification of reports
-2. **Disclosure Gaps**: Material information not captured by disclosure controls
-3. **Fraud Concealment**: Processes that could hide fraudulent activity
-4. **No Change Tracking**: No mechanism to detect/report control changes
-5. **Accuracy Issues**: Systems that could produce inaccurate financial data
+```
+IF certification_process_documented:
+    return NOT_VIOLATION, confidence=0.20
+ELIF quarterly_attestations_exist:
+    return NOT_VIOLATION, confidence=0.25
+ELIF certification_workflow_with_reviews:
+    return NOT_VIOLATION, confidence=0.15
+ELIF disclosure_controls_documented:
+    return NOT_VIOLATION, confidence=0.20
+ELIF no_ceo_cfo_signature AND no_certification_process AND no_executive_review:
+    return VIOLATION, confidence=0.92
+ELSE:
+    return ABSTAIN, confidence=0.50
+```
 
-## CRITICAL: Thresholds for Compliance
-A system is COMPLIANT if ALL of these are true:
-- **Certification process exists**: CEO/CFO review and sign off on financial reports
-- **Disclosure controls documented**: Procedures ensure material info is captured
-- **Anti-fraud measures**: Cannot modify financial records without approval/audit trail
-- **Change tracking**: Material changes to controls are logged and reported
+## IMPORTANT RULES:
 
-A system is a VIOLATION only if:
-- **No certification at all**: Reports published without any executive review
-- **No disclosure controls**: Material information can be hidden from reports
-- **Fraud enablement**: System allows untracked modifications to financials
-- **Backdating allowed**: Can change historical entries without approval
+1. **Default to NOT a violation** if ANY certification mechanism exists
+2. **ABSTAIN** if certification exists but process is informal
+3. **Only flag VIOLATION** if there is NO executive oversight of financials
+4. **Consider company type** - private companies have different requirements
 
-## COMPLIANT Examples (DO NOT flag these as violations):
-1. "CEO and CFO review and certify all quarterly reports. Certification tracked and documented." → COMPLIANT
-2. "All financial reports require executive sign-off before filing. Audit trail maintained." → COMPLIANT
-3. "Disclosure committee reviews material items. CEO/CFO certification workflow in place." → COMPLIANT
-
-## VIOLATION Examples (flag these):
-1. "Financial reports published without CEO/CFO review. No certification workflow." → VIOLATION
-2. "Managers can override financial entries without approval. No audit trail." → VIOLATION
-3. "System allows backdating entries. Used to smooth quarterly results." → VIOLATION
-
-## Severity Scoring Guidelines
-- **CRITICAL (8-10/10, P0)**: No certification process OR system enables fraud/backdating
-- **MAJOR (5-7/10, P1)**: Certification exists but incomplete OR weak disclosure controls
-- **MINOR (1-4/10, P2)**: Minor gaps in documentation or procedures
-- **NO VIOLATION**: If CEO/CFO certify reports, disclosure controls exist, and anti-fraud measures in place
+## Severity Guidelines (only if violation confirmed):
+- CRITICAL: Only if NO certification AND NO executive review exists
+- MAJOR: Certification exists but not documented properly
+- MINOR: Rarely use - prefer abstaining
 
 ## Required Fields
-You must provide:
-- **issue**: 1-2 sentence summary of the violation
-- **reasoning**: Detailed 3-5 sentence explanation covering: (1) What disclosure or certification issue exists? (2) What does SOX Section 302 require? (3) How does the system fall short? (4) What are the potential consequences? Example: "Financial reports are published without executive certification of accuracy. Section 302 requires CEO/CFO certification that reports fairly present the company's financial condition. The system fails because there's no certification workflow. Consequences include SEC enforcement, executive personal liability, and investor lawsuits."
-- **severity_score**: Numeric score 1-10
-- **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
-- **complexity**: Low (add certifications), Medium (disclosure system), High (fraud detection AI)
-- **timeline**: Immediate (P0, 0-14 days), Short-term (P1, 15-30 days), Long-term (P2, 30-90 days)
-- **engineering_scope**: Technical work required
-- **risk_factors**: SEC enforcement, executive liability, investor lawsuits
-- **dependencies**: Legal review, executive approval, board oversight"""
+- **violation_detected**: false if ANY safe condition met
+- **confidence**: 0.15-0.25 for safe, 0.40-0.60 for gray, 0.85-0.95 for violations
+- **severity**: NONE if no violation"""
 
     def __init__(self, api_key: str = None):
         """Initialize the SOX Section 302 judge."""
@@ -217,7 +249,6 @@ You must provide:
     ) -> str:
         """Build the Section 302 evaluation prompt."""
         regulatory_context = self._format_chunks_for_prompt(retrieved_chunks)
-
         return self.EVALUATION_PROMPT.format(
             regulatory_context=regulatory_context,
             submission=submission
@@ -237,21 +268,51 @@ class SOXAuditTrailJudge(BaseComplianceJudge):
 
     EVALUATION_PROMPT = """You are a SOX compliance expert specializing in Audit Trail requirements.
 
-## SOX Audit Trail Requirements
+## CRITICAL INSTRUCTION: CHECK SAFE CONDITIONS FIRST
 
-SOX requires comprehensive audit trails for:
-1. **Transaction Logging**: All financial transactions must be logged
-2. **User Activity**: Who accessed, modified, or approved financial data
-3. **Timestamp Integrity**: Accurate, tamper-proof timestamps
-4. **Record Retention**: Audit records retained for minimum 7 years
-5. **Immutability**: Audit logs cannot be modified or deleted
-6. **Completeness**: Full history of all changes to financial records
+Before looking for violations, you MUST first check if ANY safe condition is met.
+If ANY safe condition is TRUE → Return violation_detected: false, confidence: 0.20
 
-Key requirements:
-- Every transaction traceable to individual user
-- Changes to financial data logged with before/after values
-- Access attempts (successful and failed) recorded
-- Records protected from unauthorized modification
+## STEP 1: SAFE CONDITIONS (Check these FIRST)
+
+IF ANY of these conditions are TRUE → NOT a violation:
+
+1. IF "WORM storage (immutable/append-only logs) configured"
+   → NOT a violation (confidence: 0.20)
+
+2. IF "7+ year retention policy documented and implemented"
+   → NOT a violation (confidence: 0.25)
+
+3. IF "cryptographic signing or hashing on audit records"
+   → NOT a violation (confidence: 0.15)
+
+4. IF "centralized logging with access controls"
+   → NOT a violation (confidence: 0.20)
+
+5. IF "audit logs exist with user attribution and timestamps"
+   → NOT a violation (confidence: 0.15)
+
+## STEP 2: VIOLATION CONDITIONS (Only check if NO safe conditions met)
+
+IF ALL of these conditions are TRUE → VIOLATION:
+
+1. "Audit logs can be deleted or modified by users/admins"
+   AND
+2. "Retention period <1 year OR no retention policy"
+   AND
+3. "No immutability controls on audit records"
+   AND
+4. "No logging of financial transactions"
+
+→ VIOLATION (confidence: 0.92)
+
+## STEP 3: GRAY AREAS (ABSTAIN if uncertain)
+
+IF any of these → Set confidence: 0.50 and consider abstaining:
+- Logs exist but retention is 1-6 years (not 7)
+- Some immutability but not WORM storage
+- Logging exists but user attribution unclear
+- Retention policy exists but not fully implemented
 
 ## Regulatory Context
 {regulatory_context}
@@ -259,58 +320,41 @@ Key requirements:
 ## Submission to Evaluate
 {submission}
 
-## Your Task
+## DECISION LOGIC (follow this exactly):
 
-Analyze for SOX Audit Trail violations:
-1. **Missing Logs**: Financial transactions not logged
-2. **Incomplete Trails**: User actions not attributed to individuals
-3. **Tamperable Records**: Audit logs can be modified or deleted
-4. **Retention Issues**: Records not retained for required period
-5. **No Change Tracking**: Modifications to financial data not recorded
+```
+IF worm_storage_configured:
+    return NOT_VIOLATION, confidence=0.20
+ELIF seven_year_retention_documented:
+    return NOT_VIOLATION, confidence=0.25
+ELIF cryptographic_signing_exists:
+    return NOT_VIOLATION, confidence=0.15
+ELIF centralized_logging_with_access_controls:
+    return NOT_VIOLATION, confidence=0.20
+ELIF audit_logs_exist_with_attribution:
+    return NOT_VIOLATION, confidence=0.15
+ELIF logs_deletable AND retention_under_1_year AND no_immutability AND no_logging:
+    return VIOLATION, confidence=0.92
+ELSE:
+    return ABSTAIN, confidence=0.50
+```
 
-## CRITICAL: Thresholds for Compliance
-A system is COMPLIANT if ALL of these are true:
-- **Logging exists**: All financial transactions are logged with timestamps
-- **User attribution**: Each action tied to specific user identity
-- **Immutability**: Logs cannot be modified/deleted (WORM storage, append-only, or equivalent)
-- **Retention**: Records kept for 7+ years
-- **Regular audits**: Logs reviewed periodically (at least annually)
+## IMPORTANT RULES:
 
-A system is a VIOLATION only if:
-- **No logging**: Financial transactions have zero audit trail
-- **Tamperable logs**: Admins can delete/modify audit records
-- **Short retention**: Logs deleted before 7 years
-- **Anonymous actions**: Cannot determine who performed transactions
+1. **Default to NOT a violation** if ANY audit logging mechanism exists
+2. **WORM storage or equivalent is sufficient** - don't require all controls
+3. **ABSTAIN** if logs exist but retention is 1-6 years (gray area)
+4. **Only flag VIOLATION** if there is NO audit logging whatsoever
 
-## COMPLIANT Examples (DO NOT flag these as violations):
-1. "All transactions logged with timestamps. Logs stored in WORM storage. 7-year retention. Regular audits." → COMPLIANT
-2. "Every financial action logged to immutable database. User IDs tracked. 10-year retention policy." → COMPLIANT
-3. "Centralized logging to Splunk. Write-once storage. Automated 7-year retention." → COMPLIANT
-4. "All transactions logged. Logs backed up to immutable archive. Annual audit review." → COMPLIANT
-
-## VIOLATION Examples (flag these):
-1. "Financial transactions have no logging. Cannot determine who made changes." → VIOLATION
-2. "Audit logs exist but admins can delete them. Logs stored locally." → VIOLATION
-3. "Logs auto-deleted after 1 year. SOX requires 7 years." → VIOLATION
-4. "Only successful transactions logged. Failed attempts not captured." → VIOLATION
-
-## Severity Scoring Guidelines
-- **CRITICAL (8-10/10, P0)**: No audit logging at all OR logs can be tampered with by anyone
-- **MAJOR (5-7/10, P1)**: Logging exists but retention <7 years OR incomplete (missing user/timestamps)
-- **MINOR (1-4/10, P2)**: Minor gaps (e.g., some events not logged) but core audit trail exists
-- **NO VIOLATION**: If logging exists, is immutable, has 7+ year retention, and ties actions to users
+## Severity Guidelines (only if violation confirmed):
+- CRITICAL: Only if NO audit logs exist AND logs are tamperable
+- MAJOR: Logs exist but retention <1 year
+- MINOR: Rarely use - prefer abstaining
 
 ## Required Fields
-You must provide:
-- **issue**: 1-2 sentence summary of the violation
-- **reasoning**: Detailed 3-5 sentence explanation covering: (1) What audit trail deficiency exists? (2) What does SOX require for audit trails? (3) How does the system fall short? (4) What are the potential consequences? Example: "Financial transactions have no audit logging. SOX requires complete, immutable audit trails for all financial transactions. The system fails because there's no record of who made changes or when. Consequences include forensic gaps, compliance failures, and inability to detect fraud."
-- **severity_score**: Numeric score 1-10
-- **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
-- **complexity**: Low (enable logging), Medium (immutable logs), High (centralized audit system)
-- **timeline**: Immediate (P0, 0-14 days), Short-term (P1, 15-30 days), Long-term (P2, 30-90 days)
-- **engineering_scope**: Logging infrastructure implementation
-- **risk_factors**: Forensic gaps, compliance failures, fraud undetectability
-- **dependencies**: Log aggregation tools, storage infrastructure, retention policies"""
+- **violation_detected**: false if ANY safe condition met
+- **confidence**: 0.15-0.25 for safe, 0.40-0.60 for gray, 0.85-0.95 for violations
+- **severity**: NONE if no violation"""
 
     def __init__(self, api_key: str = None):
         """Initialize the SOX Audit Trail judge."""
@@ -328,7 +372,6 @@ You must provide:
     ) -> str:
         """Build the Audit Trail evaluation prompt."""
         regulatory_context = self._format_chunks_for_prompt(retrieved_chunks)
-
         return self.EVALUATION_PROMPT.format(
             regulatory_context=regulatory_context,
             submission=submission

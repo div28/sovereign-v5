@@ -3,6 +3,9 @@ GDPR Compliance Judges for Sovereign V5
 
 Specialized judges for detecting GDPR violations.
 Each judge focuses on a specific article or requirement.
+
+IMPORTANT: These judges use "SAFE CONDITIONS FIRST" logic.
+Check for compliance indicators BEFORE checking for violations.
 """
 
 import logging
@@ -26,15 +29,48 @@ class GDPRArticle22Judge(BaseComplianceJudge):
 
     EVALUATION_PROMPT = """You are a GDPR compliance expert specializing in Article 22 (Automated Decision-Making).
 
-## GDPR Article 22 Requirements
+## CRITICAL INSTRUCTION: CHECK SAFE CONDITIONS FIRST
 
-Article 22 states that data subjects have the right NOT to be subject to decisions based solely on automated processing, including profiling, which produces legal effects or similarly significantly affects them.
+Before looking for violations, you MUST first check if ANY safe condition is met.
+If ANY safe condition is TRUE → Return violation_detected: false, confidence: 0.15
 
-Key requirements:
-1. **Human Review**: Decisions with legal/significant effects cannot be solely automated
-2. **Special Categories**: Extra restrictions for automated processing of sensitive data (race, health, biometrics, etc.)
-3. **Transparency**: Data subjects must receive meaningful information about the logic involved
-4. **Right to Contest**: Data subjects must be able to obtain human intervention and contest decisions
+## STEP 1: SAFE CONDITIONS (Check these FIRST)
+
+IF ANY of these conditions are TRUE → NOT a violation:
+
+1. IF "humans review ALL or most (>50%) of automated decisions"
+   → NOT a violation (confidence: 0.15)
+
+2. IF "effective appeal/override mechanism exists for data subjects"
+   → NOT a violation (confidence: 0.20)
+
+3. IF "AI only recommends, humans make ALL final decisions"
+   → NOT a violation (confidence: 0.15)
+
+4. IF "no automated decisions that affect individuals legally or significantly"
+   → NOT a violation (confidence: 0.10)
+
+## STEP 2: VIOLATION CONDITIONS (Only check if NO safe conditions met)
+
+IF ALL of these conditions are TRUE → VIOLATION:
+
+1. "Fully automated decisions" (AI decides without human involvement)
+   AND
+2. "No meaningful human review" (review rate <10% OR no review at all)
+   AND
+3. "Affects individual rights" (employment, credit, insurance, legal status)
+   AND
+4. "No appeal mechanism" (individuals cannot request human review)
+
+→ VIOLATION (confidence: 0.92)
+
+## STEP 3: GRAY AREAS (ABSTAIN if uncertain)
+
+IF any of these → Set confidence: 0.50 and consider abstaining:
+- Human review rate is 10-50% (unclear if "meaningful")
+- Appeal mechanism exists but effectiveness unknown
+- Decisions affect individuals but severity unclear
+- System description is vague about human involvement
 
 ## Regulatory Context
 {regulatory_context}
@@ -42,59 +78,42 @@ Key requirements:
 ## Submission to Evaluate
 {submission}
 
-## Your Task
+## DECISION LOGIC (follow this exactly):
 
-Analyze the submission for GDPR Article 22 violations. Look specifically for:
+```
+IF humans_review_rate > 50%:
+    return NOT_VIOLATION, confidence=0.15
+ELIF appeal_mechanism_exists AND is_effective:
+    return NOT_VIOLATION, confidence=0.20
+ELIF ai_only_recommends AND humans_decide:
+    return NOT_VIOLATION, confidence=0.15
+ELIF no_automated_decisions_affecting_individuals:
+    return NOT_VIOLATION, confidence=0.10
+ELIF fully_automated AND no_human_review AND affects_rights AND no_appeal:
+    return VIOLATION, confidence=0.92
+ELSE:
+    return ABSTAIN, confidence=0.50
+```
 
-1. **Solely Automated Decisions**: Is there automated decision-making WITHOUT human review?
-2. **Legal/Significant Effects**: Do the decisions affect employment, credit, insurance, housing, or similar?
-3. **Missing Human Oversight**: Is there no mechanism for human intervention or review?
-4. **Special Category Data**: Is sensitive personal data being processed automatically?
-5. **Lack of Transparency**: Is there no explanation of decision logic to data subjects?
+## IMPORTANT RULES:
 
-## CRITICAL: Thresholds for Meaningful Human Review
-A system is COMPLIANT if ANY of these are true:
-- **Human reviews ALL decisions** before they take effect (even if AI scores/recommends)
-- **Override rate >50%**: Humans override AI recommendations more than half the time
-- **Human makes final decision**: AI only recommends, human approves/rejects
-- **Appeal mechanism exists**: Data subjects can request and receive human review
+1. **Default to NOT a violation** if evidence is unclear
+2. **ABSTAIN** (confidence <0.65) if you cannot clearly determine status
+3. **Only flag VIOLATION** if you have clear evidence of ALL violation conditions
+4. **If ANY safe condition is met**, return NOT a violation immediately
 
-A system is a VIOLATION only if:
-- Decisions are **fully automated with no human review**
-- Human review rate is **<10%** of decisions
-- No mechanism for human intervention exists
-- AI decisions directly execute without human approval
-
-## COMPLIANT Examples (DO NOT flag these as violations):
-1. "AI scores candidates, HR reviews every score, HR makes all hiring decisions" → COMPLIANT (human reviews all)
-2. "AI recommends loans, officers override 60% of recommendations" → COMPLIANT (>50% override)
-3. "AI provides risk assessment, human approves all final decisions" → COMPLIANT (human final decision)
-4. "Automated scoring but candidates can request human review" → COMPLIANT (appeal mechanism)
-
-## VIOLATION Examples (flag these):
-1. "AI auto-rejects candidates, only 2% are reviewed" → VIOLATION (<10% review)
-2. "Loan decisions fully automated, no human review" → VIOLATION (no review)
-3. "AI denies claims automatically, customers cannot appeal" → VIOLATION (no appeal)
-
-Be thorough but precise. Only report a violation if the submission clearly indicates non-compliance.
-
-## Severity Scoring Guidelines
-- **CRITICAL (8-10/10, P0)**: Automated decisions affecting employment/credit/legal status with NO human review (<10%)
-- **MAJOR (5-7/10, P1)**: Missing transparency or inadequate appeal mechanism (but some review exists)
-- **MINOR (1-4/10, P2)**: Incomplete documentation or partial compliance gaps
-- **NO VIOLATION**: If meaningful human review exists (>50% override OR human final decision OR appeal available)
+## Severity Guidelines (only if violation confirmed):
+- CRITICAL: Only if ALL violation conditions are clearly met
+- MAJOR: If most but not all conditions met (consider abstaining instead)
+- MINOR: Rarely use - prefer abstaining for borderline cases
 
 ## Required Fields
-You must provide:
-- **issue**: 1-2 sentence summary of the violation
-- **reasoning**: Detailed 3-5 sentence explanation covering: (1) What activity in the AI system triggers this article? (2) What does GDPR Article 22 require? (3) How does the system fall short? (4) What are the potential consequences? Example: "The AI system automatically rejects candidates scoring below 50% without allowing appeals. Article 22(1) requires individuals have the right NOT to be subject to automated decisions affecting them significantly. The system fails this because there is no meaningful human review option. Consequences include regulatory fines up to €20M or 4% of annual turnover and legal liability."
-- **severity_score**: Numeric score 1-10
-- **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
-- **complexity**: Low (config changes), Medium (feature additions), High (architectural changes)
-- **timeline**: Immediate (P0, 0-14 days), Short-term (P1, 15-30 days), Long-term (P2, 30-90 days)
-- **engineering_scope**: Detailed technical work description
-- **risk_factors**: Legal, regulatory, reputational risks
-- **dependencies**: Prerequisites like vendor integrations, data migrations, etc."""
+- **violation_detected**: false if ANY safe condition met, true only if ALL violation conditions met
+- **confidence**: 0.10-0.25 for safe conditions, 0.40-0.60 for gray areas, 0.85-0.95 for clear violations
+- **issue**: Brief description (or "No violation detected" if compliant)
+- **reasoning**: Explain which safe condition was met OR which violation conditions were confirmed
+- **severity_score**: 1-3 for minor, 4-6 for major, 7-10 for critical (only if violation)
+- **severity**: NONE if no violation, MINOR/MAJOR/CRITICAL if violation"""
 
     def __init__(self, api_key: str = None):
         """Initialize the GDPR Article 22 judge."""
@@ -110,18 +129,8 @@ You must provide:
         submission: str,
         retrieved_chunks: List[Dict[str, Any]]
     ) -> str:
-        """
-        Build the Article 22 evaluation prompt.
-
-        Args:
-            submission: System description to evaluate.
-            retrieved_chunks: Relevant GDPR context.
-
-        Returns:
-            Complete evaluation prompt.
-        """
+        """Build the Article 22 evaluation prompt."""
         regulatory_context = self._format_chunks_for_prompt(retrieved_chunks)
-
         return self.EVALUATION_PROMPT.format(
             regulatory_context=regulatory_context,
             submission=submission
@@ -140,19 +149,46 @@ class GDPRArticle17Judge(BaseComplianceJudge):
 
     EVALUATION_PROMPT = """You are a GDPR compliance expert specializing in Article 17 (Right to Erasure).
 
-## GDPR Article 17 Requirements
+## CRITICAL INSTRUCTION: CHECK SAFE CONDITIONS FIRST
 
-Data subjects have the right to obtain erasure of personal data without undue delay when:
-1. Data is no longer necessary for original purpose
-2. Consent is withdrawn
-3. Data subject objects to processing
-4. Data was unlawfully processed
-5. Legal obligation requires erasure
+Before looking for violations, you MUST first check if ANY safe condition is met.
+If ANY safe condition is TRUE → Return violation_detected: false, confidence: 0.20
 
-Controller obligations:
-- Erase data without undue delay (typically within 1 month)
-- Notify all recipients of erasure
-- Take reasonable steps to inform other controllers processing the data
+## STEP 1: SAFE CONDITIONS (Check these FIRST)
+
+IF ANY of these conditions are TRUE → NOT a violation:
+
+1. IF "deletion mechanism exists AND works within 30 days"
+   → NOT a violation (confidence: 0.20)
+
+2. IF "data anonymized instead of deleted (acceptable alternative)"
+   → NOT a violation (confidence: 0.15)
+
+3. IF "legitimate retention reason documented with user consent"
+   → NOT a violation (confidence: 0.25)
+
+4. IF "self-service deletion OR support ticket deletion available"
+   → NOT a violation (confidence: 0.20)
+
+## STEP 2: VIOLATION CONDITIONS (Only check if NO safe conditions met)
+
+IF ALL of these conditions are TRUE → VIOLATION:
+
+1. "No deletion mechanism exists" (no way to request deletion)
+   AND
+2. "User requests deletion but cannot" (explicit refusal or inability)
+   AND
+3. "No legitimate retention reason" (no legal basis to keep data)
+
+→ VIOLATION (confidence: 0.92)
+
+## STEP 3: GRAY AREAS (ABSTAIN if uncertain)
+
+IF any of these → Set confidence: 0.50 and consider abstaining:
+- Deletion takes 30-90 days (unclear if "undue delay")
+- Backups retained but with clear expiration plan
+- Third-party notification unclear but deletion works
+- Legal retention reason mentioned but not fully documented
 
 ## Regulatory Context
 {regulatory_context}
@@ -160,55 +196,39 @@ Controller obligations:
 ## Submission to Evaluate
 {submission}
 
-## Your Task
+## DECISION LOGIC (follow this exactly):
 
-Analyze for Article 17 violations:
-1. **Missing Deletion Capability**: No mechanism to delete user data on request
-2. **Incomplete Erasure**: Data retained in backups/logs without erasure plan
-3. **Third Party Notification**: Failure to propagate deletion to data recipients
-4. **Timing**: No process to ensure deletion within required timeframe
+```
+IF deletion_mechanism_exists AND completes_within_30_days:
+    return NOT_VIOLATION, confidence=0.20
+ELIF data_anonymized_instead:
+    return NOT_VIOLATION, confidence=0.15
+ELIF legitimate_retention_reason_with_consent:
+    return NOT_VIOLATION, confidence=0.25
+ELIF no_deletion_mechanism AND user_cannot_delete AND no_legal_basis:
+    return VIOLATION, confidence=0.92
+ELSE:
+    return ABSTAIN, confidence=0.50
+```
 
-## CRITICAL: Thresholds for Compliance
-A system is COMPLIANT if ALL of these are true:
-- **Deletion mechanism exists**: Users can request deletion (self-service OR support ticket)
-- **Reasonable timeframe**: Deletion completes within 30 days (1 month per GDPR)
-- **Third parties notified**: Recipients of data are informed of deletion
-- **Confirmation provided**: Users receive acknowledgment of deletion
+## IMPORTANT RULES:
 
-A system is a VIOLATION only if:
-- **No deletion possible**: Company explicitly refuses OR has no mechanism
-- **Excessive delays**: Deletion takes >6 months without valid legal reason
-- **Data retained indefinitely**: User data kept forever despite deletion request
-- **Third parties ignored**: Data shared with others but not propagated for deletion
+1. **Default to NOT a violation** if deletion mechanism exists (even if imperfect)
+2. **ABSTAIN** if deletion takes 30-90 days (gray area)
+3. **Only flag VIOLATION** if there is NO way to delete data
+4. **Anonymization counts as compliance** - do not flag if data is anonymized
 
-## COMPLIANT Examples (DO NOT flag these as violations):
-1. "Users can delete account. All data erased within 30 days. Third parties notified. Confirmation email sent." → COMPLIANT
-2. "Self-service deletion in settings. Processing takes 14 days. Email confirms completion." → COMPLIANT
-3. "Deletion request via support. Completed within 1 month. All integrations updated." → COMPLIANT
-4. "Data anonymized instead of deleted (with user consent)" → COMPLIANT (anonymization acceptable)
-
-## VIOLATION Examples (flag these):
-1. "No delete button. Support says 'we cannot delete your data'" → VIOLATION (no mechanism)
-2. "Deletion takes 6 months. No confirmation. Data stays in backups for 10 years" → VIOLATION (excessive)
-3. "Account deleted but data shared with partners is not removed" → VIOLATION (incomplete)
-
-## Severity Scoring Guidelines
-- **CRITICAL (8-10/10, P0)**: No deletion mechanism at all OR explicit refusal to delete
-- **MAJOR (5-7/10, P1)**: Deletion exists but incomplete (backups retained >1 year) or no third-party notification
-- **MINOR (1-4/10, P2)**: Minor delays (30-60 days) or documentation gaps
-- **NO VIOLATION**: If deletion mechanism exists, completes within 30 days, and notifies third parties
+## Severity Guidelines (only if violation confirmed):
+- CRITICAL: No deletion mechanism AND explicit refusal to delete
+- MAJOR: Deletion mechanism broken or takes >6 months
+- MINOR: Minor procedural gaps (prefer abstaining)
 
 ## Required Fields
-You must provide:
-- **issue**: 1-2 sentence summary of the violation
-- **reasoning**: Detailed 3-5 sentence explanation covering: (1) What data handling practice triggers this article? (2) What does GDPR Article 17 require? (3) How does the system fall short? (4) What are the potential consequences? Example: "The system stores user data indefinitely with no deletion mechanism. Article 17 grants users the right to erasure of personal data without undue delay. The system fails because users cannot request deletion. Consequences include GDPR fines up to €20M and loss of user trust."
-- **severity_score**: Numeric score 1-10
-- **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
-- **complexity**: Low (add delete endpoint), Medium (cascade deletions), High (data lake cleanup)
-- **timeline**: Immediate (P0, 0-14 days), Short-term (P1, 15-30 days), Long-term (P2, 30-90 days)
-- **engineering_scope**: Technical implementation details
-- **risk_factors**: GDPR fines, user trust issues, regulatory scrutiny
-- **dependencies**: Database access, third-party API integrations, backup systems"""
+- **violation_detected**: false if ANY safe condition met
+- **confidence**: 0.15-0.25 for safe, 0.40-0.60 for gray, 0.85-0.95 for violations
+- **issue**: Brief description
+- **reasoning**: Explain which condition was determinative
+- **severity**: NONE if no violation"""
 
     def __init__(self, api_key: str = None):
         """Initialize the GDPR Article 17 judge."""
@@ -226,7 +246,6 @@ You must provide:
     ) -> str:
         """Build the Article 17 evaluation prompt."""
         regulatory_context = self._format_chunks_for_prompt(retrieved_chunks)
-
         return self.EVALUATION_PROMPT.format(
             regulatory_context=regulatory_context,
             submission=submission
@@ -246,15 +265,45 @@ class GDPRArticle32Judge(BaseComplianceJudge):
 
     EVALUATION_PROMPT = """You are a GDPR compliance expert specializing in Article 32 (Security of Processing).
 
-## GDPR Article 32 Requirements
+## CRITICAL INSTRUCTION: CHECK SAFE CONDITIONS FIRST
 
-Controllers and processors must implement appropriate technical and organizational measures:
-1. **Pseudonymization and encryption** of personal data
-2. **Confidentiality, integrity, availability** and resilience of systems
-3. **Ability to restore** availability and access to data after incidents
-4. **Regular testing** and evaluation of security measures
+Before looking for violations, you MUST first check if ANY safe condition is met.
+If ANY safe condition is TRUE → Return violation_detected: false, confidence: 0.20
 
-Risk-based approach: measures must be appropriate to the risk level.
+## STEP 1: SAFE CONDITIONS (Check these FIRST)
+
+IF ANY of these conditions are TRUE → NOT a violation:
+
+1. IF "encryption at rest AND in transit implemented"
+   → NOT a violation (confidence: 0.20)
+
+2. IF "access controls with authentication in place"
+   → NOT a violation (confidence: 0.20)
+
+3. IF "regular security testing documented"
+   → NOT a violation (confidence: 0.15)
+
+4. IF "backup and disaster recovery plan exists"
+   → NOT a violation (confidence: 0.15)
+
+## STEP 2: VIOLATION CONDITIONS (Only check if NO safe conditions met)
+
+IF ALL of these conditions are TRUE → VIOLATION:
+
+1. "No encryption for personal data" (plaintext storage/transmission)
+   AND
+2. "No access controls" (anyone can access data)
+   AND
+3. "No security measures documented"
+
+→ VIOLATION (confidence: 0.92)
+
+## STEP 3: GRAY AREAS (ABSTAIN if uncertain)
+
+IF any of these → Set confidence: 0.50:
+- Encryption mentioned but details unclear
+- Some access controls but not comprehensive
+- Security testing planned but not yet done
 
 ## Regulatory Context
 {regulatory_context}
@@ -262,31 +311,25 @@ Risk-based approach: measures must be appropriate to the risk level.
 ## Submission to Evaluate
 {submission}
 
-## Your Task
+## DECISION LOGIC:
 
-Analyze for Article 32 violations:
-1. **Missing Encryption**: Personal data stored/transmitted without encryption
-2. **Access Controls**: Inadequate authentication or authorization
-3. **No Backup/Recovery**: Missing disaster recovery for personal data
-4. **Security Testing**: No regular security assessments or penetration testing
-5. **Risk Assessment**: No documented risk analysis for data processing
-
-## Severity Scoring Guidelines
-- **CRITICAL (8-10/10, P0)**: No encryption for sensitive data or major security gaps
-- **MAJOR (5-7/10, P1)**: Missing access controls or backup procedures
-- **MINOR (1-4/10, P2)**: Documentation gaps or incomplete testing procedures
+```
+IF encryption_implemented:
+    return NOT_VIOLATION, confidence=0.20
+ELIF access_controls_exist:
+    return NOT_VIOLATION, confidence=0.20
+ELIF security_testing_done:
+    return NOT_VIOLATION, confidence=0.15
+ELIF no_encryption AND no_access_controls AND no_security_measures:
+    return VIOLATION, confidence=0.92
+ELSE:
+    return ABSTAIN, confidence=0.50
+```
 
 ## Required Fields
-You must provide:
-- **issue**: 1-2 sentence summary of the violation
-- **reasoning**: Detailed 3-5 sentence explanation covering: (1) What security practice is deficient? (2) What does GDPR Article 32 require? (3) How does the system fall short? (4) What are the potential consequences? Example: "Personal data is stored unencrypted in the database. Article 32 requires appropriate technical measures including encryption. The system fails because sensitive data is exposed if the database is breached. Consequences include data breaches, GDPR fines, and reputational damage."
-- **severity_score**: Numeric score 1-10
-- **priority**: P0 (score 8-10), P1 (score 5-7), P2 (score 1-4)
-- **complexity**: Low (enable TLS), Medium (implement encryption), High (zero-trust architecture)
-- **timeline**: Immediate (P0, 0-14 days), Short-term (P1, 15-30 days), Long-term (P2, 30-90 days)
-- **engineering_scope**: Security measures to implement
-- **risk_factors**: Data breaches, GDPR fines, security incidents
-- **dependencies**: Key management systems, security tools, compliance frameworks"""
+- **violation_detected**: false if ANY safe condition met
+- **confidence**: Low for safe conditions, high only for clear violations
+- **severity**: NONE if no violation"""
 
     def __init__(self, api_key: str = None):
         """Initialize the GDPR Article 32 judge."""
@@ -304,7 +347,6 @@ You must provide:
     ) -> str:
         """Build the Article 32 evaluation prompt."""
         regulatory_context = self._format_chunks_for_prompt(retrieved_chunks)
-
         return self.EVALUATION_PROMPT.format(
             regulatory_context=regulatory_context,
             submission=submission

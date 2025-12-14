@@ -66,11 +66,21 @@ IF ALL of these conditions are TRUE → VIOLATION:
 
 ## STEP 3: GRAY AREAS (ABSTAIN if uncertain)
 
-IF any of these → Set confidence: 0.50 and consider abstaining:
+IF any of these → Set confidence: 0.50 and ABSTAIN (do NOT flag as violation):
 - Human review rate is 10-50% (unclear if "meaningful")
 - Appeal mechanism exists but effectiveness unknown
 - Decisions affect individuals but severity unclear
 - System description is vague about human involvement
+
+## SPECIAL: CONSENT SCENARIOS (Always ABSTAIN on ambiguous consent)
+
+IF the submission mentions consent/opt-in/opt-out:
+- IF "pre-checked box but user CAN change" → ABSTAIN (confidence: 0.45)
+- IF "consent structure is ambiguous" → ABSTAIN (confidence: 0.50)
+- IF "user can opt-out before submitting" → NOT a violation (confidence: 0.25)
+- ONLY flag violation if "no consent obtained at all" AND "no way to opt-out"
+
+CONSENT RULE: When in doubt about consent validity, ABSTAIN rather than flag violation.
 
 ## Regulatory Context
 {regulatory_context}

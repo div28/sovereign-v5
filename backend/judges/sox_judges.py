@@ -36,36 +36,44 @@ If ANY safe condition is TRUE → Return violation_detected: false, confidence: 
 
 ## STEP 1: SAFE CONDITIONS (Check these FIRST)
 
-IF ANY of these conditions are TRUE → NOT a violation:
+IF ALL of these conditions are TRUE → NOT a violation:
 
-1. IF "internal controls tested at least annually"
+1. IF "internal controls BOTH documented AND tested within last 12 months"
    → NOT a violation (confidence: 0.20)
 
-2. IF "compensating controls exist for any weaknesses"
+2. IF "compensating controls exist AND are documented AND are monitored"
    → NOT a violation (confidence: 0.25)
 
-3. IF "segregation of duties OR maker-checker process in place"
+3. IF "segregation of duties enforced AND documented"
    → NOT a violation (confidence: 0.15)
 
-4. IF "controls documented in policies/procedures"
-   → NOT a violation (confidence: 0.20)
+**IMPORTANT: Partial compliance is NOT sufficient:**
+- "Controls exist but not documented" → NOT safe (proceed to violation check)
+- "Controls documented but not tested" → NOT safe (proceed to violation check)
+- "Testing >12 months ago" → NOT safe (proceed to violation check)
 
-5. IF "quarterly testing with documentation"
-   → NOT a violation (confidence: 0.15)
+## STEP 2: VIOLATION CONDITIONS (Check if NO safe conditions met)
 
-## STEP 2: VIOLATION CONDITIONS (Only check if NO safe conditions met)
+IF ANY of these conditions are TRUE → VIOLATION:
 
-IF ALL of these conditions are TRUE → VIOLATION:
+1. "Controls exist but NOT documented" (auditors cannot verify)
+   → VIOLATION (confidence: 0.88)
 
-1. "No internal controls exist" (zero documented controls)
-   AND
-2. "No control testing in 2+ years" (controls never validated)
-   AND
-3. "No compensating controls" (no alternative mitigations)
-   AND
-4. "Material financial weakness present" (significant risk)
+2. "Controls documented but NOT tested in 12+ months"
+   → VIOLATION (confidence: 0.85)
 
-→ VIOLATION (confidence: 0.92)
+3. "No control testing in 2+ years" (controls never validated)
+   → VIOLATION (confidence: 0.92)
+
+4. "No internal controls exist at all"
+   → VIOLATION (confidence: 0.95)
+
+5. "Same person initiates AND approves transactions" (no segregation)
+   → VIOLATION (confidence: 0.90)
+
+**KEY: Documentation WITHOUT testing = VIOLATION
+       Testing WITHOUT documentation = VIOLATION
+       Either gap alone is sufficient for violation.**
 
 ## STEP 3: GRAY AREAS (ABSTAIN if uncertain)
 
@@ -84,16 +92,25 @@ IF any of these → Set confidence: 0.50 and consider abstaining:
 ## DECISION LOGIC (follow this exactly):
 
 ```
-IF controls_tested_annually:
+# SAFE only if BOTH documented AND tested recently
+IF controls_documented AND controls_tested_within_12months:
     return NOT_VIOLATION, confidence=0.20
-ELIF compensating_controls_exist:
+ELIF compensating_controls_documented_and_monitored:
     return NOT_VIOLATION, confidence=0.25
-ELIF segregation_of_duties OR maker_checker:
+ELIF segregation_enforced_and_documented:
     return NOT_VIOLATION, confidence=0.15
-ELIF controls_documented:
-    return NOT_VIOLATION, confidence=0.20
-ELIF no_controls AND no_testing_2years AND no_compensating AND material_weakness:
+
+# VIOLATION if documentation OR testing gap exists
+ELIF controls_exist_but_not_documented:
+    return VIOLATION, confidence=0.88
+ELIF controls_documented_but_not_tested_12months:
+    return VIOLATION, confidence=0.85
+ELIF no_testing_2years:
     return VIOLATION, confidence=0.92
+ELIF no_controls_at_all:
+    return VIOLATION, confidence=0.95
+ELIF no_segregation_of_duties:
+    return VIOLATION, confidence=0.90
 ELSE:
     return ABSTAIN, confidence=0.50
 ```
@@ -292,19 +309,25 @@ IF ANY of these conditions are TRUE → NOT a violation:
 5. IF "audit logs exist with user attribution and timestamps"
    → NOT a violation (confidence: 0.15)
 
-## STEP 2: VIOLATION CONDITIONS (Only check if NO safe conditions met)
+## STEP 2: VIOLATION CONDITIONS (Check if NO safe conditions met)
 
-IF ALL of these conditions are TRUE → VIOLATION:
+IF ANY of these conditions are TRUE → VIOLATION:
 
-1. "Audit logs can be deleted or modified by users/admins"
-   AND
-2. "Retention period <1 year OR no retention policy"
-   AND
-3. "No immutability controls on audit records"
-   AND
-4. "No logging of financial transactions"
+1. "Retention period <7 years" (SOX requires 7-year minimum)
+   → VIOLATION (confidence: 0.90)
 
-→ VIOLATION (confidence: 0.92)
+2. "Audit logs can be deleted or modified" (no immutability/WORM)
+   → VIOLATION (confidence: 0.88)
+
+3. "No audit logging of financial transactions at all"
+   → VIOLATION (confidence: 0.95)
+
+4. "No user attribution on audit records" (cannot trace who did what)
+   → VIOLATION (confidence: 0.85)
+
+**KEY: Retention <7 years alone = VIOLATION
+       No immutability alone = VIOLATION
+       Either gap is sufficient for violation.**
 
 ## STEP 3: GRAY AREAS (ABSTAIN if uncertain)
 
@@ -323,33 +346,40 @@ IF any of these → Set confidence: 0.50 and consider abstaining:
 ## DECISION LOGIC (follow this exactly):
 
 ```
-IF worm_storage_configured:
+# SAFE only if proper retention AND immutability exist
+IF worm_storage_configured AND seven_year_retention:
     return NOT_VIOLATION, confidence=0.20
-ELIF seven_year_retention_documented:
+ELIF seven_year_retention_documented AND immutable_logs:
     return NOT_VIOLATION, confidence=0.25
-ELIF cryptographic_signing_exists:
+ELIF cryptographic_signing_exists AND retention_7_years:
     return NOT_VIOLATION, confidence=0.15
-ELIF centralized_logging_with_access_controls:
+ELIF centralized_logging_with_access_controls AND retention_7_years:
     return NOT_VIOLATION, confidence=0.20
-ELIF audit_logs_exist_with_attribution:
-    return NOT_VIOLATION, confidence=0.15
-ELIF logs_deletable AND retention_under_1_year AND no_immutability AND no_logging:
-    return VIOLATION, confidence=0.92
+
+# VIOLATION if retention OR immutability gap exists
+ELIF retention_under_7_years:
+    return VIOLATION, confidence=0.90
+ELIF logs_deletable_or_modifiable:
+    return VIOLATION, confidence=0.88
+ELIF no_audit_logging:
+    return VIOLATION, confidence=0.95
+ELIF no_user_attribution:
+    return VIOLATION, confidence=0.85
 ELSE:
     return ABSTAIN, confidence=0.50
 ```
 
 ## IMPORTANT RULES:
 
-1. **Default to NOT a violation** if ANY audit logging mechanism exists
-2. **WORM storage or equivalent is sufficient** - don't require all controls
-3. **ABSTAIN** if logs exist but retention is 1-6 years (gray area)
-4. **Only flag VIOLATION** if there is NO audit logging whatsoever
+1. **7-year retention is MANDATORY** - anything less is a violation
+2. **Immutability is MANDATORY** - logs must be tamper-proof (WORM or equivalent)
+3. **ABSTAIN** only if retention is close to 7 years (5-7) with plans to extend
+4. **Flag VIOLATION** if retention <7 years OR logs are modifiable/deletable
 
 ## Severity Guidelines (only if violation confirmed):
-- CRITICAL: Only if NO audit logs exist AND logs are tamperable
-- MAJOR: Logs exist but retention <1 year
-- MINOR: Rarely use - prefer abstaining
+- CRITICAL: NO audit logs exist OR logs are tamperable AND retention <1 year
+- MAJOR: Retention 1-6 years (below 7-year requirement)
+- MINOR: Minor immutability gaps with retention >5 years
 
 ## Required Fields
 - **violation_detected**: false if ANY safe condition met

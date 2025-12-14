@@ -9,8 +9,8 @@ Usage:
     python3 upload_to_arize.py
 
 Environment Variables Required:
-    ARIZE_ORG_KEY - Your Arize organization key
-    ARIZE_SPACE_KEY - Your Arize space key
+    ARIZE_API_KEY - Your Arize API key (from Settings > API Keys)
+    ARIZE_SPACE_ID - Your Arize space ID (from Settings > Space)
 
 Input Files:
     evals/multimodel_results_haiku.csv (30 scenarios)
@@ -64,22 +64,24 @@ ARIZE_MODEL_VERSION = "v5.0"
 # HELPER FUNCTIONS
 # =============================================================================
 
-def get_arize_keys():
-    """Get Arize API keys from environment."""
-    org_key = os.environ.get("ARIZE_ORG_KEY")
-    space_key = os.environ.get("ARIZE_SPACE_KEY")
+def get_arize_credentials():
+    """Get Arize API credentials from environment."""
+    api_key = os.environ.get("ARIZE_API_KEY")
+    space_id = os.environ.get("ARIZE_SPACE_ID")
 
-    if not org_key:
-        print("ERROR: ARIZE_ORG_KEY environment variable not set")
-        print("Set it with: export ARIZE_ORG_KEY='your-org-key'")
+    if not api_key:
+        print("ERROR: ARIZE_API_KEY environment variable not set")
+        print("Set it with: export ARIZE_API_KEY='your-api-key'")
+        print("Get your API key from: https://app.arize.com/admin/api-keys")
         return None, None
 
-    if not space_key:
-        print("ERROR: ARIZE_SPACE_KEY environment variable not set")
-        print("Set it with: export ARIZE_SPACE_KEY='your-space-key'")
+    if not space_id:
+        print("ERROR: ARIZE_SPACE_ID environment variable not set")
+        print("Set it with: export ARIZE_SPACE_ID='your-space-id'")
+        print("Get your Space ID from: https://app.arize.com/admin/space")
         return None, None
 
-    return org_key, space_key
+    return api_key, space_id
 
 
 def load_and_combine_csvs():
@@ -143,14 +145,14 @@ def save_combined_csv(df, output_path):
     print(f"  Saved combined CSV: {output_path}")
 
 
-def upload_to_arize(df, org_key, space_key):
+def upload_to_arize(df, api_key, space_id):
     """Upload DataFrame to Arize dashboard."""
     print("\nInitializing Arize client...")
 
-    # Initialize client
+    # Initialize client with correct parameters
     arize_client = Client(
-        space_key=space_key,
-        api_key=org_key,
+        api_key=api_key,
+        space_id=space_id,
     )
 
     # Create unique prediction IDs
@@ -257,19 +259,19 @@ def main():
 
     # Step 4: Upload to Arize
     print("\nStep 3: Uploading to Arize...")
-    org_key, space_key = get_arize_keys()
+    api_key, space_id = get_arize_credentials()
 
-    if not org_key or not space_key:
-        print("\n⚠️  Skipping Arize upload (missing API keys)")
+    if not api_key or not space_id:
+        print("\n⚠️  Skipping Arize upload (missing credentials)")
         print("Set environment variables and re-run to upload:")
-        print("  export ARIZE_ORG_KEY='your-org-key'")
-        print("  export ARIZE_SPACE_KEY='your-space-key'")
+        print("  export ARIZE_API_KEY='your-api-key'")
+        print("  export ARIZE_SPACE_ID='your-space-id'")
         print(f"\n✅ Combined CSV created: {OUTPUT_FILE}")
         print(f"✅ Total rows: {len(df)}")
         return
 
     try:
-        response = upload_to_arize(df, org_key, space_key)
+        response = upload_to_arize(df, api_key, space_id)
 
         if response.status_code == 200:
             print("\n✅ Combined CSV created: " + OUTPUT_FILE)

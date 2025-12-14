@@ -6,32 +6,34 @@
     <title>Assessment Results | Sovereign Compliance</title>
     <style>
         /* ============================================
-           CSS VARIABLES & RESET
+           CSS VARIABLES
            ============================================ */
         :root {
             --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
             --bg-card: #1e293b;
-            --bg-drawer: #1e293b;
-            --bg-hover: #334155;
 
-            --text-primary: #ffffff;
-            --text-secondary: #94a3b8;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
             --text-muted: #64748b;
 
             --accent: #4f46e5;
             --accent-hover: #4338ca;
             --accent-light: rgba(79, 70, 229, 0.15);
+            --accent-glow: rgba(79, 70, 229, 0.3);
 
             --critical: #ef4444;
             --critical-bg: rgba(239, 68, 68, 0.12);
             --major: #f97316;
             --major-bg: rgba(249, 115, 22, 0.12);
-            --blue: #3b82f6;
-            --blue-bg: rgba(59, 130, 246, 0.12);
+            --medium: #eab308;
             --green: #22c55e;
+            --blue: #3b82f6;
 
             --border: #334155;
-            --radius: 6px;
+            --radius: 8px;
+            --radius-sm: 4px;
         }
 
         * {
@@ -41,10 +43,10 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
-            line-height: 1.5;
+            line-height: 1.6;
             min-height: 100vh;
         }
 
@@ -52,32 +54,50 @@
            LAYOUT
            ============================================ */
         .container {
-            padding: 32px;
+            padding: 32px 48px;
             max-width: 1400px;
             margin: 0 auto;
         }
 
-        h1 {
+        .page-title {
             font-size: 28px;
             font-weight: 700;
             margin-bottom: 24px;
+            letter-spacing: -0.5px;
         }
 
         /* ============================================
-           5 COMPACT HEADER TILES
+           VIEWS - GRID & DETAIL
+           ============================================ */
+        .view {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============================================
+           HEADER TILES (5 compact)
            ============================================ */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 12px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .metric-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 12px 14px;
+            padding: 14px 16px;
         }
 
         .metric-card.center {
@@ -89,14 +109,15 @@
         }
 
         .risk-gauge {
-            width: 44px;
-            height: 44px;
-            margin-bottom: 4px;
+            width: 48px;
+            height: 48px;
+            margin-bottom: 6px;
             border-radius: 50%;
             border: 3px solid var(--critical);
             display: flex;
             align-items: center;
             justify-content: center;
+            background: var(--critical-bg);
         }
 
         .risk-gauge .value {
@@ -108,13 +129,14 @@
         .metric-label {
             font-size: 11px;
             color: var(--text-muted);
-            margin-bottom: 2px;
+            margin-bottom: 4px;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
+            font-weight: 500;
         }
 
         .metric-value {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
             line-height: 1.2;
         }
@@ -124,22 +146,22 @@
         .metric-value.green { color: var(--green); }
 
         .metric-sublabel {
-            font-size: 10px;
+            font-size: 11px;
             color: var(--text-muted);
-            margin-top: 1px;
+            margin-top: 2px;
         }
 
         .metric-sublabel.critical { color: var(--critical); }
 
         /* ============================================
-           VIOLATION SUMMARY BAR
+           SUMMARY BAR
            ============================================ */
         .summary-bar {
-            background: rgba(51, 65, 85, 0.5);
+            background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 10px 16px;
-            margin-bottom: 20px;
+            padding: 12px 20px;
+            margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -148,14 +170,14 @@
         .summary-left {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
         }
 
         .summary-stat {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 12px;
+            gap: 8px;
+            font-size: 13px;
         }
 
         .summary-dot {
@@ -166,7 +188,7 @@
 
         .summary-dot.critical { background: var(--critical); }
         .summary-dot.major { background: var(--major); }
-        .summary-dot.medium { background: #eab308; }
+        .summary-dot.medium { background: var(--medium); }
 
         .summary-count {
             font-weight: 600;
@@ -179,15 +201,12 @@
 
         .summary-divider {
             width: 1px;
-            height: 16px;
+            height: 20px;
             background: var(--border);
         }
 
         .summary-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-muted);
         }
 
@@ -201,30 +220,31 @@
            ============================================ */
         .tabs {
             display: flex;
-            gap: 32px;
-            border-bottom: 1px solid var(--border);
+            gap: 8px;
             margin-bottom: 24px;
         }
 
         .tab-btn {
-            background: none;
-            border: none;
-            padding: 12px 0;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 20px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 500;
             color: var(--text-muted);
             cursor: pointer;
-            border-bottom: 2px solid transparent;
             transition: all 0.2s;
         }
 
         .tab-btn:hover {
+            background: var(--bg-secondary);
             color: var(--text-secondary);
         }
 
         .tab-btn.active {
-            color: var(--text-primary);
-            border-bottom-color: var(--accent);
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
         }
 
         .tab-content {
@@ -236,17 +256,7 @@
         }
 
         /* ============================================
-           SECTION TITLE
-           ============================================ */
-        .section-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-        }
-
-        /* ============================================
-           CLICKABLE CARDS
+           VIOLATION CARDS GRID
            ============================================ */
         .cards-grid {
             display: grid;
@@ -258,19 +268,37 @@
             grid-template-columns: repeat(4, 1fr);
         }
 
-        .clickable-card {
+        .violation-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 16px;
+            padding: 20px;
             cursor: pointer;
-            transition: all 0.2s;
-            text-align: left;
+            transition: all 0.2s ease;
+            position: relative;
         }
 
-        .clickable-card:hover {
+        .violation-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--critical);
+            border-radius: var(--radius) 0 0 var(--radius);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .violation-card:hover {
             border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(79, 70, 229, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .violation-card:hover::before {
+            opacity: 1;
         }
 
         .card-header {
@@ -280,47 +308,31 @@
             margin-bottom: 12px;
         }
 
-        .card-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 8px;
-        }
-
-        .card-icon.critical { background: var(--critical-bg); color: var(--critical); }
-        .card-icon.major { background: var(--major-bg); color: var(--major); }
-        .card-icon.blue { background: var(--blue-bg); color: var(--blue); }
-        .card-icon.accent { background: var(--accent-light); color: var(--accent); }
-
         .card-article {
             font-size: 12px;
             color: var(--text-muted);
+            font-weight: 500;
         }
 
         .card-title {
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 15px;
+            font-weight: 600;
             margin-top: 4px;
+            color: var(--text-primary);
         }
 
         .badge {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .badge.critical {
             background: var(--critical-bg);
             color: var(--critical);
-        }
-
-        .badge.major {
-            background: var(--major-bg);
-            color: var(--major);
         }
 
         .badge.accent {
@@ -329,13 +341,10 @@
         }
 
         .card-description {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-muted);
-            margin-bottom: 12px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            margin-bottom: 16px;
+            line-height: 1.5;
         }
 
         .card-footer {
@@ -343,6 +352,8 @@
             justify-content: space-between;
             align-items: center;
             font-size: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
         }
 
         .card-meta {
@@ -352,231 +363,328 @@
         .card-arrow {
             color: var(--accent);
             font-weight: 600;
+            font-size: 16px;
         }
 
         /* ============================================
-           BOTTOM DRAWER
+           DETAIL VIEW - FULL WIDTH
            ============================================ */
-        .drawer-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 40;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-
-        .drawer-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .drawer {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: -100%;
-            background: var(--bg-drawer);
-            border-top: 1px solid var(--border);
-            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
-            z-index: 50;
-            transition: bottom 0.3s ease;
-            max-height: 320px;
-            overflow-y: auto;
-        }
-
-        .drawer.active {
-            bottom: 0;
-        }
-
-        .drawer-content {
-            padding: 24px 32px;
-            max-width: 1400px;
+        .detail-view {
+            max-width: 900px;
             margin: 0 auto;
         }
 
-        .drawer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
-        }
-
-        .drawer-title-section {
+        /* Breadcrumb */
+        .breadcrumb {
             display: flex;
             align-items: center;
-            gap: 16px;
-        }
-
-        .drawer-title {
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .drawer-subtitle {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .drawer-close {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 4px;
-            font-size: 18px;
-            transition: all 0.2s;
-        }
-
-        .drawer-close:hover {
-            background: var(--bg-hover);
-            color: var(--text-primary);
-        }
-
-        /* Horizontal row layout for drawer content */
-        .drawer-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 32px;
-        }
-
-        .drawer-section {
-            min-width: 0;
-        }
-
-        .drawer-section-title {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .drawer-section-text {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        /* Steps in drawer */
-        .drawer-steps {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .drawer-step {
-            display: flex;
-            align-items: flex-start;
             gap: 8px;
-            font-size: 13px;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .breadcrumb-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb-link:hover {
+            color: var(--accent);
+        }
+
+        .breadcrumb-sep {
+            color: var(--text-muted);
+        }
+
+        .breadcrumb-current {
             color: var(--text-secondary);
         }
 
-        .drawer-step-num {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: var(--accent-light);
+        /* Detail Header */
+        .detail-header {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--accent);
+            gap: 24px;
+            margin-bottom: 40px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-accent {
+            width: 4px;
+            background: var(--accent);
+            border-radius: 2px;
             flex-shrink: 0;
         }
 
-        /* Metrics row in drawer */
-        .drawer-metrics {
-            display: flex;
-            gap: 24px;
+        .detail-header-content {
+            flex: 1;
         }
 
-        .drawer-metric {
+        .detail-article {
+            font-size: 14px;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-title {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .detail-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 700px;
+        }
+
+        .detail-badges {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .severity-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--critical-bg);
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--critical);
+        }
+
+        .severity-badge svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .confidence-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
+            font-size: 13px;
+        }
+
+        .confidence-bar {
+            width: 60px;
+            height: 6px;
+            background: var(--bg-primary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        /* Detail Sections */
+        .detail-section {
+            margin-bottom: 40px;
+        }
+
+        .detail-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .detail-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .detail-section-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+        }
+
+        .requirement-text {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            border-left: 3px solid var(--accent);
+            padding-left: 20px;
+            font-style: italic;
+        }
+
+        /* Remediation Steps */
+        .remediation-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+            padding-top: 4px;
+        }
+
+        .step-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .step-description {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Metrics Row */
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .metric-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
             text-align: center;
         }
 
-        .drawer-metric-value {
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        .drawer-metric-value.blue { color: var(--blue); }
-        .drawer-metric-value.major { color: var(--major); }
-        .drawer-metric-value.green { color: var(--green); }
-        .drawer-metric-value.critical { color: var(--critical); }
-
-        .drawer-metric-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        /* Citation text in drawer */
-        .drawer-citation {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.7;
-            font-style: italic;
-            border-left: 3px solid var(--accent);
-            padding-left: 12px;
-        }
-
-        /* Fine list */
-        .drawer-fines {
+        .metric-box-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 12px;
+            border-radius: 10px;
             display: flex;
-            flex-direction: column;
-            gap: 4px;
+            align-items: center;
+            justify-content: center;
         }
 
-        .drawer-fine {
+        .metric-box-icon.blue {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--blue);
+        }
+
+        .metric-box-icon.major {
+            background: var(--major-bg);
+            color: var(--major);
+        }
+
+        .metric-box-icon.critical {
+            background: var(--critical-bg);
+            color: var(--critical);
+        }
+
+        .metric-box-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .metric-box-value.blue { color: var(--blue); }
+        .metric-box-value.major { color: var(--major); }
+        .metric-box-value.critical { color: var(--critical); }
+
+        .metric-box-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Navigation Footer */
+        .detail-nav {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
+            align-items: center;
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
         }
 
-        .drawer-fine-company {
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .nav-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .nav-hint {
+            font-size: 12px;
             color: var(--text-muted);
         }
 
-        .drawer-fine-amount {
-            color: var(--critical);
-            font-weight: 600;
-        }
-
-        /* Tags in drawer */
-        .drawer-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .drawer-tag {
-            font-size: 11px;
-            padding: 3px 8px;
-            background: var(--bg-hover);
+        .nav-hint kbd {
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
             border-radius: 4px;
-            color: var(--text-secondary);
-        }
-
-        /* Reference link */
-        .drawer-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 12px;
-            margin-top: 8px;
-        }
-
-        .drawer-link:hover {
-            text-decoration: underline;
+            font-family: inherit;
+            font-size: 11px;
         }
 
         /* ============================================
@@ -589,37 +697,28 @@
             .cards-grid.four-col {
                 grid-template-columns: repeat(2, 1fr);
             }
-            .drawer-row {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 24px;
-            }
         }
 
         @media (max-width: 900px) {
+            .container {
+                padding: 24px;
+            }
             .metrics-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
             .cards-grid {
                 grid-template-columns: 1fr;
             }
-            .cards-grid.four-col {
+            .metrics-row {
                 grid-template-columns: 1fr;
             }
-            .drawer-row {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            .drawer {
-                max-height: 70vh;
+            .detail-title {
+                font-size: 24px;
             }
             .summary-bar {
                 flex-direction: column;
                 gap: 12px;
                 align-items: flex-start;
-            }
-            .summary-left {
-                flex-wrap: wrap;
-                gap: 12px;
             }
         }
 
@@ -630,269 +729,157 @@
             .metrics-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-            .drawer-content {
-                padding: 20px 16px;
+            .tabs {
+                flex-wrap: wrap;
+            }
+            .detail-header {
+                flex-direction: column;
+                gap: 16px;
+            }
+            .detail-accent {
+                width: 100%;
+                height: 4px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Assessment Results</h1>
+        <!-- ============================================
+             GRID VIEW (Main)
+             ============================================ -->
+        <div class="view active" id="gridView">
+            <h1 class="page-title">Assessment Results</h1>
 
-        <!-- 5 COMPACT HEADER TILES -->
-        <div class="metrics-grid">
-            <div class="metric-card center">
-                <div class="risk-gauge">
-                    <span class="value">70</span>
-                </div>
-                <p class="metric-label">Risk Score</p>
-            </div>
-
-            <div class="metric-card">
-                <p class="metric-label">Violations</p>
-                <p class="metric-value critical">3</p>
-                <p class="metric-sublabel critical">Critical issues</p>
-            </div>
-
-            <div class="metric-card">
-                <p class="metric-label">Risk Level</p>
-                <p class="metric-value critical">HIGH</p>
-                <p class="metric-sublabel">Immediate action</p>
-            </div>
-
-            <div class="metric-card">
-                <p class="metric-label">Timeline</p>
-                <p class="metric-value blue">3 mo</p>
-                <p class="metric-sublabel">To remediate</p>
-            </div>
-
-            <div class="metric-card">
-                <p class="metric-label">Coverage</p>
-                <p class="metric-value green">87%</p>
-                <p class="metric-sublabel">Eval scope</p>
-            </div>
-        </div>
-
-        <!-- VIOLATION SUMMARY BAR -->
-        <div class="summary-bar">
-            <div class="summary-left">
-                <div class="summary-stat">
-                    <div class="summary-dot critical"></div>
-                    <span class="summary-count">3</span>
-                    <span class="summary-label">Critical</span>
-                </div>
-                <div class="summary-stat">
-                    <div class="summary-dot major"></div>
-                    <span class="summary-count">0</span>
-                    <span class="summary-label">Major</span>
-                </div>
-                <div class="summary-stat">
-                    <div class="summary-dot medium"></div>
-                    <span class="summary-count">0</span>
-                    <span class="summary-label">Medium</span>
-                </div>
-                <div class="summary-divider"></div>
-                <div class="summary-stat">
-                    <span class="summary-count">12</span>
-                    <span class="summary-label">remediation steps</span>
-                </div>
-            </div>
-            <div class="summary-right">
-                <span>1</span> framework analyzed (GDPR)
-            </div>
-        </div>
-
-        <!-- TABS -->
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="violations">Technical Fix Plan</button>
-            <button class="tab-btn" data-tab="business">Business Plan</button>
-            <button class="tab-btn" data-tab="citations">Citations</button>
-        </div>
-
-        <!-- TAB 1: TECHNICAL FIX PLAN -->
-        <div class="tab-content active" id="violations">
-            <h3 class="section-title">3 Issues Found</h3>
-
-            <div class="cards-grid">
-                <div class="clickable-card" data-panel="violation" data-index="0">
-                    <div class="card-header">
-                        <div>
-                            <p class="card-article">Article 22</p>
-                            <h3 class="card-title">Automated Decision-Making</h3>
-                        </div>
-                        <span class="badge critical">CRITICAL</span>
+            <!-- 5 Compact Tiles -->
+            <div class="metrics-grid">
+                <div class="metric-card center">
+                    <div class="risk-gauge">
+                        <span class="value">70</span>
                     </div>
-                    <p class="card-description">System makes final hiring decisions without human review</p>
-                    <div class="card-footer">
-                        <span class="card-meta">P0 • 92%</span>
-                        <span class="card-arrow">→</span>
+                    <p class="metric-label">Risk Score</p>
+                </div>
+                <div class="metric-card">
+                    <p class="metric-label">Violations</p>
+                    <p class="metric-value critical">3</p>
+                    <p class="metric-sublabel critical">Critical issues</p>
+                </div>
+                <div class="metric-card">
+                    <p class="metric-label">Risk Level</p>
+                    <p class="metric-value critical">HIGH</p>
+                    <p class="metric-sublabel">Immediate action</p>
+                </div>
+                <div class="metric-card">
+                    <p class="metric-label">Timeline</p>
+                    <p class="metric-value blue">3 mo</p>
+                    <p class="metric-sublabel">To remediate</p>
+                </div>
+                <div class="metric-card">
+                    <p class="metric-label">Coverage</p>
+                    <p class="metric-value green">87%</p>
+                    <p class="metric-sublabel">Eval scope</p>
+                </div>
+            </div>
+
+            <!-- Summary Bar -->
+            <div class="summary-bar">
+                <div class="summary-left">
+                    <div class="summary-stat">
+                        <div class="summary-dot critical"></div>
+                        <span class="summary-count">3</span>
+                        <span class="summary-label">Critical</span>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="summary-dot major"></div>
+                        <span class="summary-count">0</span>
+                        <span class="summary-label">Major</span>
+                    </div>
+                    <div class="summary-stat">
+                        <div class="summary-dot medium"></div>
+                        <span class="summary-count">0</span>
+                        <span class="summary-label">Medium</span>
+                    </div>
+                    <div class="summary-divider"></div>
+                    <div class="summary-stat">
+                        <span class="summary-count">12</span>
+                        <span class="summary-label">remediation steps</span>
                     </div>
                 </div>
-
-                <div class="clickable-card" data-panel="violation" data-index="1">
-                    <div class="card-header">
-                        <div>
-                            <p class="card-article">Article 17</p>
-                            <h3 class="card-title">Right to Erasure</h3>
-                        </div>
-                        <span class="badge critical">CRITICAL</span>
-                    </div>
-                    <p class="card-description">No automated data deletion process for candidate data</p>
-                    <div class="card-footer">
-                        <span class="card-meta">P0 • 92%</span>
-                        <span class="card-arrow">→</span>
-                    </div>
+                <div class="summary-right">
+                    <span>1</span> framework analyzed (GDPR)
                 </div>
+            </div>
 
-                <div class="clickable-card" data-panel="violation" data-index="2">
-                    <div class="card-header">
-                        <div>
-                            <p class="card-article">Article 32</p>
-                            <h3 class="card-title">Security of Processing</h3>
-                        </div>
-                        <span class="badge critical">CRITICAL</span>
-                    </div>
-                    <p class="card-description">Resume analysis without encryption at rest</p>
-                    <div class="card-footer">
-                        <span class="card-meta">P1 • 85%</span>
-                        <span class="card-arrow">→</span>
-                    </div>
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="violations">Technical Fix Plan</button>
+                <button class="tab-btn" data-tab="business">Business Plan</button>
+                <button class="tab-btn" data-tab="citations">Citations</button>
+            </div>
+
+            <!-- Tab 1: Technical Fix Plan -->
+            <div class="tab-content active" id="violations">
+                <div class="cards-grid" id="violationsGrid">
+                    <!-- Cards rendered by JS -->
+                </div>
+            </div>
+
+            <!-- Tab 2: Business Plan -->
+            <div class="tab-content" id="business">
+                <div class="cards-grid four-col" id="businessGrid">
+                    <!-- Cards rendered by JS -->
+                </div>
+            </div>
+
+            <!-- Tab 3: Citations -->
+            <div class="tab-content" id="citations">
+                <div class="cards-grid" id="citationsGrid">
+                    <!-- Cards rendered by JS -->
                 </div>
             </div>
         </div>
 
-        <!-- TAB 2: BUSINESS PLAN -->
-        <div class="tab-content" id="business">
-            <h3 class="section-title">4 Action Items</h3>
-
-            <div class="cards-grid four-col">
-                <div class="clickable-card" data-panel="business" data-index="0">
-                    <div class="card-icon accent">
+        <!-- ============================================
+             DETAIL VIEW (Full Width)
+             ============================================ -->
+        <div class="view" id="detailView">
+            <div class="detail-view">
+                <!-- Breadcrumb -->
+                <div class="breadcrumb">
+                    <a href="#" class="breadcrumb-link" id="backToGrid">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <path d="M14 2v6h6"/>
-                            <path d="M16 13H8"/>
-                            <path d="M16 17H8"/>
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
                         </svg>
-                    </div>
-                    <h3 class="card-title">Update Privacy Policy</h3>
-                    <p class="card-description">Revise disclosures for automated decision-making</p>
-                    <div class="card-footer">
-                        <span class="card-meta">Legal • Week 1</span>
-                        <span class="card-arrow">→</span>
-                    </div>
+                        Back to Violations
+                    </a>
+                    <span class="breadcrumb-sep">›</span>
+                    <span class="breadcrumb-current" id="breadcrumbTitle">Article 22</span>
                 </div>
 
-                <div class="clickable-card" data-panel="business" data-index="1">
-                    <div class="card-icon critical">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                        </svg>
-                    </div>
-                    <h3 class="card-title">Implement Human Review</h3>
-                    <p class="card-description">Deploy manual review queue for AI decisions</p>
-                    <div class="card-footer">
-                        <span class="card-meta">Engineering • Week 2</span>
-                        <span class="card-arrow">→</span>
-                    </div>
+                <!-- Detail Content -->
+                <div id="detailContent">
+                    <!-- Rendered by JS -->
                 </div>
 
-                <div class="clickable-card" data-panel="business" data-index="2">
-                    <div class="card-icon major">
+                <!-- Navigation Footer -->
+                <div class="detail-nav">
+                    <button class="nav-btn" id="prevBtn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"/>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
                         </svg>
+                        Previous
+                    </button>
+                    <div class="nav-hint">
+                        Use <kbd>←</kbd> <kbd>→</kbd> arrow keys to navigate
                     </div>
-                    <h3 class="card-title">Data Deletion Pipeline</h3>
-                    <p class="card-description">Create automated erasure workflow</p>
-                    <div class="card-footer">
-                        <span class="card-meta">Engineering • Week 3</span>
-                        <span class="card-arrow">→</span>
-                    </div>
-                </div>
-
-                <div class="clickable-card" data-panel="business" data-index="3">
-                    <div class="card-icon blue">
+                    <button class="nav-btn" id="nextBtn">
+                        Next
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
                         </svg>
-                    </div>
-                    <h3 class="card-title">Database Encryption</h3>
-                    <p class="card-description">Implement AES-256 encryption at rest</p>
-                    <div class="card-footer">
-                        <span class="card-meta">DevOps • Week 4</span>
-                        <span class="card-arrow">→</span>
-                    </div>
+                    </button>
                 </div>
             </div>
-        </div>
-
-        <!-- TAB 3: CITATIONS -->
-        <div class="tab-content" id="citations">
-            <h3 class="section-title">Regulatory References</h3>
-
-            <div class="cards-grid">
-                <div class="clickable-card" data-panel="citation" data-index="0">
-                    <div class="card-header">
-                        <div>
-                            <p class="card-article">GDPR</p>
-                            <h3 class="card-title">Article 22 - Automated Decisions</h3>
-                        </div>
-                        <span class="badge accent">95%</span>
-                    </div>
-                    <p class="card-description">Right not to be subject to automated decision-making</p>
-                    <div class="card-footer">
-                        <span class="card-meta">2 violations linked</span>
-                        <span class="card-arrow">→</span>
-                    </div>
-                </div>
-
-                <div class="clickable-card" data-panel="citation" data-index="1">
-                    <div class="card-header">
-                        <div>
-                            <p class="card-article">GDPR</p>
-                            <h3 class="card-title">Article 17 - Right to Erasure</h3>
-                        </div>
-                        <span class="badge accent">92%</span>
-                    </div>
-                    <p class="card-description">Right to obtain erasure of personal data</p>
-                    <div class="card-footer">
-                        <span class="card-meta">1 violation linked</span>
-                        <span class="card-arrow">→</span>
-                    </div>
-                </div>
-
-                <div class="clickable-card" data-panel="citation" data-index="2">
-                    <div class="card-header">
-                        <div>
-                            <p class="card-article">GDPR</p>
-                            <h3 class="card-title">Article 32 - Security</h3>
-                        </div>
-                        <span class="badge accent">88%</span>
-                    </div>
-                    <p class="card-description">Appropriate technical measures including encryption</p>
-                    <div class="card-footer">
-                        <span class="card-meta">1 violation linked</span>
-                        <span class="card-arrow">→</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- BOTTOM DRAWER OVERLAY -->
-    <div class="drawer-overlay" id="drawerOverlay"></div>
-
-    <!-- BOTTOM DRAWER -->
-    <div class="drawer" id="drawer">
-        <div class="drawer-content" id="drawerContent">
-            <!-- Content injected by JavaScript -->
         </div>
     </div>
 
@@ -900,309 +887,315 @@
         // ============================================
         // DATA
         // ============================================
-
         const violations = [
             {
+                id: 0,
                 article: 'Article 22',
                 title: 'Automated Decision-Making',
                 severity: 'CRITICAL',
-                priority: 'P0',
                 confidence: 92,
-                risk: 'Candidates have no right to human review or explanation of automated rejection decisions.',
-                requirement: 'GDPR Article 22 requires human involvement in decisions with legal or significant effects.',
+                description: 'System makes final hiring decisions without human review, violating GDPR requirements for human oversight in automated decisions with legal effects.',
+                requirement: 'The data subject shall have the right not to be subject to a decision based solely on automated processing, including profiling, which produces legal effects concerning him or her or similarly significantly affects him or her. The data controller shall implement suitable measures to safeguard the data subject\'s rights and freedoms and legitimate interests.',
                 timeline: '30 days',
                 effort: 'High',
-                steps: ['Add human review queue', 'Implement appeal process', 'Update privacy policy', 'Train team']
+                priority: 'P0',
+                steps: [
+                    { title: 'Implement Human Review Queue', desc: 'Add mandatory human review step before any automated hiring decision is finalized' },
+                    { title: 'Build Appeal Mechanism', desc: 'Create user-facing portal for candidates to contest automated decisions' },
+                    { title: 'Update Privacy Policy', desc: 'Add clear disclosures about automated decision-making and appeal rights' },
+                    { title: 'Train HR Team', desc: 'Educate hiring managers on GDPR Article 22 requirements and review procedures' }
+                ]
             },
             {
+                id: 1,
                 article: 'Article 17',
                 title: 'Right to Erasure',
                 severity: 'CRITICAL',
-                priority: 'P0',
                 confidence: 92,
-                risk: 'Cannot fulfill data subject requests for erasure within 30-day GDPR window.',
-                requirement: 'GDPR Article 17 requires ability to delete personal data upon request within 30 days.',
+                description: 'No automated data deletion process exists for candidate data, making it impossible to fulfill erasure requests within the required 30-day window.',
+                requirement: 'The data subject shall have the right to obtain from the controller the erasure of personal data concerning him or her without undue delay and the controller shall have the obligation to erase personal data without undue delay where the personal data are no longer necessary in relation to the purposes for which they were collected.',
                 timeline: '60 days',
                 effort: 'High',
-                steps: ['Audit data locations', 'Build deletion API', 'Implement cascade deletion', 'Add tracking']
+                priority: 'P0',
+                steps: [
+                    { title: 'Audit Data Locations', desc: 'Map all systems and databases storing candidate personal data' },
+                    { title: 'Build Deletion API', desc: 'Create automated deletion endpoints with proper authentication' },
+                    { title: 'Implement Cascade Deletion', desc: 'Ensure all related records across systems are deleted together' },
+                    { title: 'Add Request Tracking', desc: 'Build dashboard to track erasure requests and compliance deadlines' }
+                ]
             },
             {
+                id: 2,
                 article: 'Article 32',
                 title: 'Security of Processing',
                 severity: 'CRITICAL',
-                priority: 'P1',
                 confidence: 85,
-                risk: 'Sensitive resume data exposed to unauthorized access without encryption.',
-                requirement: 'GDPR Article 32 requires encryption for personal data at rest and in transit.',
+                description: 'Resume data containing sensitive PII is stored without encryption at rest, exposing the organization to data breach risks.',
+                requirement: 'The controller and processor shall implement appropriate technical and organisational measures to ensure a level of security appropriate to the risk, including as appropriate the pseudonymisation and encryption of personal data, and the ability to ensure the ongoing confidentiality, integrity, availability and resilience of processing systems.',
                 timeline: '45 days',
                 effort: 'Medium',
-                steps: ['Enable AES-256 encryption', 'Implement TLS 1.3', 'Set up key rotation', 'Add monitoring']
+                priority: 'P1',
+                steps: [
+                    { title: 'Enable Database Encryption', desc: 'Implement AES-256 encryption at rest for all databases storing PII' },
+                    { title: 'Configure TLS 1.3', desc: 'Ensure all data in transit uses TLS 1.3 encryption' },
+                    { title: 'Set Up Key Rotation', desc: 'Implement 90-day key rotation policy with secure key management' },
+                    { title: 'Add Security Monitoring', desc: 'Deploy encryption status dashboard and alerting' }
+                ]
             }
         ];
 
         const businessActions = [
-            {
-                title: 'Update Privacy Policy',
-                category: 'Documentation',
-                stakeholders: ['Legal', 'Compliance', 'Product'],
-                cost: '$5K - $10K',
-                effort: 'Low',
-                timeline: 'Week 1-2',
-                rationale: 'Current privacy policy lacks required disclosures about automated decision-making.',
-                tasks: ['Audit current policy', 'Draft disclosures', 'Legal review', 'Publish updates']
-            },
-            {
-                title: 'Implement Human Review',
-                category: 'Engineering',
-                stakeholders: ['Engineering', 'HR', 'Product'],
-                cost: '$50K - $75K',
-                effort: 'High',
-                timeline: 'Week 2-4',
-                rationale: 'AI hiring decisions require human oversight to comply with Article 22.',
-                tasks: ['Design review queue UI', 'Build assignment workflow', 'Create appeal portal', 'Train HR team']
-            },
-            {
-                title: 'Data Deletion Pipeline',
-                category: 'Engineering',
-                stakeholders: ['Engineering', 'Legal', 'Data'],
-                cost: '$30K - $50K',
-                effort: 'Medium',
-                timeline: 'Week 3-5',
-                rationale: 'No automated way to fulfill Article 17 erasure requests within deadline.',
-                tasks: ['Map data locations', 'Build deletion API', 'Cascade deletion', 'Tracking dashboard']
-            },
-            {
-                title: 'Database Encryption',
-                category: 'DevOps',
-                stakeholders: ['DevOps', 'Security', 'Engineering'],
-                cost: '$15K - $25K',
-                effort: 'Medium',
-                timeline: 'Week 4-6',
-                rationale: 'Personal data stored without encryption at rest violates Article 32.',
-                tasks: ['Enable RDS encryption', 'Migrate data', 'Configure key rotation', 'Update backups']
-            }
+            { title: 'Update Privacy Policy', category: 'Legal', timeline: 'Week 1', desc: 'Revise disclosures for automated decision-making' },
+            { title: 'Implement Human Review', category: 'Engineering', timeline: 'Week 2', desc: 'Deploy manual review queue for AI decisions' },
+            { title: 'Data Deletion Pipeline', category: 'Engineering', timeline: 'Week 3', desc: 'Create automated erasure workflow' },
+            { title: 'Database Encryption', category: 'DevOps', timeline: 'Week 4', desc: 'Implement AES-256 encryption at rest' }
         ];
 
         const citations = [
-            {
-                source: 'GDPR Article 22',
-                title: 'Automated Decision-Making',
-                relevance: 95,
-                text: 'The data subject shall have the right not to be subject to a decision based solely on automated processing, including profiling, which produces legal effects concerning him or her.',
-                impact: 'Your AI hiring system makes final decisions without human review, directly triggering Article 22 obligations.',
-                caseLaw: ['CNIL v. Clearview AI', 'Dutch DPA v. Tax Authority'],
-                fines: [{ company: 'Clearview AI', amount: '€20M' }, { company: 'Amazon', amount: '€746M' }],
-                url: 'https://gdpr-info.eu/art-22-gdpr/'
-            },
-            {
-                source: 'GDPR Article 17',
-                title: 'Right to Erasure',
-                relevance: 92,
-                text: 'The data subject shall have the right to obtain from the controller the erasure of personal data concerning him or her without undue delay.',
-                impact: 'Candidates cannot request deletion of their application data. System lacks automated deletion workflow.',
-                caseLaw: ['Google Spain v. AEPD', 'CNIL v. Google LLC'],
-                fines: [{ company: 'Google France', amount: '€50M' }, { company: 'British Airways', amount: '€22M' }],
-                url: 'https://gdpr-info.eu/art-17-gdpr/'
-            },
-            {
-                source: 'GDPR Article 32',
-                title: 'Security of Processing',
-                relevance: 88,
-                text: 'The controller shall implement appropriate technical measures to ensure security appropriate to the risk, including encryption of personal data.',
-                impact: 'Resume data containing PII stored without encryption at rest. Key rotation not implemented.',
-                caseLaw: ['ICO v. British Airways', 'CNIL v. Carrefour France'],
-                fines: [{ company: 'Meta Ireland', amount: '€265M' }, { company: 'WhatsApp', amount: '€225M' }],
-                url: 'https://gdpr-info.eu/art-32-gdpr/'
-            }
+            { article: 'Article 22', title: 'Automated Decision-Making', relevance: 95, desc: 'Right not to be subject to automated decisions' },
+            { article: 'Article 17', title: 'Right to Erasure', relevance: 92, desc: 'Right to obtain erasure of personal data' },
+            { article: 'Article 32', title: 'Security of Processing', relevance: 88, desc: 'Appropriate technical measures including encryption' }
         ];
 
-        // ============================================
-        // DRAWER RENDERING
-        // ============================================
+        let currentTab = 'violations';
+        let currentIndex = 0;
 
-        function renderViolationDrawer(d) {
-            return `
-                <div class="drawer-header">
-                    <div class="drawer-title-section">
-                        <span class="badge critical">${d.severity}</span>
+        // ============================================
+        // RENDER FUNCTIONS
+        // ============================================
+        function renderViolationCards() {
+            const grid = document.getElementById('violationsGrid');
+            grid.innerHTML = violations.map((v, i) => `
+                <div class="violation-card" data-type="violation" data-index="${i}">
+                    <div class="card-header">
                         <div>
-                            <h2 class="drawer-title">${d.title}</h2>
-                            <p class="drawer-subtitle">${d.article} • ${d.confidence}% confidence</p>
+                            <p class="card-article">${v.article}</p>
+                            <h3 class="card-title">${v.title}</h3>
                         </div>
+                        <span class="badge critical">${v.severity}</span>
                     </div>
-                    <button class="drawer-close" id="drawerClose">✕</button>
+                    <p class="card-description">${v.description.substring(0, 100)}...</p>
+                    <div class="card-footer">
+                        <span class="card-meta">${v.priority} • ${v.confidence}%</span>
+                        <span class="card-arrow">→</span>
+                    </div>
                 </div>
-                <div class="drawer-row">
-                    <div class="drawer-section">
-                        <p class="drawer-section-title">Risk</p>
-                        <p class="drawer-section-text">${d.risk}</p>
+            `).join('');
+        }
+
+        function renderBusinessCards() {
+            const grid = document.getElementById('businessGrid');
+            grid.innerHTML = businessActions.map((b, i) => `
+                <div class="violation-card" data-type="business" data-index="${i}">
+                    <p class="card-article">${b.category}</p>
+                    <h3 class="card-title">${b.title}</h3>
+                    <p class="card-description">${b.desc}</p>
+                    <div class="card-footer">
+                        <span class="card-meta">${b.timeline}</span>
+                        <span class="card-arrow">→</span>
                     </div>
-                    <div class="drawer-section">
-                        <p class="drawer-section-title">Requirement</p>
-                        <p class="drawer-section-text">${d.requirement}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderCitationCards() {
+            const grid = document.getElementById('citationsGrid');
+            grid.innerHTML = citations.map((c, i) => `
+                <div class="violation-card" data-type="citation" data-index="${i}">
+                    <div class="card-header">
+                        <div>
+                            <p class="card-article">GDPR</p>
+                            <h3 class="card-title">${c.article} - ${c.title}</h3>
+                        </div>
+                        <span class="badge accent">${c.relevance}%</span>
                     </div>
-                    <div class="drawer-section">
-                        <p class="drawer-section-title">Remediation Steps</p>
-                        <div class="drawer-steps">
-                            ${d.steps.map((s, i) => `<div class="drawer-step"><span class="drawer-step-num">${i+1}</span>${s}</div>`).join('')}
+                    <p class="card-description">${c.desc}</p>
+                    <div class="card-footer">
+                        <span class="card-meta">Regulatory reference</span>
+                        <span class="card-arrow">→</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderDetailView(index) {
+            const v = violations[index];
+            const content = document.getElementById('detailContent');
+            document.getElementById('breadcrumbTitle').textContent = v.article;
+
+            content.innerHTML = `
+                <!-- Header -->
+                <div class="detail-header">
+                    <div class="detail-accent"></div>
+                    <div class="detail-header-content">
+                        <p class="detail-article">${v.article}</p>
+                        <h1 class="detail-title">${v.title}</h1>
+                        <p class="detail-description">${v.description}</p>
+                        <div class="detail-badges">
+                            <div class="severity-badge">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                    <line x1="12" y1="9" x2="12" y2="13"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
+                                ${v.severity}
+                            </div>
+                            <div class="confidence-badge">
+                                <span style="color: var(--text-muted)">Confidence</span>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill" style="width: ${v.confidence}%"></div>
+                                </div>
+                                <span style="font-weight: 600">${v.confidence}%</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="drawer-section">
-                        <p class="drawer-section-title">Metrics</p>
-                        <div class="drawer-metrics">
-                            <div class="drawer-metric">
-                                <p class="drawer-metric-value blue">${d.timeline}</p>
-                                <p class="drawer-metric-label">Timeline</p>
+                </div>
+
+                <!-- Regulatory Requirement -->
+                <div class="detail-section">
+                    <h2 class="detail-section-title">Regulatory Requirement</h2>
+                    <div class="detail-section-content">
+                        <p class="requirement-text">${v.requirement}</p>
+                    </div>
+                </div>
+
+                <!-- Remediation Plan -->
+                <div class="detail-section">
+                    <h2 class="detail-section-title">Remediation Plan</h2>
+                    <div class="detail-section-content">
+                        <div class="remediation-steps">
+                            ${v.steps.map((step, i) => `
+                                <div class="step-item">
+                                    <div class="step-number">${i + 1}</div>
+                                    <div class="step-content">
+                                        <p class="step-title">${step.title}</p>
+                                        <p class="step-description">${step.desc}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metrics -->
+                <div class="detail-section">
+                    <h2 class="detail-section-title">Timeline & Effort</h2>
+                    <div class="metrics-row">
+                        <div class="metric-box">
+                            <div class="metric-box-icon blue">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12,6 12,12 16,14"/>
+                                </svg>
                             </div>
-                            <div class="drawer-metric">
-                                <p class="drawer-metric-value major">${d.effort}</p>
-                                <p class="drawer-metric-label">Effort</p>
+                            <p class="metric-box-value blue">${v.timeline}</p>
+                            <p class="metric-box-label">Timeline</p>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-box-icon major">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/>
+                                </svg>
                             </div>
+                            <p class="metric-box-value major">${v.effort}</p>
+                            <p class="metric-box-label">Effort</p>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-box-icon critical">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                            </div>
+                            <p class="metric-box-value critical">${v.priority}</p>
+                            <p class="metric-box-label">Priority</p>
                         </div>
                     </div>
                 </div>
             `;
-        }
 
-        function renderBusinessDrawer(d) {
-            return `
-                <div class="drawer-header">
-                    <div class="drawer-title-section">
-                        <span class="badge accent">${d.category}</span>
-                        <div>
-                            <h2 class="drawer-title">${d.title}</h2>
-                            <p class="drawer-subtitle">${d.timeline}</p>
-                        </div>
-                    </div>
-                    <button class="drawer-close" id="drawerClose">✕</button>
-                </div>
-                <div class="drawer-row">
-                    <div class="drawer-section">
-                        <p class="drawer-section-title">Business Rationale</p>
-                        <p class="drawer-section-text">${d.rationale}</p>
-                    </div>
-                    <div class="drawer-section">
-                        <p class="drawer-section-title">Tasks</p>
-                        <div class="drawer-steps">
-                            ${d.tasks.map((t, i) => `<div class="drawer-step"><span class="drawer-step-num">${i+1}</span>${t}</div>`).join('')}
-                        </div>
-                    </div>
-                    <div class="drawer-section">
-                        <p class="drawer-section-title">Stakeholders</p>
-                        <div class="drawer-tags">
-                            ${d.stakeholders.map(s => `<span class="drawer-tag">${s}</span>`).join('')}
-                        </div>
-                    </div>
-                    <div class="drawer-section">
-                        <p class="drawer-section-title">Metrics</p>
-                        <div class="drawer-metrics">
-                            <div class="drawer-metric">
-                                <p class="drawer-metric-value green">${d.cost}</p>
-                                <p class="drawer-metric-label">Est. Cost</p>
-                            </div>
-                            <div class="drawer-metric">
-                                <p class="drawer-metric-value major">${d.effort}</p>
-                                <p class="drawer-metric-label">Effort</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderCitationDrawer(d) {
-            return `
-                <div class="drawer-header">
-                    <div class="drawer-title-section">
-                        <span class="badge accent">${d.relevance}%</span>
-                        <div>
-                            <h2 class="drawer-title">${d.title}</h2>
-                            <p class="drawer-subtitle">${d.source}</p>
-                        </div>
-                    </div>
-                    <button class="drawer-close" id="drawerClose">✕</button>
-                </div>
-                <div class="drawer-row">
-                    <div class="drawer-section">
-                        <p class="drawer-section-title">Article Text</p>
-                        <p class="drawer-citation">${d.text}</p>
-                    </div>
-                    <div class="drawer-section">
-                        <p class="drawer-section-title">Impact on Your System</p>
-                        <p class="drawer-section-text">${d.impact}</p>
-                    </div>
-                    <div class="drawer-section">
-                        <p class="drawer-section-title">Related Case Law</p>
-                        <div class="drawer-tags">
-                            ${d.caseLaw.map(c => `<span class="drawer-tag">${c}</span>`).join('')}
-                        </div>
-                    </div>
-                    <div class="drawer-section">
-                        <p class="drawer-section-title">Fine Examples</p>
-                        <div class="drawer-fines">
-                            ${d.fines.map(f => `<div class="drawer-fine"><span class="drawer-fine-company">${f.company}</span><span class="drawer-fine-amount">${f.amount}</span></div>`).join('')}
-                        </div>
-                        <a href="${d.url}" target="_blank" class="drawer-link">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                                <polyline points="15 3 21 3 21 9"/>
-                                <line x1="10" y1="14" x2="21" y2="3"/>
-                            </svg>
-                            View Official Reference
-                        </a>
-                    </div>
-                </div>
-            `;
+            // Update nav buttons
+            document.getElementById('prevBtn').classList.toggle('disabled', index === 0);
+            document.getElementById('nextBtn').classList.toggle('disabled', index === violations.length - 1);
         }
 
         // ============================================
-        // EVENT HANDLERS
+        // VIEW SWITCHING
         // ============================================
+        function showGridView() {
+            document.getElementById('gridView').classList.add('active');
+            document.getElementById('detailView').classList.remove('active');
+        }
 
-        // Tab switching
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                btn.classList.add('active');
-                document.getElementById(btn.dataset.tab).classList.add('active');
+        function showDetailView(index) {
+            currentIndex = index;
+            document.getElementById('gridView').classList.remove('active');
+            document.getElementById('detailView').classList.add('active');
+            renderDetailView(index);
+            window.scrollTo(0, 0);
+        }
+
+        function navigatePrev() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderDetailView(currentIndex);
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function navigateNext() {
+            if (currentIndex < violations.length - 1) {
+                currentIndex++;
+                renderDetailView(currentIndex);
+                window.scrollTo(0, 0);
+            }
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Render cards
+            renderViolationCards();
+            renderBusinessCards();
+            renderCitationCards();
+
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(btn.dataset.tab).classList.add('active');
+                    currentTab = btn.dataset.tab;
+                });
             });
-        });
 
-        // Drawer elements
-        const drawerOverlay = document.getElementById('drawerOverlay');
-        const drawer = document.getElementById('drawer');
-        const drawerContent = document.getElementById('drawerContent');
-
-        // Open drawer
-        document.querySelectorAll('.clickable-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const type = card.dataset.panel;
-                const idx = parseInt(card.dataset.index);
-
-                let html = '';
-                if (type === 'violation') html = renderViolationDrawer(violations[idx]);
-                else if (type === 'business') html = renderBusinessDrawer(businessActions[idx]);
-                else if (type === 'citation') html = renderCitationDrawer(citations[idx]);
-
-                drawerContent.innerHTML = html;
-                drawerOverlay.classList.add('active');
-                drawer.classList.add('active');
-
-                // Attach close handler
-                document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+            // Card clicks
+            document.addEventListener('click', (e) => {
+                const card = e.target.closest('.violation-card');
+                if (card && card.dataset.type === 'violation') {
+                    showDetailView(parseInt(card.dataset.index));
+                }
             });
-        });
 
-        // Close drawer
-        function closeDrawer() {
-            drawerOverlay.classList.remove('active');
-            drawer.classList.remove('active');
-        }
+            // Back button
+            document.getElementById('backToGrid').addEventListener('click', (e) => {
+                e.preventDefault();
+                showGridView();
+            });
 
-        drawerOverlay.addEventListener('click', closeDrawer);
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeDrawer();
+            // Prev/Next buttons
+            document.getElementById('prevBtn').addEventListener('click', navigatePrev);
+            document.getElementById('nextBtn').addEventListener('click', navigateNext);
+
+            // Arrow key navigation
+            document.addEventListener('keydown', (e) => {
+                if (!document.getElementById('detailView').classList.contains('active')) return;
+                if (e.key === 'ArrowLeft') navigatePrev();
+                if (e.key === 'ArrowRight') navigateNext();
+                if (e.key === 'Escape') showGridView();
+            });
         });
     </script>
 </body>

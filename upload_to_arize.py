@@ -362,20 +362,37 @@ def upload_to_arize(df, api_key, space_id):
     df["prediction_ts"] = datetime.now()
 
     # Define schema for Arize
-    # Features: framework, model_used, confidence + enriched dimensions
+    # Features: All filterable dimensions (model_used, framework, etc.)
     # Prediction: actual_verdict
     # Actual: expected_verdict (ground truth)
-    # Tags: match + enriched dimensions for segmentation
+    # Tags: Additional metadata for grouping
 
-    # Determine which columns are available
-    feature_cols = ["framework", "model_used", "confidence", "test_id"]
-    tag_cols = ["match"]
+    # Core features - these MUST be filterable in dashboard
+    feature_cols = []
 
-    # Add enriched columns if present
-    enriched_features = ["severity", "violation_category", "confidence_bucket", "test_category"]
-    for col in enriched_features:
+    # Add core columns as features (for filtering)
+    core_features = ["model_used", "framework", "test_id"]
+    for col in core_features:
         if col in df.columns:
-            tag_cols.append(col)
+            feature_cols.append(col)
+
+    # Add confidence as numeric feature
+    if "confidence" in df.columns:
+        feature_cols.append("confidence")
+
+    # Add enriched dimensions as features (for filtering)
+    enriched_cols = ["severity", "violation_category", "confidence_bucket", "test_category"]
+    for col in enriched_cols:
+        if col in df.columns:
+            feature_cols.append(col)
+
+    # Tags for additional metadata
+    tag_cols = []
+    if "match" in df.columns:
+        tag_cols.append("match")
+
+    print(f"  Features (filterable): {feature_cols}")
+    print(f"  Tags: {tag_cols}")
 
     schema = Schema(
         prediction_id_column_name="prediction_id",
@@ -383,10 +400,10 @@ def upload_to_arize(df, api_key, space_id):
         prediction_label_column_name="actual_verdict",
         actual_label_column_name="expected_verdict",
         feature_column_names=feature_cols,
-        tag_column_names=tag_cols,
+        tag_column_names=tag_cols if tag_cols else None,
     )
 
-    print(f"Uploading {len(df)} records to Arize...")
+    print(f"\nUploading {len(df)} records to Arize...")
     print(f"  Model ID: {ARIZE_MODEL_ID}")
     print(f"  Model Version: {ARIZE_MODEL_VERSION}")
 

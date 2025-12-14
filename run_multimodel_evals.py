@@ -10,6 +10,11 @@ Usage:
     python3 run_multimodel_evals.py --model opus --scenarios 60
     python3 run_multimodel_evals.py --model haiku --scenarios 30
 
+Notes:
+    - Opus uses longer delays (2-10s backoff) due to rate limits
+    - All models retry up to 3 times with exponential backoff
+    - Rate limit errors get double delay before retry
+
 Requirements:
     pip install anthropic pandas
 """
@@ -51,9 +56,14 @@ COST_PER_SCENARIO = {
 }
 
 # Retry configuration
-MAX_RETRIES = 2
-RETRY_DELAY = 5
-RATE_LIMIT_DELAY = 2
+MAX_RETRIES = 3
+
+# Model-specific delays (Opus needs longer delays due to rate limits/timeouts)
+MODEL_DELAYS = {
+    "haiku": {"rate_limit": 1, "backoff": [1, 2, 3]},
+    "sonnet": {"rate_limit": 2, "backoff": [1, 2, 4]},
+    "opus": {"rate_limit": 3, "backoff": [2, 5, 10]},
+}
 
 
 # =============================================================================
@@ -179,12 +189,16 @@ def call_claude(client, model: str, framework: str, description: str) -> dict:
         except json.JSONDecodeError:
             return parse_text_response(content)
 
-    except anthropic.RateLimitError:
-        return {"error": True, "message": "Rate limited"}
-    except anthropic.APITimeoutError:
-        return {"error": True, "message": "Timeout"}
+    except anthropic.RateLimitError as e:
+        return {"error": True, "error_type": "rate_limit", "message": f"Rate limited: {e}"}
+    except anthropic.APITimeoutError as e:
+        return {"error": True, "error_type": "timeout", "message": f"Timeout: {e}"}
+    except anthropic.APIConnectionError as e:
+        return {"error": True, "error_type": "connection", "message": f"Connection error: {e}"}
+    except anthropic.APIStatusError as e:
+        return {"error": True, "error_type": "status", "message": f"API error {e.status_code}: {e.message}"}
     except Exception as e:
-        return {"error": True, "message": str(e)}
+        return {"error": True, "error_type": "unknown", "message": f"Unexpected error: {type(e).__name__}: {e}"}
 
 
 def parse_text_response(text: str) -> dict:
@@ -224,17 +238,35 @@ def parse_text_response(text: str) -> dict:
 
 
 def call_claude_with_retry(client, model: str, framework: str,
-                           description: str, test_id: str) -> dict:
-    """Call Claude with retry logic."""
+                           description: str, test_id: str,
+                           model_name: str = "haiku") -> dict:
+    """Call Claude with retry logic and exponential backoff."""
+    # Get model-specific backoff delays
+    delays = MODEL_DELAYS.get(model_name, MODEL_DELAYS["haiku"])
+    backoff = delays["backoff"]
+
     for attempt in range(MAX_RETRIES + 1):
         result = call_claude(client, model, framework, description)
 
         if not result.get("error"):
             return result
 
+        error_type = result.get("error_type", "unknown")
+        error_msg = result.get("message", "Unknown error")
+
         if attempt < MAX_RETRIES:
-            print(f"    Retry {attempt + 1}/{MAX_RETRIES} for {test_id}...")
-            time.sleep(RETRY_DELAY)
+            # Get delay for this attempt (exponential backoff)
+            delay = backoff[min(attempt, len(backoff) - 1)]
+
+            # Extra delay for rate limits
+            if error_type == "rate_limit":
+                delay = delay * 2
+
+            print(f"    ⚠️  {error_type}: {error_msg[:50]}...")
+            print(f"    ↻  Retry {attempt + 1}/{MAX_RETRIES} in {delay}s...")
+            time.sleep(delay)
+        else:
+            print(f"    ❌ Failed after {MAX_RETRIES} retries: {error_msg[:80]}")
 
     return result
 
@@ -373,9 +405,10 @@ def main():
 
 AI System Description: {scenario['ai_system_description']}"""
 
-        # Call Claude
+        # Call Claude (pass model_name for model-specific delays)
         response = call_claude_with_retry(
-            client, model_id, framework, description, test_id
+            client, model_id, framework, description, test_id,
+            model_name=args.model
         )
 
         # Extract results
@@ -415,8 +448,9 @@ AI System Description: {scenario['ai_system_description']}"""
         status = "MATCH" if match else "MISMATCH"
         print(f"    → {actual_verdict} (expected: {expected}) [{status}]")
 
-        # Rate limit delay
-        time.sleep(RATE_LIMIT_DELAY)
+        # Model-specific rate limit delay
+        rate_limit_delay = MODEL_DELAYS.get(args.model, MODEL_DELAYS["haiku"])["rate_limit"]
+        time.sleep(rate_limit_delay)
 
     # Save results
     output_csv = f"{args.output_dir}/multimodel_results_{args.model}.csv"

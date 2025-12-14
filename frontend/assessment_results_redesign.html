@@ -11,6 +11,7 @@
         :root {
             --bg-primary: #0f172a;
             --bg-card: #1e293b;
+            --bg-card-dark: #151d2e;
             --bg-hover: #334155;
             --bg-panel: #1e293b;
 
@@ -18,18 +19,22 @@
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
 
-            --accent: #6366f1;
-            --accent-hover: #4f46e5;
+            /* Indigo-600 accent to match Sovereign app */
+            --accent: #4f46e5;
+            --accent-hover: #4338ca;
+            --accent-light: rgba(79, 70, 229, 0.15);
 
-            --critical: #f87171;
-            --critical-bg: rgba(248, 113, 113, 0.1);
-            --major: #fb923c;
-            --major-bg: rgba(251, 146, 60, 0.1);
-            --blue: #60a5fa;
-            --blue-bg: rgba(96, 165, 250, 0.1);
+            --critical: #ef4444;
+            --critical-bg: rgba(239, 68, 68, 0.12);
+            --major: #f97316;
+            --major-bg: rgba(249, 115, 22, 0.12);
+            --blue: #3b82f6;
+            --blue-bg: rgba(59, 130, 246, 0.12);
 
             --border: #334155;
-            --radius: 8px;
+            --border-light: #475569;
+            --radius: 6px;
+            --radius-sm: 4px;
         }
 
         * {
@@ -62,68 +67,72 @@
         }
 
         /* ============================================
-           COMPACT HEADER - 5 COLUMNS
+           COMPACT HEADER - 5 SMALL TILES
            ============================================ */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 16px;
-            margin-bottom: 32px;
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
         .metric-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 16px;
+            padding: 12px 14px;
         }
 
         .metric-card.center {
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .risk-gauge {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 8px;
+            width: 44px;
+            height: 44px;
+            margin-bottom: 4px;
             border-radius: 50%;
-            border: 4px solid var(--critical);
+            border: 3px solid var(--critical);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .risk-gauge .value {
-            font-size: 24px;
+            font-size: 16px;
             font-weight: 700;
             color: var(--critical);
         }
 
         .metric-label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
-            margin-bottom: 4px;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .metric-value {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 700;
-        }
-
-        .metric-value.large {
-            font-size: 20px;
+            line-height: 1.2;
         }
 
         .metric-value.critical { color: var(--critical); }
         .metric-value.blue { color: var(--blue); }
 
         .metric-sublabel {
-            font-size: 12px;
-            color: var(--critical);
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 1px;
         }
 
-        .metric-sublabel.muted {
-            color: var(--text-muted);
+        .metric-sublabel.critical {
+            color: var(--critical);
         }
 
         /* ============================================
@@ -666,37 +675,37 @@
     <div class="container">
         <h1>Assessment Results</h1>
 
-        <!-- COMPACT HEADER - 5 COLUMNS -->
+        <!-- COMPACT HEADER - 5 SMALL TILES -->
         <div class="metrics-grid">
             <div class="metric-card center">
                 <div class="risk-gauge">
                     <span class="value">70</span>
                 </div>
-                <p class="metric-label">Risk Score</p>
+                <p class="metric-label">Risk</p>
             </div>
 
             <div class="metric-card">
                 <p class="metric-label">Violations</p>
                 <p class="metric-value">3</p>
-                <p class="metric-sublabel">Critical</p>
+                <p class="metric-sublabel critical">Critical</p>
             </div>
 
             <div class="metric-card">
                 <p class="metric-label">Risk Level</p>
-                <p class="metric-value large critical">HIGH</p>
-                <p class="metric-sublabel muted">Immediate</p>
+                <p class="metric-value critical">HIGH</p>
+                <p class="metric-sublabel">Immediate action</p>
             </div>
 
             <div class="metric-card">
                 <p class="metric-label">Audit Ready</p>
-                <p class="metric-value large">32%</p>
-                <p class="metric-sublabel muted">Coverage</p>
+                <p class="metric-value">32%</p>
+                <p class="metric-sublabel">Coverage</p>
             </div>
 
             <div class="metric-card">
                 <p class="metric-label">Timeline</p>
-                <p class="metric-value large">3 mo</p>
-                <p class="metric-sublabel muted">Remediate</p>
+                <p class="metric-value">3 mo</p>
+                <p class="metric-sublabel">To remediate</p>
             </div>
         </div>
 

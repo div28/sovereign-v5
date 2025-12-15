@@ -18,8 +18,15 @@ Input Files:
     evals/multimodel_results_opus.csv (60 scenarios)
 
 Output:
-    evals/combined_multimodel_results.csv (150 total rows)
+    evals/combined_multimodel_results.csv (150 total rows, original)
+    evals/combined_multimodel_results_enriched.csv (with added dimensions)
     Dataset uploaded to Arize: "sovereign-compliance-evals"
+
+Enriched Dimensions:
+    - severity: CRITICAL, MAJOR, MEDIUM, MINOR
+    - violation_category: Privacy, Security, Automation, Transparency, etc.
+    - confidence_bucket: Low (<80%), Medium (80-90%), High (90-95%), Very High (>95%)
+    - test_category: violation, compliant, gray_area
 
 Requirements:
     pip install arize pandas
@@ -47,6 +54,7 @@ except ImportError as e:
 
 EVAL_DIR = "evals"
 OUTPUT_FILE = f"{EVAL_DIR}/combined_multimodel_results.csv"
+ENRICHED_OUTPUT_FILE = f"{EVAL_DIR}/combined_multimodel_results_enriched.csv"
 
 # Input CSV files
 INPUT_FILES = {
@@ -58,6 +66,89 @@ INPUT_FILES = {
 # Arize configuration
 ARIZE_MODEL_ID = "sovereign-compliance-evals"
 ARIZE_MODEL_VERSION = "v5.0"
+
+# =============================================================================
+# ENRICHMENT MAPPINGS
+# =============================================================================
+
+# Severity mapping based on test_id patterns
+SEVERITY_RULES = {
+    # CRITICAL - Fundamental rights violations
+    "ART22": "CRITICAL",      # Automated decision-making
+    "ART9": "CRITICAL",       # Special category data
+    "CONSENT": "CRITICAL",    # Consent violations
+    "S404": "CRITICAL",       # SOX internal controls
+    "PROHIBITED": "CRITICAL", # EU AI Act prohibited
+    "BIOMETRIC": "CRITICAL",  # Biometric data
+    "SOCIAL_SCORE": "CRITICAL",
+
+    # MAJOR - Significant compliance gaps
+    "ART17": "MAJOR",         # Right to erasure
+    "ART32": "MAJOR",         # Security of processing
+    "S302": "MAJOR",          # SOX certification
+    "AUDIT": "MAJOR",         # Audit trail
+    "BIAS": "MAJOR",          # Fairness/bias
+    "HIGH_RISK": "MAJOR",     # EU AI Act high-risk
+    "TRANSPARENCY": "MAJOR",
+
+    # MEDIUM - Moderate issues
+    "ART13": "MEDIUM",        # Information provision
+    "ART14": "MEDIUM",        # Fair processing
+    "DOCUMENTATION": "MEDIUM",
+    "RETENTION": "MEDIUM",
+    "CONFORMITY": "MEDIUM",
+
+    # MINOR - Low severity
+    "NOTICE": "MINOR",
+    "PROCEDURAL": "MINOR",
+}
+
+# Category mapping based on test_id patterns
+CATEGORY_RULES = {
+    # Privacy
+    "ART17": "Privacy",
+    "ART9": "Privacy",
+    "CONSENT": "Privacy",
+    "ERASURE": "Privacy",
+    "RETENTION": "Privacy",
+
+    # Automation
+    "ART22": "Automation",
+    "AUTOMATED": "Automation",
+    "DECISION": "Automation",
+
+    # Security
+    "ART32": "Security",
+    "ENCRYPTION": "Security",
+    "ACCESS": "Security",
+    "AUDIT": "Security",
+
+    # Transparency
+    "ART13": "Transparency",
+    "ART14": "Transparency",
+    "TRANSPARENCY": "Transparency",
+    "NOTICE": "Transparency",
+    "DISCLOSURE": "Transparency",
+
+    # Fairness
+    "BIAS": "Fairness",
+    "DISCRIMINATION": "Fairness",
+    "FAIRNESS": "Fairness",
+
+    # Governance
+    "S404": "Governance",
+    "S302": "Governance",
+    "SOX": "Governance",
+    "CERTIFICATION": "Governance",
+    "CONTROL": "Governance",
+
+    # AI Safety
+    "PROHIBITED": "AI_Safety",
+    "HIGH_RISK": "AI_Safety",
+    "BIOMETRIC": "AI_Safety",
+    "SOCIAL_SCORE": "AI_Safety",
+    "CONFORMITY": "AI_Safety",
+}
 
 
 # =============================================================================
@@ -145,6 +236,112 @@ def save_combined_csv(df, output_path):
     print(f"  Saved combined CSV: {output_path}")
 
 
+def get_severity(test_id: str) -> str:
+    """Derive severity from test_id pattern."""
+    test_id_upper = test_id.upper()
+    for pattern, severity in SEVERITY_RULES.items():
+        if pattern in test_id_upper:
+            return severity
+    return "MEDIUM"  # Default
+
+
+def get_category(test_id: str, framework: str) -> str:
+    """Derive violation category from test_id and framework."""
+    test_id_upper = test_id.upper()
+
+    # Check pattern rules first
+    for pattern, category in CATEGORY_RULES.items():
+        if pattern in test_id_upper:
+            return category
+
+    # Fall back to framework-based defaults
+    framework_upper = framework.upper() if framework else ""
+    if "GDPR" in framework_upper:
+        return "Privacy"
+    elif "SOX" in framework_upper:
+        return "Governance"
+    elif "EU" in framework_upper or "AI" in framework_upper:
+        return "AI_Safety"
+
+    return "Other"
+
+
+def get_confidence_bucket(confidence: float) -> str:
+    """Bucket confidence into categories."""
+    if pd.isna(confidence):
+        return "Unknown"
+    conf = float(confidence)
+    if conf < 0.80:
+        return "Low (<80%)"
+    elif conf < 0.90:
+        return "Medium (80-90%)"
+    elif conf < 0.95:
+        return "High (90-95%)"
+    else:
+        return "Very High (>95%)"
+
+
+def get_test_category(test_id: str, expected_verdict: str) -> str:
+    """Categorize test as violation, compliant, or gray_area."""
+    test_id_upper = test_id.upper()
+
+    # Check for gray area indicators
+    if "GRAY" in test_id_upper or "EDGE" in test_id_upper or "AMBIG" in test_id_upper:
+        return "gray_area"
+
+    # Check expected verdict
+    if expected_verdict:
+        verdict_upper = str(expected_verdict).upper()
+        if "VIOLATION" in verdict_upper:
+            return "violation"
+        elif "COMPLIANT" in verdict_upper:
+            return "compliant"
+
+    # Check test_id for hints
+    if "_V" in test_id_upper or "VIOLATION" in test_id_upper:
+        return "violation"
+    elif "_C" in test_id_upper or "COMPLIANT" in test_id_upper:
+        return "compliant"
+
+    return "unknown"
+
+
+def enrich_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    """Add enriched dimensions to DataFrame."""
+    print("\nStep 3: Enriching data with additional dimensions...")
+
+    # Create a copy to avoid modifying original
+    enriched = df.copy()
+
+    # Add severity
+    enriched["severity"] = enriched["test_id"].apply(get_severity)
+    severity_counts = enriched["severity"].value_counts()
+    print(f"  Added severity: {dict(severity_counts)}")
+
+    # Add violation_category
+    enriched["violation_category"] = enriched.apply(
+        lambda row: get_category(row["test_id"], row.get("framework", "")),
+        axis=1
+    )
+    category_counts = enriched["violation_category"].value_counts()
+    print(f"  Added violation_category: {dict(category_counts)}")
+
+    # Add confidence_bucket
+    enriched["confidence_bucket"] = enriched["confidence"].apply(get_confidence_bucket)
+    bucket_counts = enriched["confidence_bucket"].value_counts()
+    print(f"  Added confidence_bucket: {dict(bucket_counts)}")
+
+    # Add test_category
+    enriched["test_category"] = enriched.apply(
+        lambda row: get_test_category(row["test_id"], row.get("expected_verdict", "")),
+        axis=1
+    )
+    test_cat_counts = enriched["test_category"].value_counts()
+    print(f"  Added test_category: {dict(test_cat_counts)}")
+
+    return enriched
+
+
 def upload_to_arize(df, api_key, space_id):
     """Upload DataFrame to Arize dashboard."""
     print("\nInitializing Arize client...")
@@ -165,20 +362,48 @@ def upload_to_arize(df, api_key, space_id):
     df["prediction_ts"] = datetime.now()
 
     # Define schema for Arize
-    # Features: framework, model_used, confidence
+    # Features: All filterable dimensions (model_used, framework, etc.)
     # Prediction: actual_verdict
     # Actual: expected_verdict (ground truth)
+    # Tags: Additional metadata for grouping
+
+    # Core features - these MUST be filterable in dashboard
+    feature_cols = []
+
+    # Add core columns as features (for filtering)
+    core_features = ["model_used", "framework", "test_id"]
+    for col in core_features:
+        if col in df.columns:
+            feature_cols.append(col)
+
+    # Add confidence as numeric feature
+    if "confidence" in df.columns:
+        feature_cols.append("confidence")
+
+    # Add enriched dimensions as features (for filtering)
+    enriched_cols = ["severity", "violation_category", "confidence_bucket", "test_category"]
+    for col in enriched_cols:
+        if col in df.columns:
+            feature_cols.append(col)
+
+    # Tags for additional metadata
+    tag_cols = []
+    if "match" in df.columns:
+        tag_cols.append("match")
+
+    print(f"  Features (filterable): {feature_cols}")
+    print(f"  Tags: {tag_cols}")
 
     schema = Schema(
         prediction_id_column_name="prediction_id",
         timestamp_column_name="prediction_ts",
         prediction_label_column_name="actual_verdict",
         actual_label_column_name="expected_verdict",
-        feature_column_names=["framework", "model_used", "confidence", "test_id"],
-        tag_column_names=["match"],
+        feature_column_names=feature_cols,
+        tag_column_names=tag_cols if tag_cols else None,
     )
 
-    print(f"Uploading {len(df)} records to Arize...")
+    print(f"\nUploading {len(df)} records to Arize...")
     print(f"  Model ID: {ARIZE_MODEL_ID}")
     print(f"  Model Version: {ARIZE_MODEL_VERSION}")
 
@@ -250,15 +475,22 @@ def main():
 
     print(f"\n  Total combined rows: {len(df)}")
 
-    # Step 2: Save combined CSV
+    # Step 2: Save combined CSV (original)
     print("\nStep 2: Saving combined CSV...")
     save_combined_csv(df, OUTPUT_FILE)
 
-    # Step 3: Print summary
-    print_summary(df)
+    # Step 3: Enrich with additional dimensions
+    df_enriched = enrich_dataframe(df)
 
-    # Step 4: Upload to Arize
-    print("\nStep 3: Uploading to Arize...")
+    # Step 4: Save enriched CSV
+    print("\nStep 4: Saving enriched CSV...")
+    save_combined_csv(df_enriched, ENRICHED_OUTPUT_FILE)
+
+    # Step 5: Print summary
+    print_summary(df_enriched)
+
+    # Step 6: Upload to Arize (using enriched data)
+    print("\nStep 5: Uploading to Arize...")
     api_key, space_id = get_arize_credentials()
 
     if not api_key or not space_id:
@@ -267,18 +499,25 @@ def main():
         print("  export ARIZE_API_KEY='your-api-key'")
         print("  export ARIZE_SPACE_ID='your-space-id'")
         print(f"\n✅ Combined CSV created: {OUTPUT_FILE}")
-        print(f"✅ Total rows: {len(df)}")
+        print(f"✅ Enriched CSV created: {ENRICHED_OUTPUT_FILE}")
+        print(f"✅ Total rows: {len(df_enriched)}")
         return
 
     try:
-        response = upload_to_arize(df, api_key, space_id)
+        response = upload_to_arize(df_enriched, api_key, space_id)
 
         if response.status_code == 200:
             print("\n✅ Combined CSV created: " + OUTPUT_FILE)
-            print(f"✅ Total rows: {len(df)}")
-            print("✅ Dataset uploaded to Arize")
+            print(f"✅ Enriched CSV created: {ENRICHED_OUTPUT_FILE}")
+            print(f"✅ Total rows: {len(df_enriched)}")
+            print("✅ Dataset uploaded to Arize (with enriched dimensions)")
             print(f"\n📊 Dashboard: https://app.arize.com/organizations/home/spaces")
             print(f"   Model: {ARIZE_MODEL_ID}")
+            print("\n   New dimensions available for segmentation:")
+            print("   - severity: CRITICAL, MAJOR, MEDIUM, MINOR")
+            print("   - violation_category: Privacy, Security, Automation, etc.")
+            print("   - confidence_bucket: Low, Medium, High, Very High")
+            print("   - test_category: violation, compliant, gray_area")
         else:
             print(f"\n❌ Upload failed with status: {response.status_code}")
             print(f"   Response: {response.text}")
@@ -286,7 +525,8 @@ def main():
     except Exception as e:
         print(f"\n❌ Upload failed: {e}")
         print(f"\n✅ Combined CSV created: {OUTPUT_FILE}")
-        print("   You can manually import this CSV to Arize")
+        print(f"✅ Enriched CSV created: {ENRICHED_OUTPUT_FILE}")
+        print("   You can manually import the enriched CSV to Arize")
 
 
 if __name__ == "__main__":

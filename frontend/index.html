@@ -705,42 +705,103 @@
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
 
-        /* Compact Summary Bar */
+        /* New Metrics Section - 5 Column Design */
         .summary-bar {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 16px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
         }
 
         .summary-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 6px;
-            padding: 10px 12px;
-            max-height: 110px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            padding: 24px 20px;
+            text-align: center;
+            border: none;
+            max-height: none;
         }
 
         .summary-label {
-            font-size: 8px;
+            font-size: 11px;
             color: rgba(255,255,255,0.5);
-            margin-bottom: 4px;
+            margin-top: 12px;
             text-transform: uppercase;
             letter-spacing: 0.08em;
+            font-weight: 500;
         }
 
         .summary-value {
-            font-size: 16px;
-            font-weight: 800;
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 8px;
         }
 
         .summary-value.green { color: #10b981; }
         .summary-value.red { color: #ef4444; }
+        .summary-value.purple { color: #a78bfa; }
+        .summary-value.blue { color: #60a5fa; }
 
         .summary-sub {
             font-size: 11px;
             color: rgba(255,255,255,0.5);
             margin-top: 4px;
+        }
+
+        /* Progress bars for metrics */
+        .metric-progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .metric-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease-out;
+        }
+
+        .metric-progress-fill.purple {
+            background: linear-gradient(90deg, #6366f1, #a78bfa);
+        }
+
+        .metric-progress-fill.blue {
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+        }
+
+        .metric-progress-fill.green {
+            background: linear-gradient(90deg, #10b981, #34d399);
+        }
+
+        /* Severity badge in metrics */
+        .severity-badge-metric {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 8px;
+        }
+
+        .severity-badge-metric.critical {
+            background: rgba(239,68,68,0.2);
+            color: #ef4444;
+        }
+
+        .severity-badge-metric.major {
+            background: rgba(249,115,22,0.2);
+            color: #fb923c;
+        }
+
+        .severity-badge-metric.minor {
+            background: rgba(234,179,8,0.2);
+            color: #fbbf24;
         }
 
         /* Violations Overview */
@@ -755,41 +816,92 @@
         }
 
         .violation-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .violation-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-left: 3px solid #ef4444;
+            background: #1a1a2e;
             border-radius: 8px;
-            padding: 16px 20px;
+            border-left: 4px solid #6366f1;
+            padding: 20px 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .violation-card:hover {
+            background: #1f1f35;
+            transform: translateY(-1px);
+        }
+
+        .violation-card.critical {
+            border-left-color: #ef4444;
+        }
+
+        .violation-card.major {
+            border-left-color: #f97316;
+        }
+
+        .violation-card.minor {
+            border-left-color: #eab308;
         }
 
         .violation-header {
             display: flex;
             justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .violation-header-left {
+            flex: 1;
+        }
+
+        .article-label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+
+        .violation-title-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
             margin-bottom: 8px;
         }
 
         .badges {
             display: flex;
             gap: 6px;
+            flex-wrap: wrap;
         }
 
         .badge {
-            padding: 3px 8px;
+            padding: 4px 10px;
             border-radius: 4px;
-            font-size: 9px;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .badge-critical {
-            background: rgba(239,68,68,0.2);
-            color: #ef4444;
+            background: #ef4444;
+            color: white;
+        }
+
+        .badge-major {
+            background: #f97316;
+            color: white;
+        }
+
+        .badge-minor {
+            background: #eab308;
+            color: #000;
         }
 
         .badge-framework {
@@ -798,53 +910,146 @@
         }
 
         .violation-title {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        .violation-desc {
-            font-size: 12px;
-            color: rgba(255,255,255,0.7);
+            margin-bottom: 8px;
             line-height: 1.4;
         }
 
-        /* Business Impact Section */
-        .business-impact-section {
+        .violation-desc {
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .expand-icon {
+            color: rgba(255,255,255,0.5);
+            transition: transform 0.2s ease;
+            font-size: 20px;
+        }
+
+        .violation-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Metrics row in violation card */
+        .violation-metrics {
+            display: flex;
+            gap: 24px;
+            padding: 12px 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .metric-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .metric-label {
+            font-size: 9px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .metric-value {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .metric-value.critical { color: #ef4444; }
+        .metric-value.major { color: #f97316; }
+        .metric-value.minor { color: #eab308; }
+        .metric-value.high { color: #ef4444; }
+        .metric-value.medium { color: #eab308; }
+        .metric-value.low { color: #10b981; }
+
+        /* Expanded content */
+        .violation-details {
+            display: none;
+            margin-top: 16px;
+        }
+
+        .violation-card.expanded .violation-details {
+            display: block;
+        }
+
+        .detail-section {
             margin-bottom: 20px;
         }
 
-        .impact-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+        .detail-section:last-child {
+            margin-bottom: 0;
         }
 
-        .impact-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            padding: 16px;
-            text-align: center;
-        }
-
-        .impact-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .impact-label {
-            font-size: 10px;
+        .detail-section-title {
+            font-size: 11px;
             color: rgba(255,255,255,0.5);
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .detail-content {
+            font-size: 13px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.6;
+        }
+
+        .regulatory-context {
+            background: rgba(59,130,246,0.05);
+            border-left: 3px solid #3b82f6;
+            border-radius: 6px;
+            padding: 16px;
+        }
+
+        .regulatory-context-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #60a5fa;
             margin-bottom: 8px;
         }
 
-        .impact-value {
-            font-size: 18px;
-            font-weight: 700;
-            color: #ef4444;
+        .regulatory-context-text {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        /* Filter tabs for violations */
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-tab-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-tab-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .filter-tab-btn.active {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-color: transparent;
+            color: white;
         }
 
         /* Tabs */
@@ -1125,26 +1330,6 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .filter-tab-btn {
-            padding: 6px 14px;
-            background: transparent;
-            border: none;
-            border-radius: 6px;
-            color: rgba(255,255,255,0.6);
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .filter-tab-btn:hover {
-            color: rgba(255,255,255,0.9);
-        }
-
-        .filter-tab-btn.active {
-            background: rgba(99, 102, 241, 0.2);
-            color: #a5b4fc;
-        }
 
         /* Status Dot Animation */
         .status-dot {
@@ -1971,45 +2156,58 @@
                 </div>
             </div>
 
-            <!-- Compact Summary -->
+            <!-- New 5-Column Metrics -->
             <div class="summary-bar">
+                <!-- Metric 1: Risk Score -->
                 <div class="summary-item">
-                    <div class="summary-label">RISK SCORE <span class="status-dot"></span></div>
-                    <div class="risk-score-container">
-                        <div class="risk-score-ring">
-                            <svg width="70" height="70" viewBox="0 0 100 100">
-                                <defs>
-                                    <linearGradient id="riskGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stop-color="#dc2626"/>
-                                        <stop offset="100%" stop-color="#f87171"/>
-                                    </linearGradient>
-                                </defs>
-                                <circle class="bg-ring" cx="50" cy="50" r="42"/>
-                                <circle class="progress-ring" cx="50" cy="50" r="42"
-                                    stroke-dasharray="0 264" id="riskRing"/>
-                            </svg>
-                            <div class="risk-score-value-inner">
-                                <span class="risk-number" id="riskScore">0</span>
-                                <span class="risk-denom">/100</span>
-                            </div>
+                    <div class="risk-score-ring">
+                        <svg width="90" height="90" viewBox="0 0 100 100">
+                            <defs>
+                                <linearGradient id="riskGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#dc2626"/>
+                                    <stop offset="100%" stop-color="#f87171"/>
+                                </linearGradient>
+                            </defs>
+                            <circle class="bg-ring" cx="50" cy="50" r="42"/>
+                            <circle class="progress-ring" cx="50" cy="50" r="42"
+                                stroke-dasharray="0 264" id="riskRing"/>
+                        </svg>
+                        <div class="risk-score-value-inner">
+                            <span class="risk-number" id="riskScore">0</span>
                         </div>
-                        <span class="risk-label" id="riskLevel">-</span>
+                    </div>
+                    <div class="summary-label">Risk Score</div>
+                </div>
+
+                <!-- Metric 2: Violations Found -->
+                <div class="summary-item">
+                    <div class="summary-value red" id="totalViolations">0</div>
+                    <div class="summary-label">Violations Found</div>
+                    <div class="severity-badge-metric critical" id="highestSeverity">CRITICAL</div>
+                </div>
+
+                <!-- Metric 3: Months to Remediate -->
+                <div class="summary-item">
+                    <div class="summary-value purple" id="monthsToRemediate">0</div>
+                    <div class="summary-label">Months to Remediate</div>
+                </div>
+
+                <!-- Metric 4: Framework Coverage -->
+                <div class="summary-item">
+                    <div class="summary-value blue" id="frameworkCoverage">0%</div>
+                    <div class="summary-label">Framework Coverage</div>
+                    <div class="metric-progress-bar">
+                        <div class="metric-progress-fill blue" id="frameworkProgress" style="width: 0%"></div>
                     </div>
                 </div>
+
+                <!-- Metric 5: Audit Readiness -->
                 <div class="summary-item">
-                    <div class="summary-label">Total Violations</div>
-                    <div class="summary-value red" id="totalViolations">-</div>
-                    <div class="summary-sub" id="violationBreakdown">-</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-label">Frameworks Analyzed</div>
-                    <div class="summary-value" id="frameworkCount">-</div>
-                    <div class="summary-sub" id="frameworkList">-</div>
-                </div>
-                <div class="summary-item">
+                    <div class="summary-value green" id="auditReadiness">0%</div>
                     <div class="summary-label">Audit Readiness</div>
-                    <div class="summary-value red" id="auditStatus">🔴 Not Ready</div>
-                    <div class="summary-sub" id="auditEta">-</div>
+                    <div class="metric-progress-bar">
+                        <div class="metric-progress-fill green" id="auditProgress" style="width: 0%"></div>
+                    </div>
                 </div>
             </div>
 
@@ -2025,33 +2223,6 @@
                     </div>
                 </div>
                 <div class="violation-cards" id="violationCards"></div>
-            </div>
-
-            <!-- Business Impact Grid -->
-            <div class="business-impact-section">
-                <div class="section-title" style="margin-bottom: 12px;">Business Impact Assessment</div>
-                <div class="impact-grid" id="impactGrid">
-                    <div class="impact-item">
-                        <div class="impact-icon">💰</div>
-                        <div class="impact-label">Financial Risk</div>
-                        <div class="impact-value" id="financialRisk">-</div>
-                    </div>
-                    <div class="impact-item">
-                        <div class="impact-icon">⚙️</div>
-                        <div class="impact-label">Operational Impact</div>
-                        <div class="impact-value" id="operationalImpact">-</div>
-                    </div>
-                    <div class="impact-item">
-                        <div class="impact-icon">📢</div>
-                        <div class="impact-label">Reputational Damage</div>
-                        <div class="impact-value" id="reputationalDamage">-</div>
-                    </div>
-                    <div class="impact-item">
-                        <div class="impact-icon">⚖️</div>
-                        <div class="impact-label">Legal Exposure</div>
-                        <div class="impact-value" id="legalExposure">-</div>
-                    </div>
-                </div>
             </div>
 
             <!-- Tabs -->
@@ -2773,30 +2944,43 @@
             const major = violations.filter(v => v.severity === 'MAJOR').length;
             const minor = violations.length - critical - major;
 
-            // Animate SVG Risk Ring
+            // Metric 1: Risk Score with Ring
             document.getElementById('riskScore').textContent = risk;
-            document.getElementById('riskLevel').textContent = risk < 30 ? 'Low Risk' : risk < 60 ? 'Medium Risk' : 'High Risk';
-
             setTimeout(() => {
                 const circumference = 2 * Math.PI * 42; // r=42
                 const progress = (risk / 100) * circumference;
                 document.getElementById('riskRing').style.strokeDasharray = `${progress} ${circumference}`;
             }, 300);
 
+            // Metric 2: Violations Found + Highest Severity Badge
             document.getElementById('totalViolations').textContent = violations.length;
-            document.getElementById('violationBreakdown').textContent =
-                `${critical} Critical, ${major} Major, ${minor} Minor`;
-            document.getElementById('frameworkCount').textContent = data.frameworks_analyzed?.length || 0;
-            document.getElementById('frameworkList').textContent = data.frameworks_analyzed?.join(', ').toUpperCase() || 'N/A';
-            document.getElementById('auditStatus').textContent = risk < 30 ? '🟢 Ready' : '🔴 Not Ready';
-            document.getElementById('auditEta').textContent = risk < 30 ? 'Can proceed' : '~3 months';
+            const highestSeverityBadge = document.getElementById('highestSeverity');
+            if (critical > 0) {
+                highestSeverityBadge.textContent = 'CRITICAL';
+                highestSeverityBadge.className = 'severity-badge-metric critical';
+            } else if (major > 0) {
+                highestSeverityBadge.textContent = 'MAJOR';
+                highestSeverityBadge.className = 'severity-badge-metric major';
+            } else {
+                highestSeverityBadge.textContent = 'MINOR';
+                highestSeverityBadge.className = 'severity-badge-metric minor';
+            }
 
-            // Business Impact Grid
-            const criticalCount = violations.filter(v => v.severity === 'CRITICAL').length;
-            document.getElementById('financialRisk').textContent = risk > 70 ? 'High' : risk > 40 ? 'Medium' : 'Low';
-            document.getElementById('operationalImpact').textContent = violations.length > 5 ? 'Severe' : violations.length > 2 ? 'Moderate' : 'Low';
-            document.getElementById('reputationalDamage').textContent = criticalCount > 2 ? 'High' : criticalCount > 0 ? 'Medium' : 'Low';
-            document.getElementById('legalExposure').textContent = data.frameworks_analyzed?.length > 1 ? 'Multi-jurisdictional' : 'Single jurisdiction';
+            // Metric 3: Months to Remediate (estimate based on severity)
+            const monthsToRemediate = critical * 1.5 + major * 0.75 + minor * 0.25;
+            document.getElementById('monthsToRemediate').textContent = Math.ceil(monthsToRemediate);
+
+            // Metric 4: Framework Coverage (percentage of frameworks analyzed vs total available)
+            const totalFrameworks = 5; // Assume 5 total frameworks available
+            const analyzedFrameworks = data.frameworks_analyzed?.length || 0;
+            const frameworkCoverage = Math.round((analyzedFrameworks / totalFrameworks) * 100);
+            document.getElementById('frameworkCoverage').textContent = `${frameworkCoverage}%`;
+            document.getElementById('frameworkProgress').style.width = `${frameworkCoverage}%`;
+
+            // Metric 5: Audit Readiness (inverse of risk score)
+            const auditReadiness = Math.max(0, 100 - risk);
+            document.getElementById('auditReadiness').textContent = `${auditReadiness}%`;
+            document.getElementById('auditProgress').style.width = `${auditReadiness}%`;
 
             // Update filter counts
             document.getElementById('filterAll').textContent = violations.length;
@@ -2804,77 +2988,78 @@
             document.getElementById('filterMajor').textContent = major;
             document.getElementById('filterMinor').textContent = minor;
 
-            // Violations Overview - Expandable cards with metadata
+            // Violations Overview - New Expandable Card Design
             const cardsContainer = document.getElementById('violationCards');
             cardsContainer.innerHTML = '';
             violations.forEach(v => {
                 const card = document.createElement('div');
-                card.className = 'violation-card expanded';
-                const severity = v.severity || 'MAJOR';
-                card.dataset.severity = severity.toLowerCase();
-                const sevLabel = severity === 'CRITICAL' ? 'Critical' : severity === 'MAJOR' ? 'Major' : 'Minor';
+                const severity = (v.severity || 'MAJOR').toLowerCase();
+                card.className = `violation-card ${severity}`;
+                card.dataset.severity = severity;
+
+                const sevLabel = severity === 'critical' ? 'CRITICAL' : severity === 'major' ? 'MAJOR' : 'MINOR';
+                const sevClass = `badge-${severity}`;
+
                 card.innerHTML = `
                     <div class="violation-header">
-                        <div class="badges">
-                            <span class="badge badge-critical">${sevLabel}</span>
-                            <span class="badge badge-framework">${v.framework?.toUpperCase() || 'N/A'}</span>
+                        <div class="violation-header-left">
+                            <div class="article-label">Article ${v.article_violated || 'N/A'}</div>
+                            <div class="violation-title-row">
+                                <h3 class="violation-title">${v.article_violated || 'Violation'}</h3>
+                                <div class="badges">
+                                    <span class="badge ${sevClass}">${sevLabel}</span>
+                                    <span class="badge badge-framework">${v.framework?.toUpperCase() || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <p class="violation-desc">${v.evidence_quote || v.issue || 'No description provided'}</p>
                         </div>
                         <span class="expand-icon">▼</span>
                     </div>
-                    <div class="violation-title">${v.article_violated || 'Violation'}</div>
-                    <div class="violation-desc">${(v.evidence_quote || v.issue || '').substring(0, 200)}</div>
+
+                    <div class="violation-metrics">
+                        <div class="metric-item">
+                            <div class="metric-label">SEVERITY</div>
+                            <div class="metric-value ${severity}">${sevLabel}</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">PRIORITY</div>
+                            <div class="metric-value ${severity === 'critical' ? 'high' : severity === 'major' ? 'medium' : 'low'}">
+                                ${severity === 'critical' ? 'P0' : severity === 'major' ? 'P1' : 'P2'}
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">COMPLEXITY</div>
+                            <div class="metric-value medium">${v.complexity || 'High'}</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">TIMELINE</div>
+                            <div class="metric-value">${severity === 'critical' ? '0-14 days' : severity === 'major' ? '15-30 days' : '30-90 days'}</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">CONFIDENCE</div>
+                            <div class="metric-value">${v.confidence ? Math.round(v.confidence * 100) + '%' : 'N/A'}</div>
+                        </div>
+                    </div>
+
                     <div class="violation-details">
-                        <div class="metadata-grid">
-                            <div class="metadata-item">
-                                <div class="metadata-label">Severity</div>
-                                <div class="metadata-value">${severity}</div>
-                            </div>
-                            <div class="metadata-item">
-                                <div class="metadata-label">Priority</div>
-                                <div class="metadata-value">${v.priority || 'P0'}</div>
-                            </div>
-                            <div class="metadata-item">
-                                <div class="metadata-label">Complexity</div>
-                                <div class="metadata-value">${v.complexity || 'High'}</div>
-                            </div>
-                            <div class="metadata-item">
-                                <div class="metadata-label">Timeline</div>
-                                <div class="metadata-value">${v.timeline || '0-14 days'}</div>
-                            </div>
-                            <div class="metadata-item">
-                                <div class="metadata-label">Confidence</div>
-                                <div class="metadata-value">${v.confidence ? Math.round(v.confidence * 100) + '%' : (v.confidence_score || 'N/A')}</div>
-                            </div>
-                        </div>
-                        ${v.abstain ? `
-                        <div style="margin-top: 12px; padding: 10px; background: rgba(255, 193, 7, 0.2); border-radius: 6px; border: 1px solid rgba(255, 193, 7, 0.4);">
-                            <div style="font-weight: 600; color: #FFC107; font-size: 0.85rem;">⚠️ Low Confidence - Abstaining</div>
-                            <div style="color: rgba(255,255,255,0.8); font-size: 0.8rem; margin-top: 4px;">${v.abstain_reason || 'Recommend expert human review'}</div>
-                        </div>
-                        ` : ''}
                         ${v.reasoning ? `
-                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
-                            <div style="font-weight: 600; margin-bottom: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.7);">Judge Reasoning:</div>
-                            <div style="color: rgba(255,255,255,0.8); font-size: 0.85rem; line-height: 1.5;">${v.reasoning}</div>
+                        <div class="detail-section">
+                            <div class="detail-section-title">JUDGE REASONING</div>
+                            <div class="detail-content">${v.reasoning}</div>
                         </div>
                         ` : ''}
+
                         ${v.retrieved_context?.length ? `
-                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
-                            <div style="font-weight: 600; margin-bottom: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.7);">Retrieved Regulatory Context:</div>
+                        <div class="detail-section">
+                            <div class="detail-section-title">RETRIEVED REGULATORY CONTEXT</div>
                             ${v.retrieved_context.map(ctx => `
-                                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; margin-bottom: 8px;">
-                                    <div style="font-weight: 600; color: #60A5FA; font-size: 0.8rem;">${ctx.article || 'Unknown Article'} ${ctx.section ? '- ' + ctx.section : ''}</div>
-                                    <div style="color: rgba(255,255,255,0.7); font-size: 0.8rem; margin-top: 4px; font-style: italic;">"${(ctx.text || '').substring(0, 300)}${(ctx.text || '').length > 300 ? '...' : ''}"</div>
+                                <div class="regulatory-context">
+                                    <div class="regulatory-context-title">${ctx.article || 'Unknown Article'}${ctx.section ? ' - ' + ctx.section : ''}</div>
+                                    <div class="regulatory-context-text">"${(ctx.text || '').substring(0, 400)}${(ctx.text || '').length > 400 ? '...' : ''}"</div>
                                 </div>
                             `).join('')}
                         </div>
                         ` : ''}
-                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
-                            <div style="font-weight: 600; margin-bottom: 8px; font-size: 0.85rem; color: rgba(255,255,255,0.7);">Remediation Steps:</div>
-                            <ol style="margin-left: 1.5rem; color: rgba(255,255,255,0.8); font-size: 0.85rem;">
-                                ${v.remediation_steps?.map(step => `<li style="margin-bottom: 0.5rem;">${step}</li>`).join('') || '<li>No remediation steps provided</li>'}
-                            </ol>
-                        </div>
                     </div>
                 `;
 

@@ -213,7 +213,7 @@
             font-size: 18px;
             font-weight: 600;
             color: #ffffff;
-            background: #1e3a5f;
+            background: #5b9bd5;
             border: none;
             border-radius: 12px;
             cursor: pointer;
@@ -223,7 +223,7 @@
         }
 
         .cta-button:hover {
-            background: #2d4a6f;
+            background: #4a8bc5;
             transform: translateY(-1px);
         }
 
@@ -612,7 +612,7 @@
         .run-button {
             width: auto;
             max-width: 280px;
-            background: #1e3a5f;
+            background: #5b9bd5;
             border: none;
             color: #fff;
             padding: 16px 32px;
@@ -629,7 +629,7 @@
         }
 
         .run-button:hover {
-            background: #2d4a6f;
+            background: #4a8bc5;
             transform: translateY(-1px);
         }
 
@@ -687,24 +687,24 @@
         }
 
         .btn-pdf {
-            background: #1e3a5f;
+            background: #5b9bd5;
             color: white;
             border: none;
         }
 
         .btn-pdf:hover {
-            background: #2d4a6f;
+            background: #4a8bc5;
             transform: translateY(-1px);
         }
 
         .btn-csv {
             background: transparent;
-            color: white;
-            border: 2px solid #1e3a5f;
+            color: #5b9bd5;
+            border: 2px solid #5b9bd5;
         }
 
         .btn-csv:hover {
-            background: rgba(30, 58, 95, 0.1);
+            background: rgba(91, 155, 213, 0.1);
             transform: translateY(-1px);
         }
 
@@ -741,10 +741,10 @@
             margin-bottom: 8px;
         }
 
-        .summary-value.green { color: #10b981; }
+        .summary-value.green { color: #5b9bd5; }
         .summary-value.red { color: #ef4444; }
-        .summary-value.purple { color: #a78bfa; }
-        .summary-value.blue { color: #60a5fa; }
+        .summary-value.purple { color: #5b9bd5; }
+        .summary-value.blue { color: #5b9bd5; }
 
         .summary-sub {
             font-size: 11px;
@@ -769,15 +769,15 @@
         }
 
         .metric-progress-fill.purple {
-            background: linear-gradient(90deg, #6366f1, #a78bfa);
+            background: linear-gradient(90deg, #5b9bd5, #7ab8e8);
         }
 
         .metric-progress-fill.blue {
-            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            background: linear-gradient(90deg, #5b9bd5, #7ab8e8);
         }
 
         .metric-progress-fill.green {
-            background: linear-gradient(90deg, #10b981, #34d399);
+            background: linear-gradient(90deg, #5b9bd5, #7ab8e8);
         }
 
         /* Severity badge in metrics */
@@ -825,29 +825,17 @@
         }
 
         .violation-card {
-            background: #1a1a2e;
+            background: rgba(255,255,255,0.02);
             border-radius: 8px;
-            border-left: 4px solid #6366f1;
+            border: 1px solid rgba(255,255,255,0.1);
             padding: 20px 24px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
         .violation-card:hover {
-            background: #1f1f35;
-            transform: translateY(-1px);
-        }
-
-        .violation-card.critical {
-            border-left-color: #ef4444;
-        }
-
-        .violation-card.major {
-            border-left-color: #f97316;
-        }
-
-        .violation-card.minor {
-            border-left-color: #eab308;
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.15);
         }
 
         .violation-header {
@@ -1006,16 +994,16 @@
         }
 
         .regulatory-context {
-            background: rgba(59,130,246,0.05);
-            border-left: 3px solid #3b82f6;
+            background: rgba(255,255,255,0.03);
             border-radius: 6px;
             padding: 16px;
+            margin-bottom: 12px;
         }
 
         .regulatory-context-title {
             font-size: 12px;
             font-weight: 600;
-            color: #60a5fa;
+            color: #5b9bd5;
             margin-bottom: 8px;
         }
 
@@ -1024,6 +1012,47 @@
             color: rgba(255,255,255,0.7);
             line-height: 1.5;
             font-style: italic;
+        }
+
+        /* Tabs inside violation cards */
+        .violation-tabs {
+            display: flex;
+            gap: 8px;
+            margin: 20px 0 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+        }
+
+        .violation-tab {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.2s ease;
+        }
+
+        .violation-tab:hover {
+            color: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .violation-tab.active {
+            color: #5b9bd5;
+            background: rgba(91,155,213,0.1);
+            border-bottom: 2px solid #5b9bd5;
+        }
+
+        .violation-tab-content {
+            display: none;
+            padding: 16px 0;
+        }
+
+        .violation-tab-content.active {
+            display: block;
         }
 
         /* Filter tabs for violations */
@@ -1035,9 +1064,9 @@
         .filter-tab-btn {
             padding: 8px 16px;
             border-radius: 6px;
-            border: 1px solid rgba(99, 102, 241, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             background: transparent;
-            color: rgba(255,255,255,0.7);
+            color: #94a3b8;
             font-size: 12px;
             font-weight: 500;
             cursor: pointer;
@@ -1045,12 +1074,12 @@
         }
 
         .filter-tab-btn:hover {
-            background: rgba(99, 102, 241, 0.1);
-            border-color: rgba(99, 102, 241, 0.5);
+            border-color: #5b9bd5;
+            color: #5b9bd5;
         }
 
         .filter-tab-btn.active {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            background: #5b9bd5;
             border-color: transparent;
             color: white;
         }
@@ -2228,39 +2257,6 @@
                 <div class="violation-cards" id="violationCards"></div>
             </div>
 
-            <!-- Tabs -->
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab('technical')">Technical Fix Plan</button>
-                <button class="tab" onclick="switchTab('business')">Business Plan</button>
-                <button class="tab" onclick="switchTab('citations')">Citations</button>
-            </div>
-
-            <!-- Tab 1: Technical Fix Plan -->
-            <div class="tab-content active" id="technical">
-                <div class="fix-plan-grid">
-                    <div class="plan-column">
-                        <div class="plan-title">🔧 Technical Fixes (Code/API/Architecture)</div>
-                        <div class="plan-list" id="technicalList"></div>
-                    </div>
-                    <div class="plan-column">
-                        <div class="plan-title">📋 Business Process Changes</div>
-                        <div class="plan-list" id="businessProcessList"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tab 2: Business Plan -->
-            <div class="tab-content" id="business">
-                <div class="plan-column">
-                    <div class="plan-title">📋 Process & Policy Changes</div>
-                    <div class="plan-list" id="businessList"></div>
-                </div>
-            </div>
-
-            <!-- Tab 3: Citations -->
-            <div class="tab-content" id="citations">
-                <div class="citations-list" id="citationsList"></div>
-            </div>
         </div>
     </section>
 
@@ -2994,7 +2990,16 @@
             // Violations Overview - New Expandable Card Design
             const cardsContainer = document.getElementById('violationCards');
             cardsContainer.innerHTML = '';
-            violations.forEach(v => {
+            violations.forEach((v, idx) => {
+                // Debug logging for first violation
+                if (idx === 0) {
+                    console.log('DEBUG: Violation object structure:', v);
+                    console.log('DEBUG: retrieved_context:', v.retrieved_context);
+                    console.log('DEBUG: citations:', v.citations);
+                    console.log('DEBUG: regulatory_context:', v.regulatory_context);
+                    console.log('DEBUG: rag_context:', v.rag_context);
+                }
+
                 const card = document.createElement('div');
                 const severity = (v.severity || 'MAJOR').toLowerCase();
                 card.className = `violation-card ${severity}`;
@@ -3002,6 +3007,13 @@
 
                 const sevLabel = severity === 'critical' ? 'CRITICAL' : severity === 'major' ? 'MAJOR' : 'MINOR';
                 const sevClass = `badge-${severity}`;
+
+                // Try multiple field names for regulatory context
+                let regulatoryContext = v.retrieved_context || v.citations || v.regulatory_context || v.rag_context || [];
+
+                // Check if context has article info
+                const hasValidContext = regulatoryContext && regulatoryContext.length > 0 &&
+                    regulatoryContext.some(ctx => ctx.article || ctx.text);
 
                 card.innerHTML = `
                     <div class="violation-header">
@@ -3016,35 +3028,35 @@
                             </div>
                             <p class="violation-desc">${v.evidence_quote || v.issue || 'No description provided'}</p>
                         </div>
-                        <span class="expand-icon">▼</span>
-                    </div>
-
-                    <div class="violation-metrics">
-                        <div class="metric-item">
-                            <div class="metric-label">SEVERITY</div>
-                            <div class="metric-value ${severity}">${sevLabel}</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">PRIORITY</div>
-                            <div class="metric-value ${severity === 'critical' ? 'high' : severity === 'major' ? 'medium' : 'low'}">
-                                ${severity === 'critical' ? 'P0' : severity === 'major' ? 'P1' : 'P2'}
-                            </div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">COMPLEXITY</div>
-                            <div class="metric-value medium">${v.complexity || 'High'}</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">TIMELINE</div>
-                            <div class="metric-value">${severity === 'critical' ? '0-14 days' : severity === 'major' ? '15-30 days' : '30-90 days'}</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">CONFIDENCE</div>
-                            <div class="metric-value">${v.confidence ? Math.round(v.confidence * 100) + '%' : 'N/A'}</div>
-                        </div>
+                        <span class="expand-icon">▶</span>
                     </div>
 
                     <div class="violation-details">
+                        <div class="violation-metrics">
+                            <div class="metric-item">
+                                <div class="metric-label">SEVERITY</div>
+                                <div class="metric-value ${severity}">${sevLabel}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">PRIORITY</div>
+                                <div class="metric-value ${severity === 'critical' ? 'high' : severity === 'major' ? 'medium' : 'low'}">
+                                    ${severity === 'critical' ? 'P0' : severity === 'major' ? 'P1' : 'P2'}
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">COMPLEXITY</div>
+                                <div class="metric-value medium">${v.complexity || 'High'}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">TIMELINE</div>
+                                <div class="metric-value">${severity === 'critical' ? '0-14 days' : severity === 'major' ? '15-30 days' : '30-90 days'}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">CONFIDENCE</div>
+                                <div class="metric-value">${v.confidence ? Math.round(v.confidence * 100) + '%' : 'N/A'}</div>
+                            </div>
+                        </div>
+
                         ${v.reasoning ? `
                         <div class="detail-section">
                             <div class="detail-section-title">JUDGE REASONING</div>
@@ -3052,23 +3064,79 @@
                         </div>
                         ` : ''}
 
-                        ${v.retrieved_context?.length ? `
+                        ${hasValidContext ? `
                         <div class="detail-section">
                             <div class="detail-section-title">RETRIEVED REGULATORY CONTEXT</div>
-                            ${v.retrieved_context.map(ctx => `
+                            ${regulatoryContext.map(ctx => {
+                                if (!ctx.article && !ctx.text) return '';
+                                return `
                                 <div class="regulatory-context">
-                                    <div class="regulatory-context-title">${ctx.article || 'Unknown Article'}${ctx.section ? ' - ' + ctx.section : ''}</div>
-                                    <div class="regulatory-context-text">"${(ctx.text || '').substring(0, 400)}${(ctx.text || '').length > 400 ? '...' : ''}"</div>
+                                    <div class="regulatory-context-title">${ctx.article || ctx.title || 'Regulatory Reference'}${ctx.section ? ' - ' + ctx.section : ''}</div>
+                                    <div class="regulatory-context-text">"${(ctx.text || ctx.content || '').substring(0, 400)}${(ctx.text || ctx.content || '').length > 400 ? '...' : ''}"</div>
                                 </div>
-                            `).join('')}
+                            `}).join('')}
                         </div>
                         ` : ''}
+
+                        <!-- Tabs inside violation card -->
+                        <div class="violation-tabs" data-violation-idx="${idx}">
+                            <button class="violation-tab active" data-tab="technical-${idx}">Technical Fix Plan</button>
+                            <button class="violation-tab" data-tab="business-${idx}">Business Plan</button>
+                            <button class="violation-tab" data-tab="citations-${idx}">Citations</button>
+                        </div>
+
+                        <div class="violation-tab-content active" id="technical-${idx}">
+                            <div style="font-size: 13px; color: rgba(255,255,255,0.8);">
+                                ${v.remediation_steps?.map((step, i) => `
+                                    <div style="margin-bottom: 12px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 6px;">
+                                        <div style="font-weight: 600; margin-bottom: 4px;">${i + 1}. ${step}</div>
+                                    </div>
+                                `).join('') || '<p>No technical remediation steps provided.</p>'}
+                            </div>
+                        </div>
+
+                        <div class="violation-tab-content" id="business-${idx}">
+                            <div style="font-size: 13px; color: rgba(255,255,255,0.8);">
+                                <p>Business process changes and policy updates required to address this violation.</p>
+                            </div>
+                        </div>
+
+                        <div class="violation-tab-content" id="citations-${idx}">
+                            <div style="font-size: 13px; color: rgba(255,255,255,0.8);">
+                                ${v.article_violated ? `
+                                    <div style="margin-bottom: 12px;">
+                                        <div style="font-weight: 600; color: #5b9bd5; margin-bottom: 4px;">${v.article_violated}</div>
+                                        <div>${v.framework?.toUpperCase() || 'N/A'}</div>
+                                    </div>
+                                ` : '<p>No citations available.</p>'}
+                            </div>
+                        </div>
                     </div>
                 `;
 
-                // Add click handler for expand/collapse
-                card.addEventListener('click', () => {
+                // Add click handler for expand/collapse (only on header, not tabs)
+                const header = card.querySelector('.violation-header');
+                header.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     card.classList.toggle('expanded');
+                });
+
+                // Add tab switching logic
+                card.querySelectorAll('.violation-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const tabId = tab.dataset.tab;
+
+                        // Update active tab
+                        card.querySelectorAll('.violation-tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+
+                        // Update active content
+                        card.querySelectorAll('.violation-tab-content').forEach(content => {
+                            content.classList.remove('active');
+                        });
+                        card.querySelector(`#${tabId}`).classList.add('active');
+                    });
                 });
 
                 cardsContainer.appendChild(card);

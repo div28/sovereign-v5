@@ -58,6 +58,107 @@ def get_violation_field(violation, *keys, default='N/A'):
     return default
 
 
+def format_confidence(confidence):
+    """Convert confidence to percentage (0.92 -> 92)"""
+    if confidence is None:
+        return 95  # Default
+    try:
+        conf_float = float(confidence)
+        # If <= 1, it's in 0-1 range (0.92), convert to percentage
+        if conf_float <= 1:
+            return int(conf_float * 100)
+        # Already a percentage (92)
+        return int(conf_float)
+    except (ValueError, TypeError):
+        return 95  # Default
+
+
+def get_specific_business_impact(violation):
+    """Get specific business impact based on severity and framework"""
+    # Check if already has specific impact (not generic)
+    existing = violation.get('business_impact', '')
+    if existing and existing != 'Impact assessment required' and len(existing) > 30:
+        return existing
+
+    severity = violation.get('severity', '').upper()
+    framework = violation.get('framework', '').upper()
+
+    # CRITICAL violations - specific high-value impacts
+    if severity == 'CRITICAL':
+        if 'GDPR' in framework:
+            return 'Up to €20M or 4% of annual global turnover. Immediate regulatory action likely. Public disclosure required. Data processing suspension risk.'
+        elif 'EU' in framework or 'AI' in framework:
+            return 'Up to €35M or 7% of annual global turnover. Product ban possible. Mandatory notification to authorities. Market access restrictions.'
+        elif 'SOX' in framework:
+            return 'SEC enforcement action. Officer criminal liability (5-20 years prison). Trading suspension risk. Investor class-action lawsuits. Restatement of financials.'
+        else:
+            return 'Severe regulatory penalties. Operational shutdown risk. Executive personal liability. License revocation possible.'
+
+    # MAJOR violations
+    elif severity == 'MAJOR' or severity == 'HIGH':
+        if 'GDPR' in framework:
+            return 'Up to €10M or 2% of annual global turnover. Data protection authority investigation. Corrective action orders. Processing restrictions.'
+        elif 'EU' in framework or 'AI' in framework:
+            return 'Up to €15M or 3% of annual global turnover. Product restrictions possible. Enhanced monitoring requirements. Compliance audits.'
+        elif 'SOX' in framework:
+            return 'SEC investigation. Material weakness disclosure required. Restatement requirements. Stock price impact. Enhanced regulatory scrutiny.'
+        else:
+            return 'Significant regulatory penalties. Compliance review required. Corrective action orders. Reputational damage.'
+
+    # MINOR/LOW violations
+    elif severity in ['MINOR', 'LOW', 'MEDIUM']:
+        return 'Regulatory warning. Corrective action required within 30-90 days. Limited financial exposure. Enhanced monitoring.'
+
+    # Default fallback
+    return 'Compliance review recommended. Risk mitigation advised. Regulatory attention possible.'
+
+
+def preprocess_violations(violations):
+    """
+    Preprocess violations to fix common issues:
+    1. Article 5 (EU AI Act Prohibited Practices) always CRITICAL
+    2. Format confidence to percentage
+    3. Add specific business impact
+    4. Normalize severity labels
+    """
+    processed = []
+
+    for v in violations:
+        # Make a copy to avoid modifying original
+        v_copy = v.copy()
+
+        # Fix 1: Article 5 override - ALWAYS CRITICAL
+        article = str(v_copy.get('article_violated', '')).lower()
+        framework = str(v_copy.get('framework', '')).lower()
+
+        if ('article 5' in article or 'article5' in article) and ('eu' in framework or 'ai' in framework):
+            v_copy['severity'] = 'CRITICAL'
+            v_copy['priority'] = 'P0'
+            v_copy['timeline'] = 'Immediate (0-14 days)'
+            print(f"DEBUG: Overriding Article 5 to CRITICAL: {article}")
+
+        # Fix 2: Add specific business impact if missing or generic
+        if not v_copy.get('business_impact') or v_copy.get('business_impact') == 'Impact assessment required':
+            v_copy['business_impact'] = get_specific_business_impact(v_copy)
+
+        # Fix 3: Normalize confidence (done in format_confidence function)
+
+        processed.append(v_copy)
+
+    # Deduplicate by article (keep highest confidence)
+    unique_violations = {}
+    for v in processed:
+        article = v.get('article_violated', 'Unknown')
+        framework = v.get('framework', 'Unknown')
+        key = f"{framework}-{article.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')}"
+
+        conf = v.get('confidence', 0)
+        if key not in unique_violations or conf > unique_violations[key].get('confidence', 0):
+            unique_violations[key] = v
+
+    return list(unique_violations.values())
+
+
 # ============================================
 # COLOR PALETTE
 # ============================================
@@ -488,7 +589,7 @@ def create_violation_page(styles, violation, index, total):
          'Priority:', priority],
         ['Complexity:', violation.get('complexity', 'Medium'),
          'Timeline:', timeline],
-        ['Confidence:', f"{violation.get('confidence_score', violation.get('confidence', 95))}%", '', ''],
+        ['Confidence:', f"{format_confidence(violation.get('confidence_score', violation.get('confidence', 0.95)))}%", '', ''],
     ]
 
     meta_table = Table(metadata, colWidths=[1*inch, 1.8*inch, 1*inch, 1.8*inch])
@@ -808,6 +909,11 @@ def generate_compliance_report(data, output_path=None):
     data.setdefault('violations', [])
     data.setdefault('total_violations', len(data.get('violations', [])))
     data.setdefault('assessment_date', datetime.now().strftime('%Y-%m-%d'))
+
+    # CRITICAL: Preprocess violations to fix Article 5 severity, confidence format, business impact
+    print(f"DEBUG: Preprocessing {len(data['violations'])} violations")
+    data['violations'] = preprocess_violations(data['violations'])
+    print(f"DEBUG: After preprocessing: {len(data['violations'])} violations (deduplicated)")
 
     # Create buffer or file
     if output_path:

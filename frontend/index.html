@@ -1241,6 +1241,148 @@
             line-height: 1.5;
         }
 
+        /* Technical Fix Plan - Enterprise-grade styling */
+        .technical-fix-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .fix-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .fix-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .fix-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 600;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        .effort-badge {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .fix-details {
+            padding-left: 44px;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-section h5 {
+            color: #94a3b8;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .tech-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .tech-tag {
+            background: rgba(91, 155, 213, 0.2);
+            color: #5b9bd5;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid rgba(91, 155, 213, 0.3);
+        }
+
+        .code-block {
+            background: #1a1a2e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #e2e8f0;
+            margin-top: 8px;
+        }
+
+        .code-block code {
+            background: transparent;
+            padding: 0;
+            color: inherit;
+            font-family: inherit;
+        }
+
+        .api-changes {
+            list-style: none;
+            padding: 0;
+            margin-top: 8px;
+        }
+
+        .api-changes li {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .api-changes li:last-child {
+            border-bottom: none;
+        }
+
+        .api-changes code {
+            background: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+        }
+
+        .detail-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-top: 8px;
+        }
+
         .violation-tab-content {
             display: none;
         }
@@ -3171,50 +3313,59 @@
         // Tab content generator functions
         function generateTechnicalFixPlan(violation) {
             const remediationSteps = violation.remediation_steps || [];
+            const framework = violation.framework?.toLowerCase() || '';
+            const article = violation.article_violated || '';
 
-            // Split steps into technical and business process changes
-            // Technical: code, API, architecture, security, data handling
-            // Business: policy, training, governance, compliance, audit
-            const technicalSteps = [];
-            const businessSteps = [];
-
-            remediationSteps.forEach(step => {
-                const stepLower = step.toLowerCase();
-                if (stepLower.includes('code') || stepLower.includes('api') ||
-                    stepLower.includes('architecture') || stepLower.includes('security') ||
-                    stepLower.includes('encryption') || stepLower.includes('database') ||
-                    stepLower.includes('system') || stepLower.includes('technical') ||
-                    stepLower.includes('implement') || stepLower.includes('develop')) {
-                    technicalSteps.push(step);
-                } else {
-                    businessSteps.push(step);
-                }
-            });
-
-            // If no clear split, put first half in technical, second half in business
-            if (technicalSteps.length === 0 && businessSteps.length === 0) {
-                const mid = Math.ceil(remediationSteps.length / 2);
-                technicalSteps.push(...remediationSteps.slice(0, mid));
-                businessSteps.push(...remediationSteps.slice(mid));
-            } else if (technicalSteps.length === 0) {
-                technicalSteps.push(...businessSteps.splice(0, Math.ceil(businessSteps.length / 2)));
-            } else if (businessSteps.length === 0) {
-                businessSteps.push(...technicalSteps.splice(Math.ceil(technicalSteps.length / 2)));
-            }
+            // Generate highly technical fixes with code examples
+            const technicalFixes = enhanceWithTechnicalDetails(remediationSteps, framework, article);
+            const businessSteps = extractBusinessProcessChanges(remediationSteps);
 
             return `
                 <div class="fixplan-columns">
                     <div class="fixplan-column">
                         <h4>🔧 TECHNICAL IMPLEMENTATION</h4>
-                        ${technicalSteps.map((step, i) => `
-                            <div class="fix-step">
-                                <div class="step-number">${i + 1}</div>
-                                <div class="step-content">
-                                    <p>${step}</p>
+                        ${technicalFixes.map((fix, i) => `
+                            <div class="technical-fix-item">
+                                <div class="fix-header">
+                                    <div class="fix-number">${i + 1}</div>
+                                    <h4 class="fix-title">${fix.title}</h4>
+                                    <span class="effort-badge">${fix.effort}</span>
+                                </div>
+                                <div class="fix-details">
+                                    ${fix.techStack ? `
+                                        <div class="detail-section">
+                                            <h5>Technology Stack</h5>
+                                            <div class="tech-tags">
+                                                ${fix.techStack.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    ${fix.database ? `
+                                        <div class="detail-section">
+                                            <h5>Database Changes</h5>
+                                            <div class="code-block"><code>${escapeHtml(fix.database)}</code></div>
+                                        </div>
+                                    ` : ''}
+                                    ${fix.code ? `
+                                        <div class="detail-section">
+                                            <h5>Code Implementation</h5>
+                                            <div class="code-block"><code>${escapeHtml(fix.code)}</code></div>
+                                        </div>
+                                    ` : ''}
+                                    ${fix.api ? `
+                                        <div class="detail-section">
+                                            <h5>API Changes</h5>
+                                            <ul class="api-changes">
+                                                ${fix.api.map(endpoint => `<li>${endpoint}</li>`).join('')}
+                                            </ul>
+                                        </div>
+                                    ` : ''}
+                                    ${fix.description ? `
+                                        <div class="detail-text">${fix.description}</div>
+                                    ` : ''}
                                 </div>
                             </div>
                         `).join('')}
-                        ${technicalSteps.length === 0 ? '<p style="color: rgba(255,255,255,0.6);">No technical steps identified.</p>' : ''}
                     </div>
                     <div class="fixplan-column">
                         <h4>📋 BUSINESS PROCESS CHANGES</h4>
@@ -3226,10 +3377,158 @@
                                 </div>
                             </div>
                         `).join('')}
-                        ${businessSteps.length === 0 ? '<p style="color: rgba(255,255,255,0.6);">No business process changes identified.</p>' : ''}
                     </div>
                 </div>
             `;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function enhanceWithTechnicalDetails(steps, framework, article) {
+            // Generate highly technical implementations based on violation type
+            const fixes = [];
+
+            steps.forEach((step, idx) => {
+                const stepLower = step.toLowerCase();
+
+                // Encryption/Security implementation
+                if (stepLower.includes('encrypt') || stepLower.includes('security') || stepLower.includes('protect')) {
+                    fixes.push({
+                        title: 'IMPLEMENT AES-256 ENCRYPTION FOR PII DATA',
+                        effort: '3-5 days',
+                        techStack: ['AWS KMS', 'PostgreSQL', 'Python cryptography'],
+                        database: `ALTER TABLE users ADD COLUMN encrypted_ssn BYTEA;\nCREATE EXTENSION IF NOT EXISTS pgcrypto;`,
+                        code: `from cryptography.fernet import Fernet\nfrom aws_kms import get_data_key\n\ndef encrypt_pii(plaintext: str) -> bytes:\n    key = get_data_key(key_id="alias/pii-key")\n    f = Fernet(key)\n    return f.encrypt(plaintext.encode())`,
+                        api: [
+                            '<code>POST /api/users</code> - encrypt PII before storage',
+                            '<code>GET /api/users/{id}</code> - decrypt with audit log'
+                        ],
+                        description: 'Implement field-level encryption using AWS KMS for key management. All PII fields encrypted at rest with AES-256.'
+                    });
+                }
+
+                // Audit logging
+                else if (stepLower.includes('audit') || stepLower.includes('log') || stepLower.includes('track')) {
+                    fixes.push({
+                        title: 'IMPLEMENT COMPREHENSIVE AUDIT LOGGING',
+                        effort: '2-3 days',
+                        techStack: ['PostgreSQL', 'Elasticsearch', 'Python logging'],
+                        database: `CREATE TABLE audit_logs (\n  id UUID PRIMARY KEY,\n  timestamp TIMESTAMP DEFAULT NOW(),\n  user_id UUID,\n  action VARCHAR(100),\n  resource_type VARCHAR(50),\n  resource_id UUID,\n  changes JSONB,\n  ip_address INET\n);`,
+                        code: `import logging\nfrom datetime import datetime\n\nclass AuditLogger:\n    def log_action(self, user_id, action, resource_type, resource_id, changes):\n        audit_entry = {\n            'timestamp': datetime.utcnow(),\n            'user_id': user_id,\n            'action': action,\n            'resource_type': resource_type,\n            'resource_id': resource_id,\n            'changes': changes\n        }\n        db.audit_logs.insert(audit_entry)`,
+                        api: [
+                            '<code>GET /api/audit-logs</code> - query audit trail',
+                            '<code>POST /api/audit-logs/export</code> - export for compliance'
+                        ]
+                    });
+                }
+
+                // Access control/RBAC
+                else if (stepLower.includes('access') || stepLower.includes('permission') || stepLower.includes('rbac') || stepLower.includes('auth')) {
+                    fixes.push({
+                        title: 'IMPLEMENT ROLE-BASED ACCESS CONTROL (RBAC)',
+                        effort: '4-6 days',
+                        techStack: ['OAuth 2.0', 'JWT', 'Redis', 'FastAPI middleware'],
+                        database: `CREATE TABLE roles (\n  id UUID PRIMARY KEY,\n  name VARCHAR(50) UNIQUE,\n  permissions JSONB\n);\n\nCREATE TABLE user_roles (\n  user_id UUID REFERENCES users(id),\n  role_id UUID REFERENCES roles(id),\n  PRIMARY KEY (user_id, role_id)\n);`,
+                        code: `from fastapi import Depends, HTTPException\nfrom jose import jwt\n\ndef check_permission(required_permission: str):\n    def permission_checker(token: str = Depends(oauth2_scheme)):\n        payload = jwt.decode(token, SECRET_KEY)\n        user_permissions = get_user_permissions(payload['sub'])\n        if required_permission not in user_permissions:\n            raise HTTPException(status_code=403, detail="Insufficient permissions")\n        return payload\n    return permission_checker`,
+                        api: [
+                            '<code>POST /api/auth/login</code> - authenticate and get JWT',
+                            '<code>GET /api/auth/permissions</code> - list user permissions',
+                            '<code>POST /api/roles</code> - create/update roles'
+                        ]
+                    });
+                }
+
+                // Data retention/deletion
+                else if (stepLower.includes('delete') || stepLower.includes('retention') || stepLower.includes('erasure') || stepLower.includes('remove')) {
+                    fixes.push({
+                        title: 'AUTOMATED DATA RETENTION & DELETION MECHANISM',
+                        effort: '3-4 days',
+                        techStack: ['PostgreSQL', 'Celery', 'Python', 'Cron jobs'],
+                        database: `ALTER TABLE users ADD COLUMN deletion_requested_at TIMESTAMP;\nALTER TABLE users ADD COLUMN scheduled_deletion_date DATE;\n\nCREATE INDEX idx_scheduled_deletion ON users(scheduled_deletion_date) WHERE scheduled_deletion_date IS NOT NULL;`,
+                        code: `from celery import Celery\nfrom datetime import datetime, timedelta\n\n@celery.task\ndef process_deletion_requests():\n    # Find users scheduled for deletion\n    users_to_delete = db.users.find({\n        'scheduled_deletion_date': {'$lte': datetime.utcnow()}\n    })\n    \n    for user in users_to_delete:\n        # Cascade delete across all tables\n        delete_user_data_cascade(user.id)\n        audit_log('USER_DELETED', user.id)`,
+                        api: [
+                            '<code>POST /api/users/{id}/request-deletion</code> - initiate deletion',
+                            '<code>DELETE /api/users/{id}</code> - immediate deletion (admin)',
+                            '<code>GET /api/users/{id}/deletion-status</code> - check status'
+                        ]
+                    });
+                }
+
+                // Human review/oversight
+                else if (stepLower.includes('human') || stepLower.includes('review') || stepLower.includes('override') || stepLower.includes('appeal')) {
+                    fixes.push({
+                        title: 'IMPLEMENT HUMAN-IN-THE-LOOP REVIEW SYSTEM',
+                        effort: '5-7 days',
+                        techStack: ['React', 'FastAPI', 'PostgreSQL', 'WebSockets'],
+                        database: `CREATE TABLE review_queue (\n  id UUID PRIMARY KEY,\n  decision_id UUID,\n  ai_recommendation TEXT,\n  confidence_score DECIMAL,\n  status VARCHAR(20),\n  assigned_reviewer UUID,\n  created_at TIMESTAMP DEFAULT NOW()\n);\n\nCREATE TABLE review_decisions (\n  id UUID PRIMARY KEY,\n  queue_item_id UUID REFERENCES review_queue(id),\n  reviewer_id UUID,\n  decision VARCHAR(20),\n  rationale TEXT,\n  reviewed_at TIMESTAMP\n);`,
+                        code: `from fastapi import APIRouter\n\n@router.post("/api/decisions")\nasync def create_decision(data: DecisionRequest):\n    ai_result = await ai_model.predict(data)\n    \n    # Route high-risk decisions to human review\n    if ai_result.confidence < 0.85 or ai_result.risk_level == 'HIGH':\n        review_item = add_to_review_queue(\n            decision_id=ai_result.id,\n            ai_recommendation=ai_result.recommendation,\n            confidence_score=ai_result.confidence\n        )\n        notify_reviewers(review_item.id)\n        return {"status": "pending_review", "queue_id": review_item.id}\n    \n    return ai_result`,
+                        api: [
+                            '<code>GET /api/review-queue</code> - fetch pending reviews',
+                            '<code>POST /api/review-queue/{id}/decide</code> - submit review',
+                            '<code>POST /api/decisions/{id}/appeal</code> - user appeal'
+                        ]
+                    });
+                }
+
+                // Consent management
+                else if (stepLower.includes('consent') || stepLower.includes('opt-in') || stepLower.includes('opt-out') || stepLower.includes('preference')) {
+                    fixes.push({
+                        title: 'GRANULAR CONSENT MANAGEMENT SYSTEM',
+                        effort: '4-5 days',
+                        techStack: ['React', 'FastAPI', 'PostgreSQL', 'Cookie management'],
+                        database: `CREATE TABLE consent_records (\n  id UUID PRIMARY KEY,\n  user_id UUID,\n  consent_type VARCHAR(50),\n  granted BOOLEAN,\n  granted_at TIMESTAMP,\n  expires_at TIMESTAMP,\n  ip_address INET,\n  user_agent TEXT\n);\n\nCREATE INDEX idx_user_consent ON consent_records(user_id, consent_type);`,
+                        code: `from fastapi import APIRouter, Request\n\nclass ConsentManager:\n    def record_consent(self, user_id, consent_type, granted, request):\n        consent = {\n            'user_id': user_id,\n            'consent_type': consent_type,\n            'granted': granted,\n            'granted_at': datetime.utcnow(),\n            'ip_address': request.client.host,\n            'user_agent': request.headers.get('user-agent')\n        }\n        db.consent_records.insert(consent)\n    \n    def check_consent(self, user_id, consent_type):\n        return db.consent_records.find_one({\n            'user_id': user_id,\n            'consent_type': consent_type,\n            'granted': True,\n            'expires_at': {'$gte': datetime.utcnow()}\n        })`,
+                        api: [
+                            '<code>POST /api/consent</code> - record user consent',
+                            '<code>GET /api/consent/{userId}</code> - get consent status',
+                            '<code>DELETE /api/consent/{userId}/{type}</code> - withdraw consent'
+                        ]
+                    });
+                }
+
+                // Generic fallback for other steps
+                else {
+                    fixes.push({
+                        title: step.toUpperCase(),
+                        effort: '2-4 days',
+                        description: step
+                    });
+                }
+            });
+
+            return fixes.length > 0 ? fixes : [{
+                title: 'COMPLIANCE REMEDIATION REQUIRED',
+                effort: '3-5 days',
+                description: 'Implement technical controls to address identified compliance gaps.'
+            }];
+        }
+
+        function extractBusinessProcessChanges(steps) {
+            const businessSteps = [];
+            steps.forEach(step => {
+                const stepLower = step.toLowerCase();
+                if (stepLower.includes('policy') || stepLower.includes('train') ||
+                    stepLower.includes('governance') || stepLower.includes('document') ||
+                    stepLower.includes('procedure') || stepLower.includes('audit')) {
+                    businessSteps.push(step);
+                }
+            });
+
+            // Add default business steps if none found
+            if (businessSteps.length === 0) {
+                businessSteps.push(
+                    'Update privacy policy to reflect technical controls',
+                    'Conduct staff training on new compliance procedures',
+                    'Establish regular compliance audit schedule',
+                    'Document all technical and process changes'
+                );
+            }
+
+            return businessSteps;
         }
 
         function generateBusinessPlan(violation) {

@@ -95,6 +95,90 @@ class PDFComplianceReport:
             spaceAfter=6
         ))
 
+    def _preprocess_violations(self, violations: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Preprocess violations to fix issues before PDF generation.
+
+        Fixes:
+        1. Article 5 (EU AI Act Prohibited Practices) always CRITICAL
+        2. Deduplicate violations by article
+        3. Add specific business impact based on severity/framework
+        4. Normalize confidence to 0-1 range
+        """
+        # Make a copy to avoid modifying original
+        violations = [v.copy() for v in violations]
+
+        # Fix 1: Article 5 override - CRITICAL (Prohibited AI Practices)
+        for v in violations:
+            article = v.get('article_violated', '').lower()
+            framework = v.get('framework', '').lower()
+
+            # EU AI Act Article 5 = Prohibited Practices = Always CRITICAL
+            if ('article 5' in article or 'article5' in article) and 'eu' in framework:
+                v['severity'] = 'CRITICAL'
+                v['priority'] = 'P0'
+                v['timeline'] = 'Immediate (0-14 days)'
+                logger.info(f"Overriding Article 5 violation to CRITICAL: {article}")
+
+        # Fix 2: Deduplicate by article (keep highest confidence)
+        unique_violations = {}
+        for v in violations:
+            article = v.get('article_violated', 'Unknown')
+            framework = v.get('framework', 'Unknown')
+            # Create key from framework + normalized article (remove special chars)
+            key = f"{framework}-{article.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')}"
+
+            if key not in unique_violations or v.get('confidence', 0) > unique_violations[key].get('confidence', 0):
+                unique_violations[key] = v
+
+        violations = list(unique_violations.values())
+
+        # Fix 3: Add specific business impact if missing
+        for v in violations:
+            if not v.get('business_impact') or v.get('business_impact') == 'Impact assessment required':
+                v['business_impact'] = self._get_default_business_impact(
+                    v.get('severity', 'UNKNOWN'),
+                    v.get('framework', 'Unknown')
+                )
+
+        # Fix 4: Normalize confidence to 0-1 range
+        for v in violations:
+            conf = v.get('confidence', 0.0)
+            if conf > 1:  # If confidence is already in percentage (e.g., 92)
+                v['confidence'] = conf / 100
+
+        return violations
+
+    def _get_default_business_impact(self, severity: str, framework: str) -> str:
+        """Get specific business impact based on severity and framework."""
+        framework_lower = framework.lower()
+
+        if severity == 'CRITICAL':
+            if 'gdpr' in framework_lower:
+                return 'Up to €20M or 4% of annual global turnover. Immediate regulatory action likely. Public disclosure required.'
+            elif 'eu' in framework_lower or 'ai' in framework_lower:
+                return 'Up to €35M or 7% of annual global turnover. Product ban possible. Mandatory notification to authorities.'
+            elif 'sox' in framework_lower:
+                return 'SEC enforcement action. Officer criminal liability. Trading suspension risk. Investor lawsuits.'
+            else:
+                return 'Severe regulatory penalties. Operational shutdown risk. Executive liability.'
+
+        elif severity == 'MAJOR':
+            if 'gdpr' in framework_lower:
+                return 'Up to €10M or 2% of annual global turnover. Data protection authority investigation.'
+            elif 'eu' in framework_lower or 'ai' in framework_lower:
+                return 'Up to €15M or 3% of annual global turnover. Product restrictions possible.'
+            elif 'sox' in framework_lower:
+                return 'SEC investigation. Restatement requirements. Material weakness disclosure.'
+            else:
+                return 'Significant regulatory penalties. Compliance review required.'
+
+        elif severity == 'MINOR':
+            return 'Regulatory warning. Corrective action required. Limited financial exposure.'
+
+        else:
+            return 'Compliance review recommended. Risk mitigation advised.'
+
     def generate_report(
         self,
         violations: List[Dict[str, Any]],
@@ -116,6 +200,9 @@ class PDFComplianceReport:
         Returns:
             BytesIO buffer containing PDF document.
         """
+        # Preprocess violations: fix Article 5 severity, deduplicate, add business impact
+        violations = self._preprocess_violations(violations)
+
         buffer = BytesIO()
 
         # Create PDF document
@@ -428,9 +515,19 @@ class PDFComplianceReport:
         ))
         elements.append(Spacer(1, 0.1 * inch))
 
-        # Confidence
+        # Confidence - convert to percentage (0.92 -> 92%)
+        confidence_percent = int(confidence * 100) if confidence <= 1 else int(confidence)
         elements.append(Paragraph(
-            f"<b>Confidence:</b> {confidence:.1%}",
+            f"<b>Confidence:</b> {confidence_percent}%",
+            self.styles['BodyText']
+        ))
+        elements.append(Spacer(1, 0.1 * inch))
+
+        # Business Impact (now showing specific consequences instead of generic text)
+        business_impact = violation.get('business_impact', 'Impact assessment required')
+        elements.append(Paragraph("<b>Business Impact:</b>", self.styles['BodyText']))
+        elements.append(Paragraph(
+            business_impact,
             self.styles['BodyText']
         ))
 

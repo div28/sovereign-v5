@@ -1097,6 +1097,150 @@
             border-bottom-color: #60a5fa;
         }
 
+        /* Two-column layouts for Technical Fix Plan and Citations */
+        .fixplan-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 16px;
+        }
+
+        .fixplan-column {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .fixplan-column:first-child {
+            border-left: 4px solid #60a5fa; /* Blue for Technical */
+        }
+
+        .fixplan-column:last-child {
+            border-left: 4px solid #a78bfa; /* Purple for Business */
+        }
+
+        .fixplan-column h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .fix-step {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+        }
+
+        .step-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content h5 {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .step-content p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* Citations 2-column layout */
+        .citations-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 16px;
+        }
+
+        .citations-section h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .citation-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #5b9bd5;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .citation-article {
+            font-weight: 600;
+            color: #5b9bd5;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .citation-title {
+            color: white;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .citation-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        .evidence-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #a78bfa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .evidence-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .evidence-content {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
         .violation-tab-content {
             display: none;
         }
@@ -3024,6 +3168,192 @@
             `;
         }
 
+        // Tab content generator functions
+        function generateTechnicalFixPlan(violation) {
+            const remediationSteps = violation.remediation_steps || [];
+
+            // Split steps into technical and business process changes
+            // Technical: code, API, architecture, security, data handling
+            // Business: policy, training, governance, compliance, audit
+            const technicalSteps = [];
+            const businessSteps = [];
+
+            remediationSteps.forEach(step => {
+                const stepLower = step.toLowerCase();
+                if (stepLower.includes('code') || stepLower.includes('api') ||
+                    stepLower.includes('architecture') || stepLower.includes('security') ||
+                    stepLower.includes('encryption') || stepLower.includes('database') ||
+                    stepLower.includes('system') || stepLower.includes('technical') ||
+                    stepLower.includes('implement') || stepLower.includes('develop')) {
+                    technicalSteps.push(step);
+                } else {
+                    businessSteps.push(step);
+                }
+            });
+
+            // If no clear split, put first half in technical, second half in business
+            if (technicalSteps.length === 0 && businessSteps.length === 0) {
+                const mid = Math.ceil(remediationSteps.length / 2);
+                technicalSteps.push(...remediationSteps.slice(0, mid));
+                businessSteps.push(...remediationSteps.slice(mid));
+            } else if (technicalSteps.length === 0) {
+                technicalSteps.push(...businessSteps.splice(0, Math.ceil(businessSteps.length / 2)));
+            } else if (businessSteps.length === 0) {
+                businessSteps.push(...technicalSteps.splice(Math.ceil(technicalSteps.length / 2)));
+            }
+
+            return `
+                <div class="fixplan-columns">
+                    <div class="fixplan-column">
+                        <h4>🔧 TECHNICAL IMPLEMENTATION</h4>
+                        ${technicalSteps.map((step, i) => `
+                            <div class="fix-step">
+                                <div class="step-number">${i + 1}</div>
+                                <div class="step-content">
+                                    <p>${step}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                        ${technicalSteps.length === 0 ? '<p style="color: rgba(255,255,255,0.6);">No technical steps identified.</p>' : ''}
+                    </div>
+                    <div class="fixplan-column">
+                        <h4>📋 BUSINESS PROCESS CHANGES</h4>
+                        ${businessSteps.map((step, i) => `
+                            <div class="fix-step">
+                                <div class="step-number">${i + 1}</div>
+                                <div class="step-content">
+                                    <p>${step}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                        ${businessSteps.length === 0 ? '<p style="color: rgba(255,255,255,0.6);">No business process changes identified.</p>' : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateBusinessPlan(violation) {
+            // Business plan with 2 columns: Policy & Governance | Training & Compliance
+            const businessActions = violation.business_actions || violation.policy_actions || [];
+
+            // Generate default business plan items based on severity and framework
+            const policyItems = [
+                'Update privacy policy to reflect data processing activities',
+                'Establish data protection officer (DPO) oversight procedures',
+                'Implement consent management mechanisms',
+                'Define data retention and deletion policies'
+            ];
+
+            const trainingItems = [
+                'Conduct staff training on data protection requirements',
+                'Obtain relevant compliance certifications',
+                'Schedule regular compliance audits',
+                'Establish vendor assessment procedures'
+            ];
+
+            return `
+                <div class="fixplan-columns">
+                    <div class="fixplan-column">
+                        <h4>📋 POLICY & GOVERNANCE</h4>
+                        ${policyItems.map((item, i) => `
+                            <div class="fix-step">
+                                <div class="step-number">${i + 1}</div>
+                                <div class="step-content">
+                                    <p>${item}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="fixplan-column">
+                        <h4>🎓 TRAINING & COMPLIANCE</h4>
+                        ${trainingItems.map((item, i) => `
+                            <div class="fix-step">
+                                <div class="step-number">${i + 1}</div>
+                                <div class="step-content">
+                                    <p>${item}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateCitations(violation, regulatoryContext) {
+            // Debug log to see what data is available
+            console.log('DEBUG generateCitations:', {
+                article_violated: violation.article_violated,
+                framework: violation.framework,
+                regulatoryContext: regulatoryContext,
+                evidence_quote: violation.evidence_quote,
+                issue: violation.issue
+            });
+
+            // Extract citations from regulatory context
+            const citations = [];
+            if (regulatoryContext && regulatoryContext.length > 0) {
+                regulatoryContext.forEach(ctx => {
+                    if (ctx.article || ctx.text) {
+                        citations.push({
+                            article: ctx.article || violation.article_violated || 'Unknown Article',
+                            title: ctx.title || ctx.section || '',
+                            text: ctx.text || ctx.content || ''
+                        });
+                    }
+                });
+            }
+
+            // If no citations from context, create from violation data
+            if (citations.length === 0 && violation.article_violated) {
+                citations.push({
+                    article: violation.article_violated,
+                    title: `${violation.framework?.toUpperCase()} Requirement`,
+                    text: violation.evidence_quote || violation.issue || 'See full regulatory text for details.'
+                });
+            }
+
+            // Evidence items
+            const evidenceItems = [
+                {
+                    label: 'Document Reference',
+                    content: violation.evidence_quote || violation.issue || 'See system documentation'
+                },
+                {
+                    label: 'Gap Analysis',
+                    content: violation.reasoning || 'Compliance gap identified through automated analysis'
+                },
+                {
+                    label: 'Risk Assessment',
+                    content: `Severity: ${violation.severity || 'MAJOR'} | Confidence: ${violation.confidence ? Math.round(violation.confidence * 100) + '%' : 'N/A'}`
+                }
+            ];
+
+            return `
+                <div class="citations-columns">
+                    <div class="citations-section">
+                        <h4>📜 REGULATORY CITATIONS</h4>
+                        ${citations.map(cite => `
+                            <div class="citation-item">
+                                <div class="citation-article">${cite.article}</div>
+                                ${cite.title ? `<div class="citation-title">${cite.title}</div>` : ''}
+                                <div class="citation-text">"${cite.text.substring(0, 300)}${cite.text.length > 300 ? '...' : ''}"</div>
+                            </div>
+                        `).join('')}
+                        ${citations.length === 0 ? '<p style="color: rgba(255,255,255,0.6);">No citations available.</p>' : ''}
+                    </div>
+                    <div class="citations-section">
+                        <h4>📄 SUPPORTING EVIDENCE</h4>
+                        ${evidenceItems.map(item => `
+                            <div class="evidence-item">
+                                <div class="evidence-label">${item.label}</div>
+                                <div class="evidence-content">${item.content}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
         // New redesigned rendering function
         function renderResults(data) {
             // Meta
@@ -3180,30 +3510,15 @@
                         </div>
 
                         <div class="violation-tab-content active" id="technical-${idx}">
-                            <div style="font-size: 13px; color: rgba(255,255,255,0.8);">
-                                ${v.remediation_steps?.map((step, i) => `
-                                    <div style="margin-bottom: 12px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 6px;">
-                                        <div style="font-weight: 600; margin-bottom: 4px;">${i + 1}. ${step}</div>
-                                    </div>
-                                `).join('') || '<p>No technical remediation steps provided.</p>'}
-                            </div>
+                            ${generateTechnicalFixPlan(v)}
                         </div>
 
                         <div class="violation-tab-content" id="business-${idx}">
-                            <div style="font-size: 13px; color: rgba(255,255,255,0.8);">
-                                <p>Business process changes and policy updates required to address this violation.</p>
-                            </div>
+                            ${generateBusinessPlan(v)}
                         </div>
 
                         <div class="violation-tab-content" id="citations-${idx}">
-                            <div style="font-size: 13px; color: rgba(255,255,255,0.8);">
-                                ${v.article_violated ? `
-                                    <div style="margin-bottom: 12px;">
-                                        <div style="font-weight: 600; color: #5b9bd5; margin-bottom: 4px;">${v.article_violated}</div>
-                                        <div>${v.framework?.toUpperCase() || 'N/A'}</div>
-                                    </div>
-                                ` : '<p>No citations available.</p>'}
-                            </div>
+                            ${generateCitations(v, regulatoryContext)}
                         </div>
                     </div>
                 `;

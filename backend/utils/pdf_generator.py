@@ -379,13 +379,22 @@ def create_cover_page(styles, data):
     risk_score = data.get('risk_score', 0)
     severity_color, severity_bg, severity_label = get_severity_color(risk_score / 10)
 
+    # Wrap style for long text
+    cover_wrap_style = ParagraphStyle(
+        'CoverWrap',
+        parent=styles['Normal'],
+        fontSize=11,
+        textColor=COLORS['text'],
+        leading=14
+    )
+
     details = [
-        ['Assessment ID:', data.get('assessment_id', 'N/A')],
+        ['Assessment ID:', Paragraph(data.get('assessment_id', 'N/A'), cover_wrap_style)],
         ['Risk Score:', f"{risk_score}/100"],
         ['Risk Level:', severity_label],
         ['Assessment Date:', data.get('assessment_date', datetime.now().strftime('%Y-%m-%d'))],
         ['Total Violations:', str(data.get('total_violations', 0))],
-        ['Frameworks Assessed:', ', '.join(data.get('frameworks', []))],
+        ['Frameworks Assessed:', Paragraph(', '.join(data.get('frameworks', [])), cover_wrap_style)],
         ['Report Generated:', datetime.now().strftime('%Y-%m-%d %H:%M:%S')],
     ]
 
@@ -402,6 +411,7 @@ def create_cover_page(styles, data):
         ('ALIGN', (1, 0), (1, -1), 'LEFT'),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
         ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),  # Align to top for wrapped text
     ]))
 
     elements.append(detail_table)
@@ -487,9 +497,18 @@ def create_executive_summary(styles, data):
         fw = get_violation_field(v, 'framework', 'regulation', default='Unknown')
         framework_counts[fw] = framework_counts.get(fw, 0) + 1
 
+    # Wrap style for framework names
+    fw_wrap_style = ParagraphStyle(
+        'FrameworkWrap',
+        parent=styles['Normal'],
+        fontSize=10,
+        textColor=COLORS['text'],
+        leading=13
+    )
+
     fw_data = [['Framework', 'Count']]
     for fw, count in framework_counts.items():
-        fw_data.append([fw, str(count)])
+        fw_data.append([Paragraph(fw, fw_wrap_style), str(count)])
 
     fw_table = Table(fw_data, colWidths=[3*inch, 1*inch])
     fw_table.setStyle(TableStyle([
@@ -501,6 +520,7 @@ def create_executive_summary(styles, data):
         ('GRID', (0, 0), (-1, -1), 0.5, COLORS['border']),
         ('TOPPADDING', (0, 0), (-1, -1), 8),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),  # Align to top for wrapped text
     ]))
     elements.append(fw_table)
 
@@ -581,14 +601,22 @@ def create_violation_page(styles, violation, index, total):
     elements.append(badge_table)
     elements.append(Spacer(1, 0.2*inch))
 
-    # Metadata grid
+    # Metadata grid - wrap text fields to prevent overflow
+    wrap_style = ParagraphStyle(
+        'WrapText',
+        parent=styles['Normal'],
+        fontSize=9,
+        textColor=COLORS['text'],
+        leading=11
+    )
+
     metadata = [
-        ['Framework:', framework,
-         'Article:', article],
+        ['Framework:', Paragraph(framework, wrap_style),
+         'Article:', Paragraph(article, wrap_style)],
         ['Severity:', f"{severity}/10",
          'Priority:', priority],
         ['Complexity:', violation.get('complexity', 'Medium'),
-         'Timeline:', timeline],
+         'Timeline:', Paragraph(timeline, wrap_style)],
         ['Confidence:', f"{format_confidence(violation.get('confidence_score', violation.get('confidence', 0.95)))}%", '', ''],
     ]
 
@@ -604,6 +632,7 @@ def create_violation_page(styles, violation, index, total):
         ('TOPPADDING', (0, 0), (-1, -1), 4),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
         ('BACKGROUND', (0, 0), (-1, -1), COLORS['border']),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),  # Align to top for wrapped text
     ]))
     elements.append(meta_table)
     elements.append(Spacer(1, 0.2*inch))

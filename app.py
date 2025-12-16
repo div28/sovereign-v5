@@ -4,13 +4,13 @@ Sovereign V5 - AI Compliance Intelligence Platform
 FastAPI backend for regulatory compliance scanning.
 """
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, Response
 from pydantic import BaseModel
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
+# from slowapi import Limiter, _rate_limit_exceeded_handler
+# from slowapi.util import get_remote_address
+# from slowapi.errors import RateLimitExceeded
 from typing import List, Dict, Any, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -36,10 +36,10 @@ app = FastAPI(
     description="Pre-deployment AI compliance scanner for GDPR, SOX, EU AI Act"
 )
 
-# Rate limiting configuration
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+# Rate limiting configuration - TEMPORARILY DISABLED
+# limiter = Limiter(key_func=get_remote_address)
+# app.state.limiter = limiter
+# app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS configuration
 app.add_middleware(
@@ -329,8 +329,8 @@ async def health_check():
 
 
 @app.post("/api/analyze", response_model=AnalyzeResponse)
-@limiter.limit("10/minute")  # Max 10 assessments per minute per IP
-async def analyze_compliance(request_http: Request, request: AnalyzeRequest):
+# @limiter.limit("10/minute")  # Max 10 assessments per minute per IP - TEMPORARILY DISABLED
+async def analyze_compliance(request: AnalyzeRequest):
     """
     Analyze a system description for compliance violations.
 
@@ -483,8 +483,8 @@ async def list_frameworks():
 # ============================================================================
 
 @app.get("/api/export/pdf/{analysis_id}")
-@limiter.limit("20/minute")  # Max 20 PDF exports per minute per IP
-async def export_pdf(request: Request, analysis_id: str):
+# @limiter.limit("20/minute")  # Max 20 PDF exports per minute per IP - TEMPORARILY DISABLED
+async def export_pdf(analysis_id: str):
     """
     Export compliance analysis as PDF report.
 
@@ -535,8 +535,8 @@ async def export_pdf(request: Request, analysis_id: str):
 
 
 @app.get("/api/export/csv/{analysis_id}")
-@limiter.limit("20/minute")  # Max 20 CSV exports per minute per IP
-async def export_csv(request: Request, analysis_id: str):
+# @limiter.limit("20/minute")  # Max 20 CSV exports per minute per IP - TEMPORARILY DISABLED
+async def export_csv(analysis_id: str):
     """
     Export compliance violations as CSV.
 

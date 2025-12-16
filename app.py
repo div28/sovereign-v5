@@ -362,15 +362,16 @@ async def analyze_compliance(request: AnalyzeRequest):
 
         logger.info(f"Analyzing submission for frameworks: {frameworks}")
 
-        # Get RAG engine and retrieve context
+        # Get RAG engine and retrieve context with adaptive routing
         rag = get_rag_engine()
-        retrieved_chunks = rag.retrieve_for_evaluation(
-            submission_text=request.description,
+        retrieved_chunks = rag.retrieve(
+            query=request.description,
             frameworks=frameworks,
-            top_k=15
+            top_k=15,
+            use_routing=True  # Enable adaptive query routing
         )
 
-        logger.info(f"Retrieved {len(retrieved_chunks)} chunks")
+        logger.info(f"Retrieved {len(retrieved_chunks)} chunks (adaptive routing enabled)")
 
         # Get judges and prepare for parallel execution
         judges = get_judges()
@@ -403,8 +404,47 @@ async def analyze_compliance(request: AnalyzeRequest):
                 if result and result.get("violation_detected"):
                     violations.append(result)
                     logger.info(f"Violation detected by {judge_id}")
+
+                    # Log low-confidence detections for self-improvement review
+                    confidence = result.get("confidence", 1.0)
+                    if confidence < 0.70:
+                        try:
+                            from backend.improvement.error_logger import get_error_logger
+                            error_logger = get_error_logger()
+                            error_logger.log_error(
+                                judge_id=judge_id,
+                                framework=result.get("framework", "unknown"),
+                                test_case_id="production",
+                                error_type="low_confidence",
+                                expected_outcome=True,  # Unknown in production
+                                actual_outcome=True,
+                                submission_text=request.description[:500],  # Truncate for privacy
+                                actual_severity=result.get("severity"),
+                                error_details=f"Low confidence detection: {confidence:.2f}",
+                                confidence=confidence
+                            )
+                        except Exception as log_err:
+                            logger.error(f"Failed to log low-confidence error: {log_err}")
             except Exception as e:
-                logger.error(f"Error collecting judge result: {e}")
+                logger.error(f"Judge {judge_id if 'judge_id' in locals() else 'unknown'} failed: {e}")
+
+                # Log judge exceptions for debugging
+                try:
+                    from backend.improvement.error_logger import get_error_logger
+                    error_logger = get_error_logger()
+                    error_logger.log_error(
+                        judge_id=judge_id if 'judge_id' in locals() else 'unknown',
+                        framework="unknown",
+                        test_case_id="production",
+                        error_type="exception",
+                        expected_outcome=False,
+                        actual_outcome=False,
+                        submission_text=request.description[:500],
+                        error_details=str(e),
+                        confidence=None
+                    )
+                except Exception as log_err:
+                    logger.error(f"Failed to log exception: {log_err}")
 
         # Calculate risk score
         risk_score = calculate_risk_score(violations)

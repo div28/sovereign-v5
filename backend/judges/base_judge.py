@@ -140,7 +140,8 @@ class BaseComplianceJudge(ABC):
         focus_area: str,
         model: str = None,
         api_key: Optional[str] = None,
-        use_router: bool = True
+        use_router: bool = True,
+        use_caching: bool = True
     ):
         """
         Initialize the compliance judge.
@@ -151,10 +152,12 @@ class BaseComplianceJudge(ABC):
             model: Anthropic model to use. If None and use_router=True, uses ModelRouter.
             api_key: Anthropic API key.
             use_router: If True, use ModelRouter for intelligent model selection.
+            use_caching: If True, use prompt caching to reduce costs (requires Claude 3.5+).
         """
         self.framework = framework
         self.focus_area = focus_area
         self.use_router = use_router
+        self.use_caching = use_caching
 
         # Determine model to use
         if model:
@@ -174,7 +177,7 @@ class BaseComplianceJudge(ABC):
         import httpx
         http_client = httpx.Client(proxy=None)
         self._client = Anthropic(api_key=self.api_key, http_client=http_client)
-        logger.info(f"Initialized {self.__class__.__name__} for {framework} - {focus_area}")
+        logger.info(f"Initialized {self.__class__.__name__} for {framework} - {focus_area} (caching: {use_caching})")
 
     @property
     def judge_id(self) -> str:
@@ -198,6 +201,23 @@ class BaseComplianceJudge(ABC):
             Complete prompt for the LLM evaluation.
         """
         pass
+
+    def get_system_prompt(self) -> str:
+        """
+        Get the base system prompt for this judge.
+
+        This can be overridden by subclasses to provide
+        judge-specific instructions. Default provides generic
+        compliance evaluation guidance.
+
+        Returns:
+            System prompt text.
+        """
+        return f"""You are an expert compliance judge specializing in {self.framework} regulations,
+specifically focusing on {self.focus_area}.
+
+Your role is to analyze AI system descriptions and policy documents to identify
+compliance violations. Be thorough, precise, and cite specific regulatory requirements."""
 
     def _format_chunks_for_prompt(
         self,
@@ -252,25 +272,67 @@ class BaseComplianceJudge(ABC):
             logger.warning("Empty submission provided")
             return None
 
-        # Build the evaluation prompt
-        prompt = self.build_prompt(submission, retrieved_chunks)
-
         try:
-            # Use structured output with JSON schema
-            response = self._client.messages.create(
-                model=self.model,
-                max_tokens=1024,
-                messages=[{
-                    "role": "user",
-                    "content": prompt
-                }],
-                tools=[{
-                    "name": "report_violation",
-                    "description": "Report a compliance violation analysis result",
-                    "input_schema": VIOLATION_SCHEMA
-                }],
-                tool_choice={"type": "tool", "name": "report_violation"}
-            )
+            # Build prompt components
+            if self.use_caching:
+                # Use prompt caching: system blocks with cache_control
+                system_prompt = self.get_system_prompt()
+                regulatory_context = self._format_chunks_for_prompt(retrieved_chunks)
+
+                # System blocks with caching
+                system_blocks = [
+                    {
+                        "type": "text",
+                        "text": system_prompt
+                    },
+                    {
+                        "type": "text",
+                        "text": f"# Regulatory Context\n\n{regulatory_context}",
+                        "cache_control": {"type": "ephemeral"}  # Cache regulatory context
+                    }
+                ]
+
+                # User message with submission
+                user_prompt = f"""# AI System Description to Evaluate
+
+{submission}
+
+Analyze this AI system description against the regulatory context provided above.
+Report any violations you detect."""
+
+                response = self._client.messages.create(
+                    model=self.model,
+                    max_tokens=1024,
+                    system=system_blocks,
+                    messages=[{
+                        "role": "user",
+                        "content": user_prompt
+                    }],
+                    tools=[{
+                        "name": "report_violation",
+                        "description": "Report a compliance violation analysis result",
+                        "input_schema": VIOLATION_SCHEMA
+                    }],
+                    tool_choice={"type": "tool", "name": "report_violation"}
+                )
+
+            else:
+                # Traditional approach without caching
+                prompt = self.build_prompt(submission, retrieved_chunks)
+                response = self._client.messages.create(
+                    model=self.model,
+                    max_tokens=1024,
+                    messages=[{
+                        "role": "user",
+                        "content": prompt
+                    }],
+                    tools=[{
+                        "name": "report_violation",
+                        "description": "Report a compliance violation analysis result",
+                        "input_schema": VIOLATION_SCHEMA
+                    }],
+                    tool_choice={"type": "tool", "name": "report_violation"}
+                )
 
             # Record usage in ModelRouter if enabled
             if self.use_router:

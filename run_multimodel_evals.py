@@ -43,7 +43,7 @@ except ImportError:
 # =============================================================================
 
 MODEL_MAPPING = {
-    "haiku": "claude-3-5-haiku-20241022",
+    "haiku": "claude-haiku-4-5",
     "sonnet": "claude-sonnet-4-20250514",
     "opus": "claude-opus-4-5",
 }

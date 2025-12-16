@@ -2,7 +2,8 @@
 RAG Engine for Sovereign V5
 
 Complete RAG orchestrator with adaptive query routing,
-hybrid search (semantic + BM25), and Reciprocal Rank Fusion.
+hybrid search (semantic + BM25), Reciprocal Rank Fusion,
+and cross-encoder reranking.
 """
 
 import os
@@ -20,6 +21,92 @@ from .retriever import RAGRetriever, get_retriever
 from .embeddings import get_embeddings_client
 
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# CROSS-ENCODER RERANKING
+# =============================================================================
+
+class CrossEncoderReranker:
+    """
+    Cross-encoder reranker for final result refinement.
+
+    Uses a neural cross-encoder model to compute relevance scores
+    for (query, document) pairs, providing more accurate ranking
+    than bi-encoder embeddings alone.
+    """
+
+    def __init__(self, model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"):
+        """
+        Initialize cross-encoder reranker.
+
+        Args:
+            model_name: HuggingFace cross-encoder model name.
+        """
+        self.model_name = model_name
+        self._model = None
+        logger.info(f"CrossEncoderReranker configured with {model_name}")
+
+    def _lazy_load_model(self):
+        """Lazy load the cross-encoder model to avoid cold start delays."""
+        if self._model is None:
+            try:
+                from sentence_transformers import CrossEncoder
+                self._model = CrossEncoder(self.model_name, max_length=512)
+                logger.info(f"Loaded cross-encoder model: {self.model_name}")
+            except ImportError:
+                logger.error("sentence-transformers not installed. Install with: pip install sentence-transformers")
+                raise
+            except Exception as e:
+                logger.error(f"Failed to load cross-encoder: {e}")
+                raise
+
+    def rerank(
+        self,
+        query: str,
+        documents: List[Dict[str, Any]],
+        top_k: Optional[int] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Rerank documents using cross-encoder.
+
+        Args:
+            query: Search query.
+            documents: List of document chunks with 'text' field.
+            top_k: Number of top results to return (default: all).
+
+        Returns:
+            Reranked documents with 'cross_encoder_score' added.
+        """
+        if not documents:
+            return []
+
+        # Lazy load model
+        self._lazy_load_model()
+
+        # Prepare (query, doc) pairs
+        pairs = [[query, doc.get("text", "")] for doc in documents]
+
+        # Compute cross-encoder scores
+        try:
+            scores = self._model.predict(pairs)
+        except Exception as e:
+            logger.error(f"Cross-encoder prediction failed: {e}")
+            return documents  # Return original order on failure
+
+        # Add scores to documents
+        for doc, score in zip(documents, scores):
+            doc["cross_encoder_score"] = float(score)
+
+        # Sort by score
+        reranked = sorted(documents, key=lambda x: x.get("cross_encoder_score", 0), reverse=True)
+
+        # Apply top_k limit
+        if top_k:
+            reranked = reranked[:top_k]
+
+        logger.info(f"Reranked {len(documents)} documents, returning top {len(reranked)}")
+        return reranked
 
 
 class QueryType(Enum):
@@ -334,13 +421,15 @@ class RAGEngine:
     Main RAG orchestrator for Sovereign V5.
 
     Coordinates query classification, strategy selection,
-    and hybrid retrieval for optimal compliance document search.
+    hybrid retrieval, and cross-encoder reranking for optimal
+    compliance document search.
     """
 
     def __init__(
         self,
         retriever: Optional[RAGRetriever] = None,
-        api_key: Optional[str] = None
+        api_key: Optional[str] = None,
+        use_reranker: bool = True
     ):
         """
         Initialize the RAG engine.
@@ -348,11 +437,14 @@ class RAGEngine:
         Args:
             retriever: RAGRetriever instance.
             api_key: Anthropic API key for query classification.
+            use_reranker: Whether to use cross-encoder reranking.
         """
         self.retriever = retriever or get_retriever()
         self.router = AdaptiveQueryRouter(api_key=api_key)
         self.hybrid_search = HybridSearch(self.retriever)
-        logger.info("RAGEngine initialized")
+        self.use_reranker = use_reranker
+        self.reranker = CrossEncoderReranker() if use_reranker else None
+        logger.info(f"RAGEngine initialized (reranker: {use_reranker})")
 
     def retrieve(
         self,
@@ -362,7 +454,7 @@ class RAGEngine:
         use_routing: bool = True
     ) -> List[Dict[str, Any]]:
         """
-        Main retrieval method with adaptive routing.
+        Main retrieval method with adaptive routing and optional reranking.
 
         Args:
             query: User's compliance query.
@@ -371,7 +463,7 @@ class RAGEngine:
             use_routing: Whether to use adaptive query routing.
 
         Returns:
-            List of relevant document chunks.
+            List of relevant document chunks (reranked if enabled).
         """
         if not query or not frameworks:
             return []
@@ -380,11 +472,14 @@ class RAGEngine:
             # Get optimal strategy from router
             strategy = self.router.get_strategy(query)
 
+            # Retrieve more candidates for reranking (3x top_k)
+            fetch_k = (strategy.top_k if strategy.top_k < top_k else top_k) * 3 if self.use_reranker else (strategy.top_k if strategy.top_k < top_k else top_k)
+
             # Use strategy parameters
             results = self.hybrid_search.search(
                 query=query,
                 frameworks=frameworks,
-                top_k=strategy.top_k if strategy.top_k < top_k else top_k,
+                top_k=fetch_k,
                 semantic_weight=strategy.semantic_weight,
                 bm25_weight=strategy.bm25_weight
             )
@@ -394,13 +489,23 @@ class RAGEngine:
             )
         else:
             # Simple retrieval without routing
+            fetch_k = top_k * 3 if self.use_reranker else top_k
             results = self.hybrid_search.search(
                 query=query,
                 frameworks=frameworks,
-                top_k=top_k
+                top_k=fetch_k
             )
 
-        return results
+        # Apply cross-encoder reranking if enabled
+        if self.use_reranker and self.reranker and results:
+            results = self.reranker.rerank(
+                query=query,
+                documents=results,
+                top_k=top_k
+            )
+            logger.info(f"Reranked to top {len(results)} results")
+
+        return results[:top_k]
 
     def retrieve_for_evaluation(
         self,

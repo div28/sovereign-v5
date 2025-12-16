@@ -188,10 +188,10 @@ class PDFComplianceReport:
 
         # Analysis metadata table
         metadata = [
-            ["Report Date:", datetime.now().strftime("%B %d, %Y at %H:%M UTC")],
-            ["Analysis ID:", analysis_id or "N/A"],
-            ["Frameworks:", ", ".join(f.upper() for f in frameworks)],
-            ["Risk Score:", self._format_risk_score(risk_score)]
+            [Paragraph("Report Date:", self.styles['BodyText']), Paragraph(datetime.now().strftime("%B %d, %Y at %H:%M UTC"), self.styles['BodyText'])],
+            [Paragraph("Analysis ID:", self.styles['BodyText']), Paragraph(analysis_id or "N/A", self.styles['BodyText'])],
+            [Paragraph("Frameworks:", self.styles['BodyText']), Paragraph(", ".join(f.upper() for f in frameworks), self.styles['BodyText'])],
+            [Paragraph("Risk Score:", self.styles['BodyText']), Paragraph(self._format_risk_score(risk_score), self.styles['BodyText'])]
         ]
 
         table = Table(metadata, colWidths=[2 * inch, 4 * inch])
@@ -204,6 +204,7 @@ class PDFComplianceReport:
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('WORDWRAP', (0, 0), (-1, -1), 'LTR'),
         ]))
 
         elements.append(table)

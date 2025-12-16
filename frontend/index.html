@@ -719,6 +719,35 @@
             margin-top: 4px;
         }
 
+        /* Results header with logo */
+        .results-header {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 32px;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .header-center {
+            text-align: left;
+        }
+
+        .header-center h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .results-header .logo {
+            justify-self: start;
+        }
+
+        .results-header .export-btns {
+            justify-self: end;
+        }
+
         .export-btns {
             display: flex;
             gap: 8px;
@@ -2509,8 +2538,15 @@
     <!-- Results Section -->
     <section class="results-section" id="resultsSection">
         <div class="container">
-            <div class="header">
-                <div>
+            <div class="header results-header">
+                <a href="#" class="logo" onclick="goHome(); return false;">
+                    <img src="logo.png" alt="Sovereign" class="logo-img">
+                    <div class="logo-text">
+                        <span class="logo-title">SOVEREIGN</span>
+                        <span class="logo-subtitle">THE COMPLIANCE WHISPERER</span>
+                    </div>
+                </a>
+                <div class="header-center">
                     <h1>Assessment Results</h1>
                     <div class="meta" id="metaInfo">Loading...</div>
                 </div>

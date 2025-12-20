@@ -2438,22 +2438,22 @@
                 <div class="demo-scenarios">
                     <div class="demo-scenario-card" data-scenario="bank_fraud">
                         <div class="scenario-content">
-                            <div class="scenario-title">🏦 Bank Fraud Detection AI</div>
-                            <div class="scenario-frameworks">EU AI Act + GDPR + SOX</div>
+                            <div class="scenario-title">🏦 Fraud Detection AI</div>
+                            <div class="scenario-frameworks">GDPR + SOX + EU AI Act</div>
                         </div>
                         <button class="load-btn">Load</button>
                     </div>
-                    <div class="demo-scenario-card" data-scenario="trading">
+                    <div class="demo-scenario-card" data-scenario="contract_intelligence">
                         <div class="scenario-content">
-                            <div class="scenario-title">📈 AI Trading Algorithm</div>
-                            <div class="scenario-frameworks">SOX + EU AI Act + GDPR</div>
+                            <div class="scenario-title">⚖️ AI Contract Intelligence</div>
+                            <div class="scenario-frameworks">GDPR + SOX + EU AI Act</div>
                         </div>
                         <button class="load-btn">Load</button>
                     </div>
                     <div class="demo-scenario-card" data-scenario="credit_scoring">
                         <div class="scenario-content">
-                            <div class="scenario-title">💳 AI Credit Scoring System</div>
-                            <div class="scenario-frameworks">GDPR + EU AI Act + SOX</div>
+                            <div class="scenario-title">💳 AI Credit Decisioning</div>
+                            <div class="scenario-frameworks">GDPR + SOX + EU AI Act</div>
                         </div>
                         <button class="load-btn">Load</button>
                     </div>
@@ -2633,16 +2633,47 @@
         
         const SCENARIOS = {
             bank_fraud: {
-                text: 'A publicly-traded bank deploys an AI system that monitors customer transactions in real-time. It automatically freezes accounts flagged as "suspicious," blocks wire transfers, and adds customers to an internal risk database—all without human review, explanation, or appeal process. The system processes biometric voice data from customer service calls to enhance its risk scoring.',
+                text: `FraudShield AI — Real-time transaction monitoring system.
+Features:
+
+• Monitors all customer transactions in real-time
+• Uses behavioral biometrics (typing patterns, mouse movements) to detect fraud
+• Automatically blocks "suspicious" accounts without human review
+• Shares fraud patterns with banking consortium partners
+• Stores transaction history indefinitely for pattern training
+• Customer risk scores affect credit limit adjustments
+
+Deployed at 50+ financial institutions. Processes 2M transactions daily.`,
                 frameworks: ['gdpr', 'sox', 'euai']
             },
-            trading: {
-                text: 'A Fortune 500 investment firm uses an AI system to execute high-frequency trades based on social media sentiment analysis and news scraping. The algorithm makes autonomous buy/sell decisions worth millions without human approval, maintains no audit trail of its decision logic, and has caused unexplained losses that weren\'t detected for weeks.',
-                frameworks: ['sox', 'euai', 'gdpr']
+            contract_intelligence: {
+                text: `ContractIQ AI — Enterprise contract intelligence platform.
+Features:
+
+• Reads and analyzes all company contracts (NDAs, MSAs, SOWs, vendor agreements)
+• Trained on 50,000+ client contracts from Fortune 500 companies
+• Learns your negotiation patterns and auto-suggests redline edits
+• Flags "risky vendors" based on historical dispute data
+• Predicts contract renewal probability and recommends pricing
+• Integrates with Salesforce, DocuSign, and SAP
+• SOC 2 Type II certified
+
+Used by legal teams at 200+ enterprises. Processes 10,000 contracts daily.`,
+                frameworks: ['gdpr', 'sox', 'euai']
             },
             credit_scoring: {
-                text: 'A major financial institution deploys AI to evaluate loan applications. The system scrapes applicants\' social media profiles, analyzes browsing patterns, and uses facial recognition from ID photos to predict "trustworthiness." It auto-rejects 65% of applications with no explanation, disproportionately affecting certain demographics.',
-                frameworks: ['gdpr', 'euai', 'sox']
+                text: `QuickCredit AI — Instant loan approval platform.
+Features:
+
+• Analyzes bank transactions, employment history, and social media activity
+• Instant loan decisions in under 30 seconds with no human review
+• Uses location data and device fingerprinting for "fraud prevention"
+• Automatically adjusts interest rates based on "risk profile"
+• Shares applicant data with credit bureaus and marketing partners
+• Denies appeals through automated chatbot only
+
+Serves 5M loan applications annually. 94% automation rate.`,
+                frameworks: ['gdpr', 'sox', 'euai']
             }
         };
 

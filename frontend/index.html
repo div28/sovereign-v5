@@ -2462,7 +2462,7 @@
 
             <!-- Textarea -->
             <div class="textarea-section">
-                <textarea class="textarea" id="systemDescription" placeholder="Describe your AI system here..."></textarea>
+                <textarea class="textarea" id="systemDescription" placeholder="Describe your AI system here..." autocomplete="off"></textarea>
                 <button class="run-button" onclick="runAssessment()">🔍 Run Assessment</button>
             </div>
         </div>
@@ -2781,12 +2781,24 @@ Serves 5M loan applications annually. 94% automation rate.`,
             document.getElementById('heroSection').style.display = 'none';
             document.getElementById('assessmentSection').classList.add('active');
             document.getElementById('resultsSection').classList.remove('active');
+
+            // Scroll to top of page
+            window.scrollTo(0, 0);
+
+            // Clear textarea to prevent browser autofill artifacts
+            const textarea = document.getElementById('systemDescription');
+            if (textarea && !textarea.value.trim()) {
+                textarea.value = '';
+            }
         }
 
         function showResultsView(assessmentId) {
             document.getElementById('heroSection').style.display = 'none';
             document.getElementById('assessmentSection').classList.remove('active');
             document.getElementById('resultsSection').classList.add('active');
+
+            // Scroll to top of page
+            window.scrollTo(0, 0);
 
             // Restore assessment data if available
             if (assessmentId && window.currentAssessment) {

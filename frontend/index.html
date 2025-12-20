@@ -3302,7 +3302,7 @@ Serves 5M loan applications annually. 94% automation rate.`,
                         <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
                             <div style="font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; color: rgba(255,255,255,0.7);">Remediation Steps:</div>
                             <ol style="margin-left: 1.5rem; color: rgba(255,255,255,0.8); font-size: 0.9rem;">
-                                ${v.remediation_steps.map(step => `<li style="margin-bottom: 0.5rem;">${step}</li>`).join('')}
+                                ${(Array.isArray(v.remediation_steps) ? v.remediation_steps : []).map(step => `<li style="margin-bottom: 0.5rem;">${step}</li>`).join('')}
                             </ol>
                         </div>
                     </div>
@@ -3320,7 +3320,7 @@ Serves 5M loan applications annually. 94% automation rate.`,
             const businessKeywords = ['policy', 'training', 'process', 'documentation', 'review', 'procedure', 'governance', 'compliance', 'audit', 'legal'];
 
             result.violations.forEach(v => {
-                const steps = v.remediation_steps || [];
+                const steps = Array.isArray(v.remediation_steps) ? v.remediation_steps : [];
                 const severity = v.severity || 'MAJOR';
                 steps.forEach(step => {
                     if (!step) return;
@@ -3379,7 +3379,7 @@ Serves 5M loan applications annually. 94% automation rate.`,
 
         // Tab content generator functions
         function generateTechnicalFixPlan(violation) {
-            const remediationSteps = violation.remediation_steps || [];
+            const remediationSteps = Array.isArray(violation.remediation_steps) ? violation.remediation_steps : [];
             const framework = violation.framework?.toLowerCase() || '';
             const article = violation.article_violated || '';
 
@@ -3458,8 +3458,9 @@ Serves 5M loan applications annually. 94% automation rate.`,
         function enhanceWithTechnicalDetails(steps, framework, article) {
             // Generate highly technical implementations based on violation type
             const fixes = [];
+            const safeSteps = Array.isArray(steps) ? steps : [];
 
-            steps.forEach((step, idx) => {
+            safeSteps.forEach((step, idx) => {
                 const stepLower = step.toLowerCase();
 
                 // Encryption/Security implementation
@@ -3576,7 +3577,8 @@ Serves 5M loan applications annually. 94% automation rate.`,
 
         function extractBusinessProcessChanges(steps) {
             const businessSteps = [];
-            steps.forEach(step => {
+            const safeSteps = Array.isArray(steps) ? steps : [];
+            safeSteps.forEach(step => {
                 const stepLower = step.toLowerCase();
                 if (stepLower.includes('policy') || stepLower.includes('train') ||
                     stepLower.includes('governance') || stepLower.includes('document') ||

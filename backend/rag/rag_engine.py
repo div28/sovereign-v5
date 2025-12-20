@@ -429,7 +429,7 @@ class RAGEngine:
         self,
         retriever: Optional[RAGRetriever] = None,
         api_key: Optional[str] = None,
-        use_reranker: bool = True
+        use_reranker: bool = False  # Disabled to fit Render free tier memory limits
     ):
         """
         Initialize the RAG engine.

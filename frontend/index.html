@@ -428,11 +428,18 @@
         }
 
         .assessment-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            display: flex;
+            flex-direction: column;
             gap: 1.5rem;
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
+        }
+
+        /* Row 1: Frameworks + Upload side by side */
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1.5rem;
         }
 
         .assessment-card {
@@ -443,10 +450,139 @@
             padding: 1.25rem;
         }
 
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 700;
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        /* Upload + Description Card */
+        .upload-description-card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 0;
+        }
+
+        .input-divider::before,
+        .input-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.15);
+        }
+
+        .input-divider span {
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .description-input textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 14px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .description-input textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .description-input textarea::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* Row 2: Demo Scenarios - Horizontal Grid */
+        .demos-row {
+            margin-top: 0.5rem;
+        }
+
+        .demos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 1.25rem 0 1rem 0;
+        }
+
+        .section-divider .edge-label {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .section-divider .edge-hint {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .section-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(245, 158, 11, 0.3);
+        }
+
+        /* Action Row */
+        .action-row {
+            display: flex;
+            justify-content: center;
+            padding: 1rem 0;
+        }
+
+        .run-assessment-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 48px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+        }
+
+        .run-assessment-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .run-assessment-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
 
         /* Framework Selection */
@@ -554,61 +690,69 @@
             color: rgba(255,255,255,0.5);
         }
 
-        /* Test Scenarios */
-        /* Demo Scenarios */
-        .demo-scenarios {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
+        /* Demo Scenarios - Horizontal Cards */
         .demo-scenario-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 16px 20px;
+            border-radius: 12px;
+            padding: 16px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 12px;
             transition: all 0.2s ease;
+            cursor: pointer;
         }
 
         .demo-scenario-card:hover {
-            border-color: #5b9bd5;
-            background: rgba(91, 155, 213, 0.05);
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .scenario-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .scenario-icon {
+            font-size: 28px;
+            flex-shrink: 0;
         }
 
         .scenario-content {
             flex: 1;
+            min-width: 0;
         }
 
         .scenario-title {
             font-weight: 600;
             color: white;
-            font-size: 15px;
-            margin-bottom: 4px;
+            font-size: 14px;
+            margin-bottom: 2px;
         }
 
         .scenario-frameworks {
-            font-size: 12px;
-            color: #5b9bd5;
+            font-size: 11px;
+            color: #3b82f6;
+            font-weight: 500;
         }
 
         .load-btn {
-            background: #5b9bd5;
+            background: #3b82f6;
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 10px 16px;
+            border-radius: 8px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
             font-size: 13px;
+            width: 100%;
         }
 
         .load-btn:hover {
-            background: #4a8bc5;
-            transform: translateY(-1px);
+            background: #2563eb;
         }
 
         /* Edge Case Badge */
@@ -2090,6 +2234,14 @@
                 padding: 24px;
             }
 
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+
+            .demos-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
             .assessment-title {
                 font-size: 28px;
             }
@@ -2126,7 +2278,7 @@
             background: #1a1f2e;
             border-radius: 16px;
             width: 90%;
-            max-width: 700px;
+            max-width: 900px;
             max-height: 80vh;
             display: flex;
             flex-direction: column;
@@ -2605,6 +2757,15 @@
             .judge-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+
+            .demos-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .run-assessment-btn {
+                padding: 14px 32px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -2705,109 +2866,144 @@
     <section class="assessment-section" id="assessmentSection">
         <h2 class="assessment-title">Compliance Assessment Setup</h2>
         <div class="assessment-grid">
-            <!-- Select Frameworks -->
-            <div class="assessment-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h3 class="card-title" style="margin: 0;">Select Frameworks</h3>
-                    <button class="select-all-btn" id="selectAllBtn">Select All</button>
+            <!-- Row 1: Frameworks + Upload/Description -->
+            <div class="input-row">
+                <!-- Select Frameworks -->
+                <div class="assessment-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Select Frameworks</h3>
+                        <button class="select-all-btn" id="selectAllBtn">Select All</button>
+                    </div>
+                    <div class="framework-options">
+                        <div class="framework-option" data-framework="gdpr">
+                            <div class="framework-checkbox"></div>
+                            <span class="framework-icon">🔒</span>
+                            <div class="framework-info">
+                                <div class="framework-name"><span class="tooltip" data-tooltip="General Data Protection Regulation - EU data privacy law enforced since May 2018">GDPR</span></div>
+                                <div class="framework-desc">EU data privacy</div>
+                            </div>
+                        </div>
+                        <div class="framework-option" data-framework="sox">
+                            <div class="framework-checkbox"></div>
+                            <span class="framework-icon">📊</span>
+                            <div class="framework-info">
+                                <div class="framework-name"><span class="tooltip" data-tooltip="Sarbanes-Oxley Act - US financial reporting and corporate governance law">SOX</span></div>
+                                <div class="framework-desc">Financial controls</div>
+                            </div>
+                        </div>
+                        <div class="framework-option" data-framework="euai">
+                            <div class="framework-checkbox"></div>
+                            <span class="framework-icon">🤖</span>
+                            <div class="framework-info">
+                                <div class="framework-name"><span class="tooltip" data-tooltip="European Union Artificial Intelligence Act - regulates AI systems based on risk levels">EU AI Act</span></div>
+                                <div class="framework-desc">AI risk classification</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="framework-options">
-                    <div class="framework-option" data-framework="gdpr">
-                        <div class="framework-checkbox"></div>
-                        <span class="framework-icon">🔒</span>
-                        <div class="framework-info">
-                            <div class="framework-name"><span class="tooltip" data-tooltip="General Data Protection Regulation - EU data privacy law enforced since May 2018">GDPR</span></div>
-                            <div class="framework-desc">EU data privacy</div>
-                        </div>
+
+                <!-- Upload + Description -->
+                <div class="assessment-card upload-description-card">
+                    <h3 class="card-title">AI System Input</h3>
+                    <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+                        <input type="file" id="fileInput" style="display:none" accept=".pdf,.docx,.txt">
+                        <div class="upload-icon">📄</div>
+                        <div class="upload-text">Drop file or browse</div>
+                        <div class="upload-hint">PDF, DOCX, TXT</div>
                     </div>
-                    <div class="framework-option" data-framework="sox">
-                        <div class="framework-checkbox"></div>
-                        <span class="framework-icon">📊</span>
-                        <div class="framework-info">
-                            <div class="framework-name"><span class="tooltip" data-tooltip="Sarbanes-Oxley Act - US financial reporting and corporate governance law">SOX</span></div>
-                            <div class="framework-desc">Financial controls</div>
-                        </div>
-                    </div>
-                    <div class="framework-option" data-framework="euai">
-                        <div class="framework-checkbox"></div>
-                        <span class="framework-icon">🤖</span>
-                        <div class="framework-info">
-                            <div class="framework-name"><span class="tooltip" data-tooltip="European Union Artificial Intelligence Act - regulates AI systems based on risk levels">EU AI Act</span></div>
-                            <div class="framework-desc">AI risk classification</div>
-                        </div>
+                    <div class="input-divider"><span>OR</span></div>
+                    <div class="description-input">
+                        <textarea id="systemDescription" placeholder="Describe your AI system, its data processing, decision-making logic, and deployment context..." autocomplete="off"></textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- Upload Document -->
-            <div class="assessment-card">
-                <h3 class="card-title">Upload Document</h3>
-                <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
-                    <input type="file" id="fileInput" style="display:none" accept=".pdf,.docx,.txt">
-                    <div class="upload-icon">📁</div>
-                    <div class="upload-text">Drop file or browse</div>
-                    <div class="upload-hint">PDF, DOCX, TXT</div>
-                </div>
-            </div>
-
-            <!-- Demo Scenarios -->
-            <div class="assessment-card">
+            <!-- Row 2: Demo Scenarios -->
+            <div class="assessment-card demos-row">
                 <h3 class="card-title">Demo Scenarios</h3>
-                <div class="demo-scenarios">
+
+                <!-- Standard Demos - Horizontal Grid -->
+                <div class="demos-grid">
                     <div class="demo-scenario-card" data-scenario="bank_fraud">
-                        <div class="scenario-content">
-                            <div class="scenario-title">🏦 Fraud Detection AI</div>
-                            <div class="scenario-frameworks">GDPR + SOX + EU AI Act</div>
+                        <div class="scenario-header">
+                            <span class="scenario-icon">🏦</span>
+                            <div class="scenario-content">
+                                <div class="scenario-title">Fraud Detection AI</div>
+                                <div class="scenario-frameworks">GDPR + SOX + EU AI Act</div>
+                            </div>
                         </div>
                         <button class="load-btn">Load</button>
                     </div>
                     <div class="demo-scenario-card" data-scenario="contract_intelligence">
-                        <div class="scenario-content">
-                            <div class="scenario-title">⚖️ AI Contract Intelligence</div>
-                            <div class="scenario-frameworks">GDPR + SOX + EU AI Act</div>
+                        <div class="scenario-header">
+                            <span class="scenario-icon">📋</span>
+                            <div class="scenario-content">
+                                <div class="scenario-title">Contract Intelligence</div>
+                                <div class="scenario-frameworks">GDPR + SOX + EU AI Act</div>
+                            </div>
                         </div>
                         <button class="load-btn">Load</button>
                     </div>
                     <div class="demo-scenario-card" data-scenario="credit_scoring">
-                        <div class="scenario-content">
-                            <div class="scenario-title">💳 AI Credit Decisioning</div>
-                            <div class="scenario-frameworks">GDPR + SOX + EU AI Act</div>
+                        <div class="scenario-header">
+                            <span class="scenario-icon">💳</span>
+                            <div class="scenario-content">
+                                <div class="scenario-title">Credit Decisioning</div>
+                                <div class="scenario-frameworks">GDPR + SOX + EU AI Act</div>
+                            </div>
                         </div>
                         <button class="load-btn">Load</button>
                     </div>
+                </div>
 
-                    <!-- Edge Case Scenarios - Designed to trigger reflection loop -->
+                <!-- Edge Cases Section -->
+                <div class="section-divider">
+                    <span class="edge-label">🔄 EDGE CASES</span>
+                    <span class="edge-hint">Tests reflection loop behavior</span>
+                </div>
+                <div class="demos-grid">
                     <div class="demo-scenario-card edge-case" data-scenario="gdpr_recommendation">
-                        <div class="scenario-content">
-                            <div class="scenario-title">🤔 TalentSuggest AI<span class="edge-case-badge">🔄 Edge Case</span></div>
-                            <div class="scenario-frameworks">GDPR</div>
-                            <div class="scenario-hint">Tests reflection loop: recommendation vs automated decision</div>
+                        <div class="scenario-header">
+                            <span class="scenario-icon">🤔</span>
+                            <div class="scenario-content">
+                                <div class="scenario-title">TalentSuggest AI</div>
+                                <div class="scenario-frameworks">GDPR</div>
+                                <div class="scenario-hint">Recommendation vs automated decision</div>
+                            </div>
                         </div>
                         <button class="load-btn">Load</button>
                     </div>
                     <div class="demo-scenario-card edge-case" data-scenario="sox_partial_controls">
-                        <div class="scenario-content">
-                            <div class="scenario-title">📊 AutoLedger AI<span class="edge-case-badge">🔄 Edge Case</span></div>
-                            <div class="scenario-frameworks">SOX</div>
-                            <div class="scenario-hint">Tests reflection loop: partial audit trail requirements</div>
+                        <div class="scenario-header">
+                            <span class="scenario-icon">📊</span>
+                            <div class="scenario-content">
+                                <div class="scenario-title">AutoLedger AI</div>
+                                <div class="scenario-frameworks">SOX</div>
+                                <div class="scenario-hint">Partial audit trail requirements</div>
+                            </div>
                         </div>
                         <button class="load-btn">Load</button>
                     </div>
                     <div class="demo-scenario-card edge-case" data-scenario="euai_emotion_wellness">
-                        <div class="scenario-content">
-                            <div class="scenario-title">🧘 MindfulAI Wellness<span class="edge-case-badge">🔄 Edge Case</span></div>
-                            <div class="scenario-frameworks">EU AI Act</div>
-                            <div class="scenario-hint">Tests reflection loop: voluntary wellness vs prohibited emotion AI</div>
+                        <div class="scenario-header">
+                            <span class="scenario-icon">🧘</span>
+                            <div class="scenario-content">
+                                <div class="scenario-title">MindfulAI Wellness</div>
+                                <div class="scenario-frameworks">EU AI Act</div>
+                                <div class="scenario-hint">Voluntary vs prohibited emotion AI</div>
+                            </div>
                         </div>
                         <button class="load-btn">Load</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Textarea -->
-            <div class="textarea-section">
-                <textarea class="textarea" id="systemDescription" placeholder="Describe your AI system here..." autocomplete="off"></textarea>
-                <button class="run-button" onclick="runAssessment()">🔍 Run Assessment</button>
+            <!-- Action Button -->
+            <div class="action-row">
+                <button class="run-assessment-btn" onclick="runAssessment()">
+                    <span>🔍</span>
+                    <span>Run Compliance Assessment</span>
+                </button>
             </div>
         </div>
     </section>

@@ -3991,16 +3991,31 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
                 });
 
                 // Call agentic API
+                console.log('[DEBUG] Calling agentic API...');
                 const response = await fetch(`${API_BASE}/api/analyze/agentic?include_agent_trace=true`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({description, frameworks})
                 });
 
+                console.log('[DEBUG] Response status:', response.status, response.ok);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('[DEBUG] Response error:', errorText);
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                console.log('[DEBUG] Parsing JSON...');
                 const result = await response.json();
+                console.log('[DEBUG] Response parsed successfully');
+                console.log('[DEBUG] Result keys:', Object.keys(result));
+                console.log('[DEBUG] Violations count:', result.violations?.length);
+                console.log('[DEBUG] Has agent_trace:', !!result.agent_trace);
 
                 // Update researcher with docs count
                 const docsCount = result.agent_trace?.researcher_findings?.reduce((sum, f) => sum + (f.results_count || 3), 0) || frameworks.length * 5;
+                console.log('[DEBUG] Docs count:', docsCount);
                 agentUI.updateAgentStatus('researcher', 'complete', `Retrieved ${docsCount} documents`, { docsRetrieved: docsCount, time: agentUI.getElapsedTime() });
 
                 // Phase 3: Validators evaluation
@@ -4076,8 +4091,21 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
 
             } catch (error) {
                 clearInterval(timerInterval);
-                console.error('Assessment failed:', error);
-                alert('Assessment failed. Please try again.');
+                console.error('[DEBUG] Assessment failed:', error);
+                console.error('[DEBUG] Error name:', error.name);
+                console.error('[DEBUG] Error message:', error.message);
+                console.error('[DEBUG] Error stack:', error.stack);
+
+                let errorMsg = 'Assessment failed: ' + (error.message || 'Unknown error');
+                if (error.name === 'AbortError') {
+                    errorMsg = 'Request timed out. The server may be overloaded.';
+                } else if (error.message?.includes('Failed to fetch')) {
+                    errorMsg = 'Could not connect to server. Please try again.';
+                } else if (error.message?.includes('JSON')) {
+                    errorMsg = 'Invalid response from server. Please try again.';
+                }
+
+                alert(errorMsg);
                 modal.classList.remove('active');
             }
         }

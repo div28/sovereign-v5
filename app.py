@@ -18,6 +18,7 @@ import os
 import logging
 import uuid
 import json
+import asyncio
 from datetime import datetime
 
 # Debug: Print SDK versions at startup
@@ -110,6 +111,26 @@ CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 # Store analysis results temporarily (in production, use Redis or database)
 _analysis_cache: Dict[str, Dict[str, Any]] = {}
+
+# Job queue for async analysis (avoids Render's 60s timeout)
+_job_store: Dict[str, Dict[str, Any]] = {}
+
+
+class JobStatusResponse(BaseModel):
+    """Response for job status check."""
+    job_id: str
+    status: str  # "processing", "complete", "error"
+    result: Optional[Dict[str, Any]] = None
+    error: Optional[str] = None
+    created_at: str
+    completed_at: Optional[str] = None
+
+
+class JobCreatedResponse(BaseModel):
+    """Response when job is created."""
+    job_id: str
+    status: str = "processing"
+    message: str = "Analysis started. Poll /api/jobs/{job_id} for results."
 
 
 def save_analysis_to_disk(analysis_id: str, data: Dict[str, Any]):
@@ -496,7 +517,72 @@ async def analyze_compliance(request: AnalyzeRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/api/analyze/agentic", response_model=AgenticAnalyzeResponse)
+async def _run_analysis_job(
+    job_id: str,
+    description: str,
+    frameworks: List[str],
+    include_agent_trace: bool
+):
+    """Background task to run the analysis and store results."""
+    try:
+        logger.info(f"[Job {job_id}] Starting analysis...")
+
+        from backend.agents import OrchestratorAgent, SharedMemory
+
+        scratchpad = SharedMemory()
+        orchestrator = OrchestratorAgent(scratchpad=scratchpad)
+
+        result = await orchestrator.analyze(
+            description=description,
+            frameworks=frameworks,
+            risk_tolerance="medium",
+            include_synthesis=True
+        )
+
+        logger.info(f"[Job {job_id}] Analysis completed, building response...")
+
+        # Store result for export
+        analysis_id = store_analysis_result(
+            violations=result.get("violations", []),
+            risk_score=result.get("risk_score", 0),
+            frameworks=frameworks,
+            description=description
+        )
+
+        # Build response
+        response_data = {
+            "status": result.get("status", "success"),
+            "violations": result.get("violations", []),
+            "risk_score": result.get("risk_score", 0),
+            "frameworks_analyzed": result.get("frameworks_analyzed", frameworks),
+            "chunks_retrieved": result.get("chunks_retrieved", 0),
+            "iterations": result.get("iterations", 1),
+            "confidence": result.get("confidence", 0.0),
+            "executive_summary": result.get("executive_summary", ""),
+            "prioritized_findings": result.get("prioritized_findings", []),
+            "remediation_roadmap": result.get("remediation_roadmap", []),
+            "confidence_improvements": result.get("confidence_improvements", {}),
+            "analysis_id": analysis_id
+        }
+
+        if include_agent_trace:
+            response_data["agent_trace"] = result.get("agent_trace", {})
+
+        # Update job store with result
+        _job_store[job_id]["status"] = "complete"
+        _job_store[job_id]["result"] = response_data
+        _job_store[job_id]["completed_at"] = datetime.utcnow().isoformat()
+
+        logger.info(f"[Job {job_id}] Job completed successfully")
+
+    except Exception as e:
+        logger.error(f"[Job {job_id}] Analysis failed: {e}")
+        _job_store[job_id]["status"] = "error"
+        _job_store[job_id]["error"] = str(e)
+        _job_store[job_id]["completed_at"] = datetime.utcnow().isoformat()
+
+
+@app.post("/api/analyze/agentic", response_model=JobCreatedResponse)
 async def analyze_compliance_agentic(
     request: AnalyzeRequest,
     include_agent_trace: bool = Query(
@@ -505,23 +591,10 @@ async def analyze_compliance_agentic(
     )
 ):
     """
-    Multi-agent compliance analysis with reflection loop and synthesis.
+    Start async multi-agent compliance analysis.
 
-    Enhanced analysis using the Anthropic-style multi-agent architecture:
-    - Orchestrator coordinates specialized agents
-    - Validators evaluate against regulatory requirements
-    - Researcher fetches additional context when needed
-    - Synthesis generates executive summary and remediation roadmap
-
-    Features:
-    - Plan/Act/Reflect iteration loop for improved confidence
-    - Low-confidence findings trigger targeted re-retrieval
-    - Executive summary in narrative prose (not bullets)
-    - Prioritized findings by business impact
-    - Actionable remediation roadmap
-
-    Query Parameters:
-    - include_agent_trace: Include full scratchpad with agent reasoning
+    Returns a job_id immediately. Poll /api/jobs/{job_id} for results.
+    This avoids Render's 60-second timeout on the free tier.
     """
     try:
         # Validate request
@@ -542,72 +615,64 @@ async def analyze_compliance_agentic(
                 detail=f"No valid frameworks. Choose from: {valid_frameworks}"
             )
 
-        logger.info(f"[Agentic] Analyzing submission for frameworks: {frameworks}")
+        # Create job
+        job_id = str(uuid.uuid4())
+        _job_store[job_id] = {
+            "status": "processing",
+            "result": None,
+            "error": None,
+            "created_at": datetime.utcnow().isoformat(),
+            "completed_at": None,
+            "frameworks": frameworks,
+            "description_length": len(request.description)
+        }
 
-        # Initialize multi-agent system
-        from backend.agents import OrchestratorAgent, SharedMemory
+        logger.info(f"[Agentic] Created job {job_id} for frameworks: {frameworks}")
 
-        scratchpad = SharedMemory()
-        orchestrator = OrchestratorAgent(scratchpad=scratchpad)
-
-        # Run agentic analysis with synthesis
-        logger.info("[Agentic] Calling orchestrator.analyze()...")
-        result = await orchestrator.analyze(
+        # Start background task
+        asyncio.create_task(_run_analysis_job(
+            job_id=job_id,
             description=request.description,
             frameworks=frameworks,
-            risk_tolerance="medium",
-            include_synthesis=True
+            include_agent_trace=include_agent_trace
+        ))
+
+        return JobCreatedResponse(
+            job_id=job_id,
+            status="processing",
+            message=f"Analysis started. Poll /api/jobs/{job_id} for results."
         )
-        logger.info(f"[Agentic] orchestrator.analyze() returned, keys: {list(result.keys())}")
-
-        # Store result for export
-        logger.info("[Agentic] Calling store_analysis_result()...")
-        analysis_id = store_analysis_result(
-            violations=result.get("violations", []),
-            risk_score=result.get("risk_score", 0),
-            frameworks=frameworks,
-            description=request.description
-        )
-        logger.info(f"[Agentic] store_analysis_result() returned: {analysis_id}")
-
-        # Build response
-        logger.info("[Agentic] Building response_data...")
-        response_data = {
-            "status": result.get("status", "success"),
-            "violations": result.get("violations", []),
-            "risk_score": result.get("risk_score", 0),
-            "frameworks_analyzed": result.get("frameworks_analyzed", frameworks),
-            "chunks_retrieved": result.get("chunks_retrieved", 0),
-            "iterations": result.get("iterations", 1),
-            "confidence": result.get("confidence", 0.0),
-            "executive_summary": result.get("executive_summary", ""),
-            "prioritized_findings": result.get("prioritized_findings", []),
-            "remediation_roadmap": result.get("remediation_roadmap", []),
-            "confidence_improvements": result.get("confidence_improvements", {}),
-            "analysis_id": analysis_id
-        }
-        logger.info("[Agentic] response_data built")
-
-        # Include agent trace if requested
-        if include_agent_trace:
-            logger.info("[Agentic] Adding agent_trace to response...")
-            response_data["agent_trace"] = result.get("agent_trace", {})
-            logger.info(f"[Agentic] agent_trace added, size: {len(str(response_data['agent_trace']))}")
-
-        logger.info(
-            f"[Agentic] Analysis complete: {len(response_data['violations'])} violations, "
-            f"risk score: {response_data['risk_score']}, "
-            f"iterations: {response_data['iterations']}"
-        )
-
-        logger.info("[Agentic] Returning response_data...")
-        return response_data
 
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"[Agentic] Analysis failed: {e}")
+        logger.error(f"[Agentic] Failed to create job: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/jobs/{job_id}", response_model=JobStatusResponse)
+async def get_job_status(job_id: str):
+    """
+    Get the status of an analysis job.
+
+    Returns:
+    - status: "processing", "complete", or "error"
+    - result: Full analysis results when complete
+    - error: Error message if failed
+    """
+    if job_id not in _job_store:
+        raise HTTPException(status_code=404, detail=f"Job {job_id} not found")
+
+    job = _job_store[job_id]
+
+    return JobStatusResponse(
+        job_id=job_id,
+        status=job["status"],
+        result=job.get("result"),
+        error=job.get("error"),
+        created_at=job["created_at"],
+        completed_at=job.get("completed_at")
+    )
 
 
 @app.get("/api/frameworks")

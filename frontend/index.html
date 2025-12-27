@@ -3990,25 +3990,67 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
                     }
                 });
 
-                // Call agentic API
+                // Call agentic API (now returns job_id for async processing)
                 console.log('[DEBUG] Calling agentic API...');
-                const response = await fetch(`${API_BASE}/api/analyze/agentic?include_agent_trace=true`, {
+                const jobResponse = await fetch(`${API_BASE}/api/analyze/agentic?include_agent_trace=true`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({description, frameworks})
                 });
 
-                console.log('[DEBUG] Response status:', response.status, response.ok);
+                console.log('[DEBUG] Job response status:', jobResponse.status, jobResponse.ok);
 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('[DEBUG] Response error:', errorText);
-                    throw new Error(`Server error: ${response.status}`);
+                if (!jobResponse.ok) {
+                    const errorText = await jobResponse.text();
+                    console.error('[DEBUG] Job creation error:', errorText);
+                    throw new Error(`Server error: ${jobResponse.status}`);
                 }
 
-                console.log('[DEBUG] Parsing JSON...');
-                const result = await response.json();
-                console.log('[DEBUG] Response parsed successfully');
+                const jobData = await jobResponse.json();
+                const jobId = jobData.job_id;
+                console.log('[DEBUG] Job created:', jobId);
+
+                // Poll for results
+                let result = null;
+                let pollCount = 0;
+                const maxPolls = 120; // 4 minutes max (2s intervals)
+
+                while (pollCount < maxPolls) {
+                    await new Promise(r => setTimeout(r, 2000)); // Wait 2 seconds
+                    pollCount++;
+
+                    console.log(`[DEBUG] Polling job ${jobId} (attempt ${pollCount})...`);
+                    const statusResponse = await fetch(`${API_BASE}/api/jobs/${jobId}`);
+
+                    if (!statusResponse.ok) {
+                        console.error('[DEBUG] Poll error:', statusResponse.status);
+                        continue;
+                    }
+
+                    const statusData = await statusResponse.json();
+                    console.log('[DEBUG] Job status:', statusData.status);
+
+                    if (statusData.status === 'complete') {
+                        result = statusData.result;
+                        console.log('[DEBUG] Job complete, violations:', result.violations?.length);
+                        break;
+                    } else if (statusData.status === 'error') {
+                        throw new Error(statusData.error || 'Analysis failed');
+                    }
+
+                    // Update UI to show progress
+                    if (pollCount % 5 === 0) {
+                        const insight = document.createElement('div');
+                        insight.className = 'insight-item';
+                        insight.textContent = `Analysis in progress... (${pollCount * 2}s)`;
+                        insightsFeed.appendChild(insight);
+                    }
+                }
+
+                if (!result) {
+                    throw new Error('Analysis timed out after 4 minutes');
+                }
+
                 console.log('[DEBUG] Result keys:', Object.keys(result));
                 console.log('[DEBUG] Violations count:', result.violations?.length);
                 console.log('[DEBUG] Has agent_trace:', !!result.agent_trace);

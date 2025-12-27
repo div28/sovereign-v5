@@ -3816,12 +3816,28 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
                     }
                 });
 
-                // Call agentic API
+                // Call agentic API with extended timeout for cold starts
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 min timeout
+
+                // Show cold start warning after 15 seconds
+                const coldStartWarning = setTimeout(() => {
+                    const insight = document.createElement('div');
+                    insight.className = 'insight-item';
+                    insight.textContent = 'Server is waking up (free tier cold start)...';
+                    insight.style.color = '#f59e0b';
+                    insightsFeed.appendChild(insight);
+                }, 15000);
+
                 const response = await fetch(`${API_BASE}/api/analyze/agentic?include_agent_trace=true`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({description, frameworks})
+                    body: JSON.stringify({description, frameworks}),
+                    signal: controller.signal
                 });
+
+                clearTimeout(timeoutId);
+                clearTimeout(coldStartWarning);
 
                 const result = await response.json();
 
@@ -3903,7 +3919,15 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
             } catch (error) {
                 clearInterval(timerInterval);
                 console.error('Assessment failed:', error);
-                alert('Assessment failed. Please try again.');
+
+                let errorMsg = 'Assessment failed. Please try again.';
+                if (error.name === 'AbortError') {
+                    errorMsg = 'Request timed out after 5 minutes. The server may be overloaded.';
+                } else if (error.message?.includes('Failed to fetch')) {
+                    errorMsg = 'Could not connect to server. It may be waking up from sleep - please wait 30 seconds and try again.';
+                }
+
+                alert(errorMsg);
                 modal.classList.remove('active');
             }
         }

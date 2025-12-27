@@ -308,14 +308,16 @@ Respond with a JSON reflection:
         try:
             # Step 1: Retrieve regulatory context
             # PERF: use_routing=False skips Claude classification call (saves ~3-5s)
-            logger.info(f"Step 1: Retrieving regulatory context for {len(description)} char description")
+            logger.info(f"[ACT] Step 1: Starting RAG retrieval for {len(description)} char description")
             rag = self._get_rag_engine()
+            logger.info("[ACT] RAG engine obtained, calling retrieve()...")
             retrieved_chunks = rag.retrieve(
                 query=description,
                 frameworks=frameworks,
                 top_k=15,
                 use_routing=False
             )
+            logger.info(f"[ACT] RAG retrieval completed: {len(retrieved_chunks)} chunks")
 
             if self.scratchpad:
                 self.scratchpad.append_finding("researcher", {
@@ -327,8 +329,9 @@ Respond with a JSON reflection:
             logger.info(f"Retrieved {len(retrieved_chunks)} chunks")
 
             # Step 2: Run judges in parallel
-            logger.info("Step 2: Running validators in parallel")
+            logger.info("[ACT] Step 2: Getting judges...")
             judges = self._get_judges()
+            logger.info(f"[ACT] Got {sum(len(j) for j in judges.values())} judges")
 
             # Prepare judge tasks
             judge_tasks = []
@@ -358,11 +361,13 @@ Respond with a JSON reflection:
                     return (judge.judge_id, None)
 
             # Run all judges concurrently
+            logger.info(f"[ACT] Running {len(judge_tasks)} judge tasks in parallel...")
             tasks = [
                 run_judge_async(judge, submission, chunks)
                 for judge, submission, chunks in judge_tasks
             ]
             results = await asyncio.gather(*tasks, return_exceptions=True)
+            logger.info(f"[ACT] All {len(tasks)} judge tasks completed")
 
             # Process results
             for item in results:
@@ -551,6 +556,7 @@ Respond with a JSON reflection:
             Analysis results including violations, risk score, synthesis, and agent trace.
         """
         # Reset scratchpad for new analysis
+        logger.info("[ANALYZE] Starting analysis...")
         if self.scratchpad:
             self.scratchpad.clear()
 
@@ -563,7 +569,9 @@ Respond with a JSON reflection:
         }
 
         # Run the agent loop (plan/act/reflect with iterations)
+        logger.info("[ANALYZE] Calling self.run()...")
         result = await self.run(goal, context)
+        logger.info("[ANALYZE] self.run() completed")
 
         # Calculate risk score
         violations = result.data.get("violations", [])
@@ -585,6 +593,7 @@ Respond with a JSON reflection:
         # Generate synthesis if requested
         if include_synthesis:
             try:
+                logger.info("[ANALYZE] Starting synthesis...")
                 from .synthesizer import SynthesisAgent
 
                 synthesizer = SynthesisAgent(scratchpad=self.scratchpad)
@@ -593,6 +602,7 @@ Respond with a JSON reflection:
                     frameworks=frameworks,
                     scratchpad=self.scratchpad
                 )
+                logger.info("[ANALYZE] Synthesis completed")
 
                 response["executive_summary"] = synthesis.get("executive_summary", "")
                 response["prioritized_findings"] = synthesis.get("prioritized_findings", [])

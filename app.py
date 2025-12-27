@@ -517,6 +517,40 @@ async def analyze_compliance(request: AnalyzeRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+def _run_analysis_sync(
+    job_id: str,
+    description: str,
+    frameworks: List[str],
+    include_agent_trace: bool
+) -> Dict[str, Any]:
+    """
+    Synchronous analysis runner - runs in thread pool to avoid blocking event loop.
+    """
+    import asyncio
+
+    logger.info(f"[Job {job_id}] Starting analysis in thread pool...")
+
+    from backend.agents import OrchestratorAgent, SharedMemory
+
+    scratchpad = SharedMemory()
+    orchestrator = OrchestratorAgent(scratchpad=scratchpad)
+
+    # Create a new event loop for this thread
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    try:
+        result = loop.run_until_complete(orchestrator.analyze(
+            description=description,
+            frameworks=frameworks,
+            risk_tolerance="medium",
+            include_synthesis=True
+        ))
+    finally:
+        loop.close()
+
+    return result
+
+
 async def _run_analysis_job(
     job_id: str,
     description: str,
@@ -525,18 +559,17 @@ async def _run_analysis_job(
 ):
     """Background task to run the analysis and store results."""
     try:
-        logger.info(f"[Job {job_id}] Starting analysis...")
+        logger.info(f"[Job {job_id}] Dispatching to thread pool...")
 
-        from backend.agents import OrchestratorAgent, SharedMemory
-
-        scratchpad = SharedMemory()
-        orchestrator = OrchestratorAgent(scratchpad=scratchpad)
-
-        result = await orchestrator.analyze(
-            description=description,
-            frameworks=frameworks,
-            risk_tolerance="medium",
-            include_synthesis=True
+        # Run in thread pool to avoid blocking the event loop
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(
+            None,  # Use default executor
+            _run_analysis_sync,
+            job_id,
+            description,
+            frameworks,
+            include_agent_trace
         )
 
         logger.info(f"[Job {job_id}] Analysis completed, building response...")

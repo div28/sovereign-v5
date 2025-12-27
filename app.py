@@ -551,22 +551,27 @@ async def analyze_compliance_agentic(
         orchestrator = OrchestratorAgent(scratchpad=scratchpad)
 
         # Run agentic analysis with synthesis
+        logger.info("[Agentic] Calling orchestrator.analyze()...")
         result = await orchestrator.analyze(
             description=request.description,
             frameworks=frameworks,
             risk_tolerance="medium",
             include_synthesis=True
         )
+        logger.info(f"[Agentic] orchestrator.analyze() returned, keys: {list(result.keys())}")
 
         # Store result for export
+        logger.info("[Agentic] Calling store_analysis_result()...")
         analysis_id = store_analysis_result(
             violations=result.get("violations", []),
             risk_score=result.get("risk_score", 0),
             frameworks=frameworks,
             description=request.description
         )
+        logger.info(f"[Agentic] store_analysis_result() returned: {analysis_id}")
 
         # Build response
+        logger.info("[Agentic] Building response_data...")
         response_data = {
             "status": result.get("status", "success"),
             "violations": result.get("violations", []),
@@ -581,10 +586,13 @@ async def analyze_compliance_agentic(
             "confidence_improvements": result.get("confidence_improvements", {}),
             "analysis_id": analysis_id
         }
+        logger.info("[Agentic] response_data built")
 
         # Include agent trace if requested
         if include_agent_trace:
+            logger.info("[Agentic] Adding agent_trace to response...")
             response_data["agent_trace"] = result.get("agent_trace", {})
+            logger.info(f"[Agentic] agent_trace added, size: {len(str(response_data['agent_trace']))}")
 
         logger.info(
             f"[Agentic] Analysis complete: {len(response_data['violations'])} violations, "
@@ -592,6 +600,7 @@ async def analyze_compliance_agentic(
             f"iterations: {response_data['iterations']}"
         )
 
+        logger.info("[Agentic] Returning response_data...")
         return response_data
 
     except HTTPException:

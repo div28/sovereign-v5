@@ -604,10 +604,12 @@ Respond with a JSON reflection:
                 )
                 logger.info("[ANALYZE] Synthesis completed")
 
+                logger.info("[ANALYZE] Setting response fields from synthesis...")
                 response["executive_summary"] = synthesis.get("executive_summary", "")
                 response["prioritized_findings"] = synthesis.get("prioritized_findings", [])
                 response["remediation_roadmap"] = synthesis.get("remediation_roadmap", [])
                 response["confidence_improvements"] = synthesis.get("confidence_improvements", {})
+                logger.info("[ANALYZE] Response fields set")
 
             except Exception as e:
                 logger.error(f"Synthesis failed: {e}")
@@ -616,8 +618,11 @@ Respond with a JSON reflection:
 
         # Add agent trace if scratchpad available
         if self.scratchpad:
+            logger.info("[ANALYZE] Calling scratchpad.to_dict()...")
             response["agent_trace"] = self.scratchpad.to_dict()
+            logger.info("[ANALYZE] scratchpad.to_dict() completed")
 
+        logger.info("[ANALYZE] Returning response from analyze()")
         return response
 
     async def analyze_with_retry(

@@ -404,8 +404,69 @@ class SharedMemory:
             self._current_iteration = 0
             self._total_llm_calls = 0
             self._total_tokens = {"input": 0, "output": 0}
+            self._additional_context: Dict[str, List[Dict]] = {}
             self._created_at = datetime.utcnow().isoformat()
             logger.info("SharedMemory cleared")
+
+    # =========================================================================
+    # ADDITIONAL CONTEXT (for reflection loop retries)
+    # =========================================================================
+
+    def add_additional_context(self, judge_id: str, context: List[Dict[str, Any]]) -> None:
+        """
+        Store additional context fetched for a specific judge during reflection.
+
+        Args:
+            judge_id: Judge that needs additional context.
+            context: Additional regulatory chunks.
+        """
+        with self._lock:
+            if not hasattr(self, '_additional_context'):
+                self._additional_context = {}
+            self._additional_context[judge_id] = context
+            logger.debug(f"Added {len(context)} additional context chunks for {judge_id}")
+
+    def get_additional_context(self, judge_id: str) -> List[Dict[str, Any]]:
+        """Get additional context for a judge (fetched during reflection)."""
+        with self._lock:
+            if not hasattr(self, '_additional_context'):
+                return []
+            return self._additional_context.get(judge_id, [])
+
+    def get_low_confidence_flag(self, judge_id: str) -> Optional[Dict[str, Any]]:
+        """Get low-confidence flag for a specific judge."""
+        with self._lock:
+            for flag in self._low_confidence_flags:
+                if flag.judge_id == judge_id:
+                    return flag.to_dict()
+            return None
+
+    def log_iteration_start(self, iteration: int) -> None:
+        """Log the start of a new iteration."""
+        with self._lock:
+            self._iteration_history.append(IterationRecord(
+                iteration=iteration,
+                agent="orchestrator",
+                action="iteration_start",
+                changes={"status": "started"}
+            ))
+            self._current_iteration = iteration
+            logger.info(f"Iteration {iteration} started")
+
+    def log_iteration_end(self, iteration: int, avg_confidence: float, violation_count: int) -> None:
+        """Log the end of an iteration with summary metrics."""
+        with self._lock:
+            self._iteration_history.append(IterationRecord(
+                iteration=iteration,
+                agent="orchestrator",
+                action="iteration_end",
+                changes={
+                    "status": "completed",
+                    "avg_confidence": avg_confidence,
+                    "violation_count": violation_count
+                }
+            ))
+            logger.info(f"Iteration {iteration} completed: avg_confidence={avg_confidence:.2f}, violations={violation_count}")
 
     def __repr__(self) -> str:
         return (

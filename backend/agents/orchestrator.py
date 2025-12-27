@@ -221,48 +221,21 @@ Respond with a JSON reflection:
             logger.info(f"Planning retry iteration with {len(gaps)} gaps to address")
 
         try:
-            prompt = self.PLANNING_PROMPT.format(
-                goal=goal,
-                description=description[:2000],  # Truncate for prompt
-                frameworks=", ".join(frameworks),
-                risk_tolerance=risk_tolerance
-            )
+            # OPTIMIZATION: Skip Claude planning call - execution steps are deterministic
+            # The planning phase was taking 200+ seconds due to Claude API latency
+            # We already know: frameworks from context, steps are always researcher→validators→synthesizer
+            logger.info(f"Creating plan for {len(frameworks)} frameworks (skipping Claude call)")
 
-            response = self._client.messages.create(
-                model=self.model,
-                max_tokens=1024,
-                messages=[{"role": "user", "content": prompt}]
-            )
-
-            # Record LLM usage
-            if self.scratchpad:
-                self.scratchpad.record_llm_call(
-                    response.usage.input_tokens,
-                    response.usage.output_tokens
-                )
-
-            # Parse response
-            response_text = response.content[0].text
-
-            # Extract JSON from response
-            import json
-            import re
-
-            json_match = re.search(r'\{[\s\S]*\}', response_text)
-            if json_match:
-                plan_data = json.loads(json_match.group())
-            else:
-                # Fallback to default plan
-                plan_data = {
-                    "frameworks_to_analyze": frameworks,
-                    "priority_areas": [],
-                    "execution_sequence": [
-                        {"step": 1, "action": "invoke_researcher"},
-                        {"step": 2, "action": "invoke_validators"},
-                        {"step": 3, "action": "invoke_synthesizer"}
-                    ],
-                    "estimated_complexity": "medium"
-                }
+            plan_data = {
+                "frameworks_to_analyze": frameworks,
+                "priority_areas": [],
+                "execution_sequence": [
+                    {"step": 1, "action": "invoke_researcher"},
+                    {"step": 2, "action": "invoke_validators"},
+                    {"step": 3, "action": "invoke_synthesizer"}
+                ],
+                "estimated_complexity": "medium" if len(frameworks) <= 2 else "high"
+            }
 
             # CRITICAL: Add original context to plan metadata so act() can access it
             # Without this, act() receives empty description and RAG returns 0 chunks

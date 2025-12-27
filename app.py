@@ -4,10 +4,10 @@ Sovereign V5 - AI Compliance Intelligence Platform
 FastAPI backend for regulatory compliance scanning.
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, Response
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 # from slowapi import Limiter, _rate_limit_exceeded_handler
 # from slowapi.util import get_remote_address
 # from slowapi.errors import RateLimitExceeded
@@ -77,6 +77,23 @@ class AnalyzeResponse(BaseModel):
     risk_score: int
     frameworks_analyzed: List[str]
     chunks_retrieved: int
+    analysis_id: str
+
+
+class AgenticAnalyzeResponse(BaseModel):
+    """Response model for agentic compliance analysis with synthesis."""
+    status: str
+    violations: List[Dict[str, Any]]
+    risk_score: int
+    frameworks_analyzed: List[str]
+    chunks_retrieved: int
+    iterations: int = Field(description="Number of plan/act/reflect iterations")
+    confidence: float = Field(description="Average confidence across evaluations")
+    executive_summary: str = Field(description="Narrative summary for executives")
+    prioritized_findings: List[Dict[str, Any]] = Field(description="Findings sorted by business impact")
+    remediation_roadmap: List[Dict[str, Any]] = Field(description="Actionable remediation steps")
+    confidence_improvements: Dict[str, Any] = Field(default={}, description="How reflection improved confidence")
+    agent_trace: Optional[Dict[str, Any]] = Field(default=None, description="Full agent reasoning trace")
     analysis_id: str
 
 
@@ -476,6 +493,111 @@ async def analyze_compliance(request: AnalyzeRequest):
         raise
     except Exception as e:
         logger.error(f"Analysis failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/analyze/agentic", response_model=AgenticAnalyzeResponse)
+async def analyze_compliance_agentic(
+    request: AnalyzeRequest,
+    include_agent_trace: bool = Query(
+        False,
+        description="Include full agent reasoning trace in response"
+    )
+):
+    """
+    Multi-agent compliance analysis with reflection loop and synthesis.
+
+    Enhanced analysis using the Anthropic-style multi-agent architecture:
+    - Orchestrator coordinates specialized agents
+    - Validators evaluate against regulatory requirements
+    - Researcher fetches additional context when needed
+    - Synthesis generates executive summary and remediation roadmap
+
+    Features:
+    - Plan/Act/Reflect iteration loop for improved confidence
+    - Low-confidence findings trigger targeted re-retrieval
+    - Executive summary in narrative prose (not bullets)
+    - Prioritized findings by business impact
+    - Actionable remediation roadmap
+
+    Query Parameters:
+    - include_agent_trace: Include full scratchpad with agent reasoning
+    """
+    try:
+        # Validate request
+        if not request.description or not request.description.strip():
+            raise HTTPException(status_code=400, detail="Description is required")
+
+        if not request.frameworks:
+            raise HTTPException(status_code=400, detail="At least one framework is required")
+
+        # Normalize frameworks
+        frameworks = [f.lower() for f in request.frameworks]
+        valid_frameworks = ["gdpr", "sox", "euai"]
+        frameworks = [f for f in frameworks if f in valid_frameworks]
+
+        if not frameworks:
+            raise HTTPException(
+                status_code=400,
+                detail=f"No valid frameworks. Choose from: {valid_frameworks}"
+            )
+
+        logger.info(f"[Agentic] Analyzing submission for frameworks: {frameworks}")
+
+        # Initialize multi-agent system
+        from backend.agents import OrchestratorAgent, SharedMemory
+
+        scratchpad = SharedMemory()
+        orchestrator = OrchestratorAgent(scratchpad=scratchpad)
+
+        # Run agentic analysis with synthesis
+        result = await orchestrator.analyze(
+            description=request.description,
+            frameworks=frameworks,
+            risk_tolerance="medium",
+            include_synthesis=True
+        )
+
+        # Store result for export
+        analysis_id = store_analysis_result(
+            violations=result.get("violations", []),
+            risk_score=result.get("risk_score", 0),
+            frameworks=frameworks,
+            description=request.description
+        )
+
+        # Build response
+        response_data = {
+            "status": result.get("status", "success"),
+            "violations": result.get("violations", []),
+            "risk_score": result.get("risk_score", 0),
+            "frameworks_analyzed": result.get("frameworks_analyzed", frameworks),
+            "chunks_retrieved": result.get("chunks_retrieved", 0),
+            "iterations": result.get("iterations", 1),
+            "confidence": result.get("confidence", 0.0),
+            "executive_summary": result.get("executive_summary", ""),
+            "prioritized_findings": result.get("prioritized_findings", []),
+            "remediation_roadmap": result.get("remediation_roadmap", []),
+            "confidence_improvements": result.get("confidence_improvements", {}),
+            "analysis_id": analysis_id
+        }
+
+        # Include agent trace if requested
+        if include_agent_trace:
+            response_data["agent_trace"] = result.get("agent_trace", {})
+
+        logger.info(
+            f"[Agentic] Analysis complete: {len(response_data['violations'])} violations, "
+            f"risk score: {response_data['risk_score']}, "
+            f"iterations: {response_data['iterations']}"
+        )
+
+        return response_data
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"[Agentic] Analysis failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

@@ -209,3 +209,11 @@ __marimo__/
 # Local Netlify folder
 .netlify
 cache/
+
+# Large media files
+*.mp4
+*.mp3
+*.wav
+*.avi
+*.mov
+*.DS_Store

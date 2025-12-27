@@ -1,0 +1,448 @@
+# SOVEREIGN V4 - CLAUDE CODE SESSION RULES
+
+## 🚨 CRITICAL: FRESH START PROJECT
+
+**THIS IS A BRAND NEW PROJECT. START FROM ZERO.**
+
+- ❌ DO NOT reference any existing Sovereign V1/V2/V3 repositories
+- ❌ DO NOT look at old code or previous implementations  
+- ❌ DO NOT reuse or adapt prior work
+- ❌ DO NOT assume anything exists from before
+
+**Project:** sovereign-v4 (NEW GitHub repository)
+**Status:** Empty - building from scratch
+**Demo Date:** January 11, 2026
+**Current Date:** December 4, 2024
+
+---
+
+## 👤 USER CONTEXT
+
+**Background:**
+- 18+ years Technical PM (Microsoft, DigitalOcean)
+- Transitioning to AI Product Manager
+- Product Faculty AI PM Certification student
+- AI Evals course student (Hamel & Shreya)
+- Demo to CPO-level judges from OpenAI, Google, Shopify, Atlassian
+
+**Project Goal:**
+Build production-grade AI compliance intelligence platform demonstrating:
+- Advanced RAG with adaptive routing
+- LLM-as-judge methodology  
+- Multi-agent orchestration
+- Self-improvement agents
+- Rigorous evaluation (95.8% TPR target)
+
+---
+
+## 🎯 PRODUCT SPECIFICATION
+
+**Product:** Sovereign V4 - AI Compliance Intelligence Platform
+
+**Value Proposition:**
+Scans AI systems for regulatory violations BEFORE deployment, preventing $2M+ fines and 2-3 week delays. From manual 3-week reviews to 20-second automated scans.
+
+**Frameworks Supported:** 3 only (focused excellence over breadth)
+1. GDPR (General Data Protection Regulation)
+2. SOX (Sarbanes-Oxley Act)  
+3. EU AI Act
+
+**Target Users:**
+- Enterprise AI Platform Teams
+- Risk & Compliance Officers
+- AI Product Managers at Fortune 500
+
+---
+
+## 🏗️ TECHNICAL ARCHITECTURE
+
+### Technology Stack
+
+**Backend:**
+- FastAPI (Python 3.11+)
+- Deployed on Render.com
+- PostgreSQL (Render managed)
+
+**Vector Database:**
+- Pinecone (3 separate indexes - ALREADY EXIST, DO NOT RECREATE)
+  - sovereign-gdpr-regulation (EXACT name - no 's')
+  - sovereign-sox-regulation (EXACT name - no 's')
+  - sovereign-euai-regulation (EXACT name - no 's')
+- OpenAI text-embedding-3-small (1536 dimensions)
+- Note: 2 additional indexes exist (sovereign-eeoc-guidelines, sovereign-hipaa-regulation) but are NOT used in V4
+
+**LLM APIs:**
+- Claude Haiku 3.5 ($0.001/M) - stable regulations (GDPR, SOX)
+- Claude Sonnet 4.5 ($0.003/M) - evolving regulations (EU AI Act)
+
+**Frontend:**
+- Vanilla HTML/JavaScript/CSS
+- Tailwind CSS for styling
+- Deployed on Netlify
+- NO React or complex frameworks
+
+**Exports:**
+- PDF reports (Puppeteer or ReportLab)
+- CSV exports (csv module)
+
+### System Components
+
+**1. Advanced RAG V3** (backend/rag/)
+- Multi-index Pinecone architecture (DO NOT CREATE NEW INDEXES - use existing)
+- Adaptive query router (5 query types)
+- Hybrid search (semantic + BM25 keyword with RRF fusion)
+- Target: <2 second retrieval
+
+**2. Specialized Compliance Judges** (backend/judges/)
+- 9 judges total (3 per framework)
+- Each detects ONE specific violation type
+- Structured JSON outputs via Anthropic API
+- Parallel execution (ThreadPoolExecutor)
+
+**GDPR Judges:**
+1. GDPRArticle22Judge - Automated decision-making
+2. GDPRDataMinimizationJudge - Excessive data collection
+3. GDPRTransparencyJudge - Missing user disclosures
+
+**SOX Judges:**
+1. SOXSection404Judge - Internal controls
+2. SOXDataIntegrityJudge - Data accuracy
+3. SOXAuditabilityJudge - Audit trail
+
+**EU AI Act Judges:**
+1. EUAIActHighRiskJudge - High-risk classification
+2. EUAIActProhibitedPracticesJudge - Banned practices
+3. EUAIActTransparencyJudge - User disclosure
+
+**3. Multi-Model Routing** (backend/routing/)
+- Intelligent model selection based on regulation stability
+- Cost tracking and optimization (target: 60-70% savings)
+- GDPR/SOX → Haiku, EU AI Act → Sonnet
+
+**4. Self-Improvement Agent** (backend/improvement/)
+- Error logging (false positives/negatives)
+- Pattern analysis (identify root causes)
+- Prompt refinement (generate improvements)
+- A/B testing (validate changes)
+
+**5. Evaluation System** (backend/evals/)
+- Calculate TPR, TNR, F1, confusion matrix
+- Target: Overall TPR ≥90%, TNR ≥90%, Critical TPR ≥95%
+- 120 golden test cases (40 per framework)
+
+**6. FastAPI Endpoints**
+```
+GET  / - Root
+GET  /api/health - Health check
+POST /api/analyze - Main analysis
+POST /api/export/pdf - PDF report
+POST /api/export/csv - CSV export
+```
+
+---
+
+## 🎨 DESIGN SYSTEM - PROFESSIONAL GRC AESTHETICS
+
+**❌ AVOID THESE (Typical AI/LLM Patterns):**
+- Purple gradients (overused in AI tools)
+- Blue-purple color schemes
+- Neon accents
+- Glassmorphism effects
+- Particle backgrounds
+- Animated gradients
+
+**✅ USE THESE (Enterprise GRC Standards):**
+
+**Color Palette - Corporate Trust:**
+```css
+/* Primary - Professional Navy */
+--primary: #1e3a5f;        /* Deep navy blue */
+--primary-light: #2c5282;  /* Lighter navy */
+--primary-dark: #1a2f4d;   /* Darker navy */
+
+/* Secondary - Executive Gray */
+--secondary: #4a5568;      /* Slate gray */
+--secondary-light: #718096; /* Medium gray */
+
+/* Accents - Minimal & Professional */
+--accent-success: #047857; /* Forest green (not bright) */
+--accent-warning: #d97706; /* Amber (for warnings) */
+--accent-critical: #b91c1c; /* Deep red (for violations) */
+
+/* Neutrals - Clean Background */
+--bg-primary: #ffffff;     /* Pure white */
+--bg-secondary: #f7fafc;   /* Subtle gray */
+--bg-tertiary: #edf2f7;    /* Card backgrounds */
+
+/* Text */
+--text-primary: #1a202c;   /* Almost black */
+--text-secondary: #4a5568; /* Medium gray */
+--text-muted: #a0aec0;     /* Light gray */
+
+/* Borders */
+--border-light: #e2e8f0;   /* Subtle borders */
+--border-medium: #cbd5e0;  /* Card borders */
+```
+
+**Typography - Corporate Professional:**
+```css
+/* Font Stack */
+font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+/* Hierarchy */
+--h1: 2.5rem;   /* 40px - Hero sections */
+--h2: 2rem;     /* 32px - Section headers */
+--h3: 1.5rem;   /* 24px - Subsections */
+--h4: 1.25rem;  /* 20px - Card titles */
+--body: 1rem;   /* 16px - Body text */
+--small: 0.875rem; /* 14px - Metadata */
+
+/* Weight */
+--weight-normal: 400;
+--weight-medium: 500;
+--weight-semibold: 600;
+--weight-bold: 700;
+```
+
+**Layout Principles:**
+- Maximum content width: 1280px
+- Card-based layout (not full-bleed)
+- Generous white space (breathing room)
+- Clear visual hierarchy
+- Professional shadows (subtle, not dramatic)
+
+**Component Style:**
+```css
+/* Cards - Clean & Corporate */
+.card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-medium);
+    border-radius: 8px; /* Subtle, not overly rounded */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); /* Minimal shadow */
+    padding: 24px;
+}
+
+/* Buttons - Professional */
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background: var(--primary-light);
+}
+
+/* Violation Cards - Severity-Based */
+.violation-critical {
+    border-left: 4px solid var(--accent-critical);
+    background: #fef2f2; /* Very subtle red tint */
+}
+
+.violation-major {
+    border-left: 4px solid var(--accent-warning);
+    background: #fffbeb; /* Very subtle amber tint */
+}
+
+.violation-minor {
+    border-left: 4px solid #fbbf24;
+    background: #fefce8; /* Very subtle yellow tint */
+}
+```
+
+**Reference Designs (Inspiration):**
+- Vanta (vanta.com) - Clean GRC SaaS
+- OneTrust (onetrust.com) - Enterprise compliance
+- Stripe Dashboard (stripe.com/docs) - Professional data display
+- Linear (linear.app) - Modern but professional
+- Vercel Dashboard (vercel.com) - Clean, minimal
+
+**Key Differentiators:**
+- White/light gray backgrounds (not dark mode)
+- Minimal use of color (strategic only)
+- Clear data visualization (charts, not decorative)
+- Professional sans-serif fonts
+- Generous spacing
+- Subtle shadows and borders
+- No animated backgrounds or gradients
+
+---
+
+## ⚙️ CLAUDE CODE PREFERENCES
+
+**Planning Mode:**
+- ✅ ALWAYS ask clarifying questions BEFORE implementing
+- ✅ Propose architecture decisions and wait for approval
+- ✅ Present 2-3 options when trade-offs exist
+- ✅ Confirm understanding before large changes
+
+**Thinking Mode:**
+- ✅ Keep thinking mode ON for all responses
+- ✅ Use ULTRA thinking for complex architectural decisions
+- ✅ Use ULTRA thinking for debugging production issues
+- ✅ Use ULTRA thinking for optimization problems
+
+**Communication Style:**
+- Be concise but complete
+- Ask questions when unclear
+- Propose solutions, don't assume
+- Flag potential issues proactively
+
+**Code Quality Standards:**
+- Type hints on all functions
+- Docstrings for classes and complex functions
+- Error handling on all external calls
+- Logging for debugging
+- No hardcoded values (use env vars)
+- Production-grade, not prototype
+
+---
+
+## 📋 CURRENT PROJECT STATE
+
+**Completed:**
+- ✅ Old projects deleted from Render and Netlify
+- ✅ Old GitHub repos renamed (no conflicts)
+- ✅ Pinecone indexes exist (DO NOT RECREATE)
+
+**Pending Setup:**
+- ⏳ Create GitHub repository: sovereign-v4
+- ⏳ Create Render web service (connect to GitHub)
+- ⏳ Add environment variables to Render
+- ⏳ Create Netlify site (connect to GitHub)
+- ⏳ Build FastAPI backend
+- ⏳ Build frontend UI
+- ⏳ Implement RAG V3
+- ⏳ Implement 9 judges
+- ⏳ Implement multi-model routing
+- ⏳ Implement self-improvement agent
+- ⏳ Run evaluations
+- ⏳ Prepare demo
+
+**Timeline:**
+- Today: Setup infrastructure + first component
+- Week 1: RAG V3
+- Week 2: Judges
+- Week 3: Routing + Improvement
+- Week 4: Evals
+- Week 5: Frontend + Exports
+- Week 6: Testing + Polish
+- Week 7: Demo prep
+- Jan 11, 2026: Demo day
+
+---
+
+## 🎯 SUCCESS METRICS
+
+**Technical:**
+- Retrieval speed: <2 seconds
+- Analysis speed: 7-20 seconds
+- Overall TPR: ≥95%
+- Overall TNR: ≥90%
+- Critical TPR: ≥95%
+- Cost per scan: $0.07-$0.35
+- Cost savings: 60-70%
+
+**Demo Day:**
+- Zero crashes during presentation
+- Professional UI (not student project)
+- Clear violations with evidence
+- PDF export works
+- 4-minute timing perfect
+
+---
+
+## 🚨 CRITICAL REMINDERS
+
+**Every Session:**
+1. This is a FRESH START - no old code
+2. Ask clarifying questions before implementing
+3. Use professional GRC design (not AI purple gradients)
+4. Production quality, not prototype
+5. Test each component before moving on
+6. Pinecone indexes already exist - DO NOT RECREATE
+
+**When Uncertain:**
+- ASK before implementing
+- Propose 2-3 options
+- Explain trade-offs
+- Wait for user decision
+
+**File Organization:**
+```
+sovereign-v4/
+├── backend/
+│   ├── rag/          # RAG V3 components
+│   ├── judges/       # 9 compliance judges
+│   ├── routing/      # Multi-model router
+│   ├── improvement/  # Self-improvement agent
+│   ├── evals/        # Evaluation system
+│   └── exports/      # PDF/CSV generators
+├── frontend/
+│   ├── index.html
+│   ├── styles.css
+│   └── app.js
+├── data/
+│   ├── regulatory_docs/
+│   ├── error_logs/
+│   └── bm25_index/
+├── scripts/
+├── app.py            # FastAPI main
+├── requirements.txt
+└── .env.example
+```
+
+---
+
+## 💡 QUICK REFERENCE
+
+**Environment Variables Needed:**
+```
+ANTHROPIC_API_KEY=your_key
+OPENAI_API_KEY=your_key
+PINECONE_API_KEY=your_key
+DATABASE_URL=postgresql://...
+```
+
+**First Commands:**
+```bash
+mkdir sovereign-v4
+cd sovereign-v4
+git init
+git branch -M main
+```
+
+**Deploy Commands:**
+```bash
+# Render: Auto-deploys from GitHub
+# Netlify: Auto-deploys from GitHub
+```
+
+---
+
+## 🎬 START OF EVERY SESSION
+
+When you (Claude Code) start a new session:
+
+1. ✅ Acknowledge you've loaded this context
+2. ✅ Confirm this is a FRESH START project
+3. ✅ Ask what component we're building today
+4. ✅ Propose architecture before implementing
+5. ✅ Use thinking mode for complex decisions
+
+**Example Session Start:**
+```
+✅ Loaded Sovereign V4 context
+✅ Fresh start project - no old code
+✅ Using professional GRC design (no purple gradients)
+✅ Planning mode ON - will ask clarifying questions
+
+What component are we building today?
+```
+
+---
+
+**END OF SESSION RULES**

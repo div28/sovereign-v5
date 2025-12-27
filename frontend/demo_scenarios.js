@@ -90,6 +90,127 @@ We've deployed this system in 200 stores across France, Germany, and Spain. The 
             "EU AI Act Article 52 - Transparency violations"
         ],
         severityHint: "CRITICAL - Multiple prohibited AI practices in public spaces"
+    },
+
+    // =========================================================================
+    // EDGE CASE SCENARIOS - Designed to trigger reflection loop
+    // These have intentional ambiguity that requires additional context
+    // =========================================================================
+
+    gdpr_recommendation: {
+        id: "gdpr_recommendation",
+        title: "GDPR: Edge Case - Recommendation vs Automated Decision",
+        framework: "gdpr",
+        isEdgeCase: true,
+        description: `TalentSuggest - AI-Powered Candidate Recommendation System
+
+SYSTEM OVERVIEW:
+HR platform that analyzes resumes and suggests top 10 candidates to hiring managers. The system uses NLP to match skills, experience, and job requirements.
+
+KEY BEHAVIORS:
+- Analyzes 500+ applications per role
+- Generates ranked list of top 10 candidates with match scores (0-100)
+- Hiring managers review ALL suggestions before any interview decisions
+- Managers can (and frequently do) interview candidates not in top 10
+- Match score is one factor; managers consider other factors
+- System explains why each candidate was ranked (skills matched, experience gaps)
+- Candidates can request their match score and explanation
+- 40% of hires come from outside the AI's top 10 recommendations
+
+TECHNICAL DETAILS:
+- No facial recognition or emotion detection
+- No automated rejection - all applications remain accessible
+- Scores recalculated if job requirements change
+- 6-month data retention, then anonymized
+- Candidates notified their application was processed by AI
+
+UNCERTAINTY FACTORS:
+- Match scores ARE used as primary filter for initial review
+- Low-scored candidates rarely get interviews (but system doesn't prevent it)
+- Some managers over-rely on AI rankings despite training
+- Score threshold of 60 is "suggested" but not enforced
+
+Is this a GDPR Article 22 violation? The line between "recommendation" and "automated decision with legal effect" is unclear.`,
+        expectedBehavior: "Should trigger reflection loop - initial confidence ~0.5-0.65, then improve after researching Art. 22 case law and WP29 guidelines on profiling",
+        expectedViolations: [
+            "GDPR Article 22 - Possible violation depending on interpretation of 'meaningful human review'"
+        ],
+        severityHint: "UNCERTAIN - Requires analysis of WP29 guidelines and case law"
+    },
+
+    sox_partial_controls: {
+        id: "sox_partial_controls",
+        title: "SOX: Edge Case - Partial Audit Trail",
+        framework: "sox",
+        isEdgeCase: true,
+        description: `AutoLedger - AI-Assisted Journal Entry System
+
+SYSTEM OVERVIEW:
+Financial AI that suggests journal entries based on transaction patterns. Used by accounting team at publicly traded company.
+
+KEY BEHAVIORS:
+- Analyzes bank feeds and invoices to suggest journal entries
+- Accountant reviews and approves each entry before posting
+- Dual approval required for entries over $10,000
+- All approvals logged with timestamp and user ID
+
+CONTROL ENVIRONMENT:
+- Segregation: Different users for entry creation vs approval ✓
+- Approval workflow: Mandatory review before posting ✓
+- Audit log: Records WHO approved and WHEN ✓
+
+GAPS IDENTIFIED:
+- Audit log does NOT capture the AI's original suggestion vs final posted entry
+- If accountant modifies AI suggestion, only final version is stored
+- AI model updates are logged but not the training data changes
+- 90-day detailed log retention, then summarized (loses entry-level detail)
+- No log of AI confidence scores or alternative suggestions considered
+
+QUESTION: Do SOX Section 404 controls require logging AI reasoning, or just human approvals?`,
+        expectedBehavior: "Should trigger reflection - controls exist but AI-specific documentation requirements are evolving. Need to research SOX guidance on AI systems.",
+        expectedViolations: [
+            "SOX Section 404 - Possible gap in AI-specific audit trail requirements"
+        ],
+        severityHint: "UNCERTAIN - Traditional controls exist, AI-specific requirements unclear"
+    },
+
+    euai_emotion_wellness: {
+        id: "euai_emotion_wellness",
+        title: "EU AI Act: Edge Case - Emotion AI in Wellness App",
+        framework: "euai",
+        isEdgeCase: true,
+        description: `MindfulAI - Employee Wellness Check-in App
+
+SYSTEM OVERVIEW:
+Voluntary workplace wellness app that uses AI to detect stress levels and suggest wellness resources to employees.
+
+KEY BEHAVIORS:
+- Employees opt-in and can opt-out at any time
+- Analyzes voice patterns during optional daily check-ins
+- Detects stress indicators and suggests breathing exercises, breaks, or EAP resources
+- NO data shared with employer - aggregate anonymized trends only
+- Individual results visible only to the employee
+- No employment decisions based on wellness data
+
+TECHNICAL DETAILS:
+- Voice analysis for stress detection (pitch, pace, tremor)
+- Text sentiment analysis of optional journal entries
+- Pattern recognition to identify burnout risk
+- All individual data encrypted, employee holds key
+- 30-day rolling window, then deleted
+
+UNCERTAINTY FACTORS:
+- Uses emotion recognition technology (EU AI Act concern)
+- But it's voluntary, private, and benefits the employee
+- Is this "workplace" emotion AI if employer provides but doesn't access?
+- App recommends when to take breaks - is this influencing behavior?
+
+Does the EU AI Act prohibition on workplace emotion AI apply to voluntary wellness tools?`,
+        expectedBehavior: "Should trigger reflection - emotion AI in workplace is prohibited, but voluntary wellness with no employer access may be exempt. Need to research EU AI Act Article 5 exceptions.",
+        expectedViolations: [
+            "EU AI Act Article 5 - Possible prohibition on workplace emotion recognition"
+        ],
+        severityHint: "UNCERTAIN - Voluntary wellness vs prohibited workplace emotion AI"
     }
 };
 
@@ -109,11 +230,16 @@ function loadDemoScenario(scenarioId) {
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
-    // Select the appropriate framework
+    // Handle single framework or array of frameworks
+    const frameworks = Array.isArray(scenario.frameworks)
+        ? scenario.frameworks
+        : [scenario.framework];
+
+    // Select the appropriate framework(s)
     const frameworkCards = document.querySelectorAll('.framework-card');
     frameworkCards.forEach(card => {
         const framework = card.dataset.framework;
-        if (framework === scenario.framework) {
+        if (frameworks.includes(framework)) {
             if (!card.classList.contains('selected')) {
                 card.click();
             }
@@ -129,10 +255,25 @@ function loadDemoScenario(scenarioId) {
         textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    // Show toast notification (use new function from app.js)
+    // Show toast notification with edge case indicator
     if (typeof showToast === 'function') {
-        showToast(`✓ Loaded: ${scenario.title}`);
+        const edgeCaseLabel = scenario.isEdgeCase ? ' [Edge Case - Reflection Loop Demo]' : '';
+        showToast(`✓ Loaded: ${scenario.title}${edgeCaseLabel}`);
     }
+}
+
+// Get all edge case scenarios (for UI filtering)
+function getEdgeCaseScenarios() {
+    return Object.entries(DEMO_SCENARIOS)
+        .filter(([_, scenario]) => scenario.isEdgeCase)
+        .map(([id, scenario]) => ({ id, ...scenario }));
+}
+
+// Get all standard scenarios (for UI filtering)
+function getStandardScenarios() {
+    return Object.entries(DEMO_SCENARIOS)
+        .filter(([_, scenario]) => !scenario.isEdgeCase)
+        .map(([id, scenario]) => ({ id, ...scenario }));
 }
 
 // Export for use globally

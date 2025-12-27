@@ -611,6 +611,47 @@
             transform: translateY(-1px);
         }
 
+        /* Edge Case Badge */
+        .edge-case-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 8px;
+        }
+
+        .demo-scenario-card.edge-case {
+            border-color: rgba(245, 158, 11, 0.4);
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .demo-scenario-card.edge-case:hover {
+            border-color: #F59E0B;
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .demo-scenario-card.edge-case .load-btn {
+            background: #F59E0B;
+        }
+
+        .demo-scenario-card.edge-case .load-btn:hover {
+            background: #D97706;
+        }
+
+        .scenario-hint {
+            font-size: 11px;
+            color: #9CA3AF;
+            font-style: italic;
+            margin-top: 4px;
+        }
+
         .load-btn.loaded {
             background: #10b981;
         }
@@ -2458,6 +2499,32 @@
                         </div>
                         <button class="load-btn">Load</button>
                     </div>
+
+                    <!-- Edge Case Scenarios - Designed to trigger reflection loop -->
+                    <div class="demo-scenario-card edge-case" data-scenario="gdpr_recommendation">
+                        <div class="scenario-content">
+                            <div class="scenario-title">🤔 TalentSuggest AI<span class="edge-case-badge">🔄 Edge Case</span></div>
+                            <div class="scenario-frameworks">GDPR</div>
+                            <div class="scenario-hint">Tests reflection loop: recommendation vs automated decision</div>
+                        </div>
+                        <button class="load-btn">Load</button>
+                    </div>
+                    <div class="demo-scenario-card edge-case" data-scenario="sox_partial_controls">
+                        <div class="scenario-content">
+                            <div class="scenario-title">📊 AutoLedger AI<span class="edge-case-badge">🔄 Edge Case</span></div>
+                            <div class="scenario-frameworks">SOX</div>
+                            <div class="scenario-hint">Tests reflection loop: partial audit trail requirements</div>
+                        </div>
+                        <button class="load-btn">Load</button>
+                    </div>
+                    <div class="demo-scenario-card edge-case" data-scenario="euai_emotion_wellness">
+                        <div class="scenario-content">
+                            <div class="scenario-title">🧘 MindfulAI Wellness<span class="edge-case-badge">🔄 Edge Case</span></div>
+                            <div class="scenario-frameworks">EU AI Act</div>
+                            <div class="scenario-hint">Tests reflection loop: voluntary wellness vs prohibited emotion AI</div>
+                        </div>
+                        <button class="load-btn">Load</button>
+                    </div>
                 </div>
             </div>
 
@@ -2675,6 +2742,78 @@ Features:
 
 Serves 5M loan applications annually. 94% automation rate.`,
                 frameworks: ['gdpr', 'sox', 'euai']
+            },
+
+            // ========== EDGE CASE SCENARIOS - Trigger Reflection Loop ==========
+
+            gdpr_recommendation: {
+                text: `TalentSuggest — AI-Powered Candidate Recommendation System
+
+SYSTEM OVERVIEW:
+HR platform that analyzes resumes and suggests top 10 candidates to hiring managers.
+
+KEY BEHAVIORS:
+• Generates ranked list of top 10 candidates with match scores (0-100)
+• Hiring managers review ALL suggestions before interview decisions
+• Managers can interview candidates not in top 10 (40% of hires are)
+• Candidates can request their match score and explanation
+
+UNCERTAINTY FACTORS:
+• Match scores ARE used as primary filter for initial review
+• Low-scored candidates rarely get interviews (but not prevented)
+• Score threshold of 60 is "suggested" but not enforced
+
+Is this a GDPR Article 22 violation? The line between "recommendation" and "automated decision" is unclear.`,
+                frameworks: ['gdpr'],
+                isEdgeCase: true,
+                label: 'Edge Case'
+            },
+
+            sox_partial_controls: {
+                text: `AutoLedger — AI-Assisted Journal Entry System
+
+SYSTEM OVERVIEW:
+Financial AI that suggests journal entries based on transaction patterns.
+
+CONTROLS IN PLACE:
+✓ Segregation: Different users for entry creation vs approval
+✓ Approval workflow: Mandatory review before posting
+✓ Audit log: Records WHO approved and WHEN
+
+GAPS IDENTIFIED:
+• Audit log does NOT capture AI's original suggestion vs final entry
+• If accountant modifies AI suggestion, only final version stored
+• 90-day detailed log retention, then summarized
+• No log of AI confidence scores or alternatives considered
+
+Do SOX Section 404 controls require logging AI reasoning, or just human approvals?`,
+                frameworks: ['sox'],
+                isEdgeCase: true,
+                label: 'Edge Case'
+            },
+
+            euai_emotion_wellness: {
+                text: `MindfulAI — Employee Wellness Check-in App
+
+SYSTEM OVERVIEW:
+Voluntary workplace wellness app using AI to detect stress and suggest resources.
+
+KEY BEHAVIORS:
+• Employees opt-in and can opt-out at any time
+• Analyzes voice patterns for stress indicators
+• NO data shared with employer - only aggregate anonymized trends
+• Individual results visible only to the employee
+• No employment decisions based on wellness data
+
+UNCERTAINTY FACTORS:
+• Uses emotion recognition technology (EU AI Act concern)
+• But voluntary, private, and benefits employee
+• Is this "workplace" emotion AI if employer doesn't access data?
+
+Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness tools?`,
+                frameworks: ['euai'],
+                isEdgeCase: true,
+                label: 'Edge Case'
             }
         };
 

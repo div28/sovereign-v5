@@ -264,6 +264,11 @@ Respond with a JSON reflection:
                     "estimated_complexity": "medium"
                 }
 
+            # CRITICAL: Add original context to plan metadata so act() can access it
+            # Without this, act() receives empty description and RAG returns 0 chunks
+            plan_data["description"] = description
+            plan_data["original_frameworks"] = frameworks
+
             # Store plan in scratchpad
             if self.scratchpad:
                 self.scratchpad.set_plan(plan_data)
@@ -280,14 +285,19 @@ Respond with a JSON reflection:
 
         except Exception as e:
             logger.error(f"Planning failed: {e}")
-            # Return default plan on failure
+            # Return default plan on failure - CRITICAL: must include description and frameworks
             return AgentPlan(
                 agent_name=self.name,
                 goal=goal,
                 steps=["invoke_researcher", "invoke_validators", "invoke_synthesizer"],
                 tools_to_use=self.TOOLS,
                 estimated_complexity="medium",
-                metadata={"error": str(e)}
+                metadata={
+                    "error": str(e),
+                    "description": description,
+                    "original_frameworks": frameworks,
+                    "frameworks_to_analyze": frameworks
+                }
             )
 
     async def act(self, plan: AgentPlan) -> AgentResult:
@@ -302,7 +312,21 @@ Respond with a JSON reflection:
         start_time = time.time()
         context = plan.metadata
         description = context.get("description", "")
-        frameworks = context.get("frameworks_to_analyze", ["gdpr", "sox", "euai"])
+        # Use original_frameworks as fallback in case Claude's response doesn't include them
+        frameworks = context.get("frameworks_to_analyze") or context.get("original_frameworks", ["gdpr", "sox", "euai"])
+
+        # DEFENSIVE: Fail fast if description is empty (prevents 4-minute timeout)
+        if not description or not description.strip():
+            logger.error("CRITICAL: Empty description in act() - check plan.metadata flow")
+            return AgentResult(
+                agent_name=self.name,
+                success=False,
+                data={"violations": [], "frameworks_analyzed": frameworks, "chunks_retrieved": 0},
+                confidence=0.0,
+                execution_time_ms=(time.time() - start_time) * 1000,
+                errors=["Empty submission provided. Unable to analyze."],
+                warnings=["This may indicate a bug in the plan/act data flow."]
+            )
 
         violations = []
         errors = []
@@ -310,7 +334,7 @@ Respond with a JSON reflection:
 
         try:
             # Step 1: Retrieve regulatory context
-            logger.info("Step 1: Retrieving regulatory context")
+            logger.info(f"Step 1: Retrieving regulatory context for {len(description)} char description")
             rag = self._get_rag_engine()
             retrieved_chunks = rag.retrieve(
                 query=description,

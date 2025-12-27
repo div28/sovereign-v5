@@ -535,7 +535,8 @@ Respond with a JSON reflection:
         self,
         description: str,
         frameworks: List[str],
-        risk_tolerance: str = "medium"
+        risk_tolerance: str = "medium",
+        include_synthesis: bool = True
     ) -> Dict[str, Any]:
         """
         Main entry point for agentic compliance analysis.
@@ -546,9 +547,10 @@ Respond with a JSON reflection:
             description: AI system description to analyze.
             frameworks: List of frameworks to check against.
             risk_tolerance: "low", "medium", or "high".
+            include_synthesis: Whether to generate executive summary.
 
         Returns:
-            Analysis results including violations, risk score, and agent trace.
+            Analysis results including violations, risk score, synthesis, and agent trace.
         """
         # Reset scratchpad for new analysis
         if self.scratchpad:
@@ -562,14 +564,14 @@ Respond with a JSON reflection:
             "risk_tolerance": risk_tolerance
         }
 
-        # Run the agent loop
+        # Run the agent loop (plan/act/reflect with iterations)
         result = await self.run(goal, context)
 
         # Calculate risk score
         violations = result.data.get("violations", [])
         risk_score = self._calculate_risk_score(violations)
 
-        # Build response
+        # Build base response
         response = {
             "status": "success" if result.success else "error",
             "violations": violations,
@@ -582,11 +584,180 @@ Respond with a JSON reflection:
             "warnings": result.warnings
         }
 
+        # Generate synthesis if requested
+        if include_synthesis:
+            try:
+                from .synthesizer import SynthesisAgent
+
+                synthesizer = SynthesisAgent(scratchpad=self.scratchpad)
+                synthesis = await synthesizer.synthesize(
+                    violations=violations,
+                    frameworks=frameworks,
+                    scratchpad=self.scratchpad
+                )
+
+                response["executive_summary"] = synthesis.get("executive_summary", "")
+                response["prioritized_findings"] = synthesis.get("prioritized_findings", [])
+                response["remediation_roadmap"] = synthesis.get("remediation_roadmap", [])
+                response["confidence_improvements"] = synthesis.get("confidence_improvements", {})
+
+            except Exception as e:
+                logger.error(f"Synthesis failed: {e}")
+                response["executive_summary"] = "Unable to generate executive summary."
+                response["synthesis_error"] = str(e)
+
         # Add agent trace if scratchpad available
         if self.scratchpad:
             response["agent_trace"] = self.scratchpad.to_dict()
 
         return response
+
+    async def analyze_with_retry(
+        self,
+        description: str,
+        frameworks: List[str],
+        risk_tolerance: str = "medium"
+    ) -> Dict[str, Any]:
+        """
+        Enhanced analysis with explicit reflection and retry loop.
+
+        This method provides more control over the iteration process
+        and fetches additional context for low-confidence findings.
+        """
+        if self.scratchpad:
+            self.scratchpad.clear()
+
+        violations = []
+        all_chunks = []
+
+        for iteration in range(1, self.max_iterations + 1):
+            logger.info(f"Starting iteration {iteration}/{self.max_iterations}")
+
+            if self.scratchpad:
+                self.scratchpad.log_iteration_start(iteration)
+
+            # Step 1: Retrieve context (initial or targeted)
+            rag = self._get_rag_engine()
+
+            if iteration == 1:
+                # Initial broad retrieval
+                chunks = rag.retrieve(
+                    query=description,
+                    frameworks=frameworks,
+                    top_k=15,
+                    use_routing=True
+                )
+                all_chunks = chunks
+            else:
+                # Targeted retrieval for low-confidence judges
+                low_conf_judges = self.scratchpad.get_judges_needing_retry() if self.scratchpad else []
+                for judge_id in low_conf_judges:
+                    flag = self.scratchpad.get_low_confidence_flag(judge_id)
+                    if flag and flag.get("context_needed"):
+                        additional = rag.retrieve(
+                            query=" ".join(flag["context_needed"]),
+                            frameworks=frameworks,
+                            top_k=5,
+                            use_routing=True
+                        )
+                        self.scratchpad.add_additional_context(judge_id, additional)
+                        all_chunks.extend(additional)
+
+            # Step 2: Run judges
+            judges = self._get_judges()
+            judge_tasks = []
+
+            for framework in frameworks:
+                framework_lower = framework.lower()
+                framework_judges = judges.get(framework_lower, [])
+                framework_chunks = [c for c in all_chunks if c.get("framework", "").lower() == framework_lower]
+
+                for judge in framework_judges:
+                    # Add any additional context for this judge
+                    additional = self.scratchpad.get_additional_context(judge.judge_id) if self.scratchpad else []
+                    combined_chunks = framework_chunks + additional
+
+                    judge_tasks.append(self._run_judge_async(judge, description, combined_chunks))
+
+            results = await asyncio.gather(*judge_tasks, return_exceptions=True)
+
+            # Process results
+            iteration_violations = []
+            low_confidence_count = 0
+
+            for item in results:
+                if isinstance(item, Exception):
+                    continue
+
+                judge_id, result = item
+                if result:
+                    if self.scratchpad:
+                        self.scratchpad.set_judge_reasoning(judge_id, result)
+
+                    if result.get("violation_detected"):
+                        iteration_violations.append(result)
+
+                        confidence = result.get("confidence", 0)
+                        if confidence < self.confidence_threshold:
+                            low_confidence_count += 1
+                            if self.scratchpad:
+                                self.scratchpad.flag_low_confidence(
+                                    judge_id=judge_id,
+                                    confidence=confidence,
+                                    reason=f"Confidence {confidence:.2f} below threshold",
+                                    context_needed=[f"More context for {result.get('article_violated', '')}"]
+                                )
+
+            violations = iteration_violations
+
+            # Calculate avg confidence
+            avg_conf = sum(v.get("confidence", 0) for v in violations) / len(violations) if violations else 1.0
+
+            if self.scratchpad:
+                self.scratchpad.log_iteration_end(iteration, avg_conf, len(violations))
+
+            # Check if we can stop
+            if low_confidence_count == 0 or iteration == self.max_iterations:
+                logger.info(f"Stopping at iteration {iteration}: low_conf={low_confidence_count}")
+                break
+
+            # Clear flags for next iteration
+            if self.scratchpad:
+                for judge_id in self.scratchpad.get_judges_needing_retry():
+                    self.scratchpad.clear_flags_for_judge(judge_id)
+
+        # Generate synthesis
+        from .synthesizer import SynthesisAgent
+        synthesizer = SynthesisAgent(scratchpad=self.scratchpad)
+        synthesis = await synthesizer.synthesize(violations, frameworks, self.scratchpad)
+
+        return {
+            "status": "success",
+            "violations": violations,
+            "risk_score": self._calculate_risk_score(violations),
+            "frameworks_analyzed": frameworks,
+            "chunks_retrieved": len(all_chunks),
+            "iterations": iteration,
+            "confidence": avg_conf,
+            "executive_summary": synthesis.get("executive_summary", ""),
+            "prioritized_findings": synthesis.get("prioritized_findings", []),
+            "remediation_roadmap": synthesis.get("remediation_roadmap", []),
+            "confidence_improvements": synthesis.get("confidence_improvements", {}),
+            "agent_trace": self.scratchpad.to_dict() if self.scratchpad else {}
+        }
+
+    async def _run_judge_async(self, judge, submission: str, chunks: List[Dict]) -> Tuple[str, Optional[Dict]]:
+        """Wrap sync judge.evaluate in async."""
+        try:
+            result = await asyncio.to_thread(
+                judge.evaluate,
+                submission=submission,
+                retrieved_chunks=chunks
+            )
+            return (judge.judge_id, result)
+        except Exception as e:
+            logger.error(f"Judge {judge.judge_id} failed: {e}")
+            return (judge.judge_id, None)
 
     def _calculate_risk_score(self, violations: List[Dict[str, Any]]) -> int:
         """Calculate risk score from violations (0-100)."""

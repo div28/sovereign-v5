@@ -9,6 +9,7 @@ from .shared_memory import SharedMemory
 from .orchestrator import OrchestratorAgent
 from .researcher import ResearcherAgent
 from .validator import ValidatorAgent, GDPRValidatorAgent, SOXValidatorAgent, EUAIValidatorAgent
+from .synthesizer import SynthesisAgent
 
 __all__ = [
     # Base classes
@@ -26,4 +27,5 @@ __all__ = [
     "GDPRValidatorAgent",
     "SOXValidatorAgent",
     "EUAIValidatorAgent",
+    "SynthesisAgent",
 ]

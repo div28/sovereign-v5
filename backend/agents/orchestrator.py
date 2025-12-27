@@ -307,13 +307,14 @@ Respond with a JSON reflection:
 
         try:
             # Step 1: Retrieve regulatory context
+            # PERF: use_routing=False skips Claude classification call (saves ~3-5s)
             logger.info(f"Step 1: Retrieving regulatory context for {len(description)} char description")
             rag = self._get_rag_engine()
             retrieved_chunks = rag.retrieve(
                 query=description,
                 frameworks=frameworks,
                 top_k=15,
-                use_routing=True
+                use_routing=False
             )
 
             if self.scratchpad:
@@ -638,11 +639,12 @@ Respond with a JSON reflection:
 
             if iteration == 1:
                 # Initial broad retrieval
+                # PERF: use_routing=False skips Claude classification call
                 chunks = rag.retrieve(
                     query=description,
                     frameworks=frameworks,
                     top_k=15,
-                    use_routing=True
+                    use_routing=False
                 )
                 all_chunks = chunks
             else:
@@ -655,7 +657,7 @@ Respond with a JSON reflection:
                             query=" ".join(flag["context_needed"]),
                             frameworks=frameworks,
                             top_k=5,
-                            use_routing=True
+                            use_routing=False
                         )
                         self.scratchpad.add_additional_context(judge_id, additional)
                         all_chunks.extend(additional)

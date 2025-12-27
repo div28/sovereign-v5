@@ -410,423 +410,267 @@
         }
 
         /* Assessment Section */
+        /* ============================================
+           CLEAN ENTERPRISE LAYOUT - No Scroll
+           ============================================ */
         .assessment-section {
             min-height: 100vh;
-            padding: 5.5rem 3rem 1.5rem 3rem;  /* Balanced padding for fixed header */
+            padding: 24px;
             display: none;
-        }
-
-        .assessment-section.active {
-            display: block;
-        }
-
-        .assessment-title {
-            text-align: center;
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .assessment-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
-        /* Row 1: Frameworks + Upload side by side */
-        .input-row {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 1.5rem;
-        }
-
-        .assessment-card {
-            background: rgba(255,255,255,0.03);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 1.25rem;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin: 0;
-        }
-
-        /* Upload + Description Card */
-        .upload-description-card {
+        .assessment-section.active {
             display: flex;
             flex-direction: column;
         }
 
-        .input-divider {
+        /* Setup Card - Main Container */
+        .setup-card {
+            background: #1e2538;
+            border-radius: 16px;
+            border: 1px solid #2d3748;
+            padding: 32px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .setup-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 32px;
+            flex: 1;
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 16px 0;
+        }
+
+        /* Frameworks Section */
+        .frameworks-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .frameworks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .framework-checkbox {
             display: flex;
             align-items: center;
-            gap: 16px;
-            padding: 12px 0;
+            gap: 12px;
+            padding: 14px 16px;
+            background: #252d40;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s ease;
         }
 
-        .input-divider::before,
-        .input-divider::after {
+        .framework-checkbox:hover {
+            border-color: #3b82f6;
+        }
+
+        .framework-checkbox.selected {
+            border-color: #3b82f6;
+            background: #1e3a5f;
+        }
+
+        .framework-checkbox input {
+            display: none;
+        }
+
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #4b5563;
+            border-radius: 4px;
+            position: relative;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+        }
+
+        .framework-checkbox.selected .checkbox-custom {
+            background: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .framework-checkbox.selected .checkbox-custom::after {
             content: '';
-            flex: 1;
-            height: 1px;
-            background: rgba(255,255,255,0.15);
+            position: absolute;
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid #fff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
         }
 
-        .input-divider span {
-            color: rgba(255,255,255,0.5);
+        .framework-label {
+            font-weight: 600;
+            color: #fff;
+            font-size: 15px;
+        }
+
+        .framework-subtitle {
             font-size: 12px;
-            font-weight: 500;
+            color: #64748b;
+            margin-left: auto;
         }
 
-        .description-input textarea {
+        .select-all-btn {
+            background: transparent;
+            border: 1px solid #3b82f6;
+            color: #3b82f6;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
             width: 100%;
-            min-height: 100px;
-            padding: 14px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 10px;
+        }
+
+        .select-all-btn:hover {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .select-all-btn.all-selected {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        /* Input Section */
+        .input-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .description-textarea {
+            flex: 1;
+            min-height: 160px;
+            padding: 16px;
+            background: #252d40;
+            border: 1px solid #3a4259;
+            border-radius: 8px;
             color: #fff;
             font-size: 14px;
-            resize: vertical;
             font-family: inherit;
+            resize: none;
+            line-height: 1.6;
         }
 
-        .description-input textarea:focus {
+        .description-textarea:focus {
             outline: none;
             border-color: #3b82f6;
         }
 
-        .description-input textarea::placeholder {
-            color: rgba(255,255,255,0.4);
+        .description-textarea::placeholder {
+            color: #64748b;
         }
 
-        /* Row 2: Demo Scenarios - Horizontal Grid */
-        .demos-row {
-            margin-top: 0.5rem;
-        }
-
-        .demos-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-        }
-
-        .section-divider {
+        /* Demo Loader - Dropdown */
+        .demo-loader {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin: 1.25rem 0 1rem 0;
+            margin-top: 16px;
         }
 
-        .section-divider .edge-label {
-            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .section-divider .edge-hint {
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
-        }
-
-        .section-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: rgba(245, 158, 11, 0.3);
-        }
-
-        /* Action Row */
-        .action-row {
-            display: flex;
-            justify-content: center;
-            padding: 1rem 0;
-        }
-
-        .run-assessment-btn {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 16px 48px;
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
-        }
-
-        .run-assessment-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
-        }
-
-        .run-assessment-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Framework Selection */
-        .framework-options {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .framework-option {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .framework-option:hover {
-            background: rgba(96, 165, 250, 0.05);
-            border-color: #60a5fa;
-        }
-
-        .framework-option.selected {
-            background: rgba(59, 130, 246, 0.1);
-            border-color: #3b82f6;
-        }
-
-        .framework-checkbox {
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .framework-option.selected .framework-checkbox {
-            background: #3b82f6;
-            border-color: #3b82f6;
-        }
-
-        .framework-checkbox::after {
-            content: '✓';
-            color: #fff;
-            font-weight: 700;
-            display: none;
-        }
-
-        .framework-option.selected .framework-checkbox::after {
-            display: block;
-        }
-
-        .framework-icon {
-            font-size: 1.5rem;
-        }
-
-        .framework-info {
-            flex: 1;
-        }
-
-        .framework-name {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .framework-desc {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.6);
-        }
-
-        /* Upload Zone */
-        .upload-zone {
-            border: 2px dashed rgba(255,255,255,0.2);
-            border-radius: 12px;
-            padding: 3rem 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .upload-zone:hover {
-            border-color: #60a5fa;
-            background: rgba(96, 165, 250, 0.02);
-        }
-
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
-        .upload-text {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .upload-hint {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.5);
-        }
-
-        /* Demo Scenarios - Horizontal Cards */
-        .demo-scenario-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .demo-scenario-card:hover {
-            border-color: #3b82f6;
-            background: rgba(59, 130, 246, 0.05);
-            transform: translateY(-2px);
-        }
-
-        .scenario-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .scenario-icon {
-            font-size: 28px;
-            flex-shrink: 0;
-        }
-
-        .scenario-content {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .scenario-title {
-            font-weight: 600;
-            color: white;
-            font-size: 14px;
-            margin-bottom: 2px;
-        }
-
-        .scenario-frameworks {
-            font-size: 11px;
-            color: #3b82f6;
-            font-weight: 500;
-        }
-
-        .load-btn {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .demo-label {
             font-size: 13px;
-            width: 100%;
+            color: #64748b;
+            white-space: nowrap;
         }
 
-        .load-btn:hover {
+        .demo-select {
+            flex: 1;
+            padding: 10px 14px;
+            background: #252d40;
+            border: 1px solid #3a4259;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        .demo-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .demo-select option {
+            background: #1e2538;
+            color: #fff;
+        }
+
+        .demo-select optgroup {
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        /* Action Section */
+        .action-section {
+            display: flex;
+            justify-content: center;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #2d3748;
+        }
+
+        .run-btn {
+            padding: 14px 48px;
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .run-btn:hover {
             background: #2563eb;
         }
 
-        /* Edge Case Badge */
-        .edge-case-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-            color: white;
-            padding: 3px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-left: 8px;
+        .run-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
-        .demo-scenario-card.edge-case {
-            border-color: rgba(245, 158, 11, 0.4);
-            background: rgba(245, 158, 11, 0.05);
+        /* Responsive for setup grid */
+        @media (max-width: 768px) {
+            .setup-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .demo-loader {
+                flex-direction: column;
+                align-items: stretch;
+            }
         }
 
-        .demo-scenario-card.edge-case:hover {
-            border-color: #F59E0B;
-            background: rgba(245, 158, 11, 0.1);
-        }
-
-        .demo-scenario-card.edge-case .load-btn {
-            background: #F59E0B;
-        }
-
-        .demo-scenario-card.edge-case .load-btn:hover {
-            background: #D97706;
-        }
-
-        .scenario-hint {
-            font-size: 11px;
-            color: #9CA3AF;
-            font-style: italic;
-            margin-top: 4px;
-        }
-
-        .load-btn.loaded {
-            background: #10b981;
-        }
-
-        /* Select All Button */
-        .select-all-btn {
-            background: transparent;
-            color: #5b9bd5;
-            border: 1px solid #5b9bd5;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .select-all-btn:hover {
-            background: rgba(91, 155, 213, 0.1);
-        }
-
-        .select-all-btn.all-selected {
-            background: #5b9bd5;
-            color: white;
-        }
-
-        .textarea-section {
-            grid-column: span 3;
-            margin-top: 0.75rem;
-        }
-
+        /* Legacy textarea styles */
         .textarea {
             width: 100%;
             min-height: 170px;
@@ -2387,8 +2231,27 @@
             50% { box-shadow: 0 0 10px 3px rgba(245, 158, 11, 0.2); }
         }
 
-        .step-icon {
-            font-size: 20px;
+        .step-number {
+            width: 24px;
+            height: 24px;
+            background: #3a4259;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #9ca3af;
+        }
+
+        .agent-step[data-status="active"] .step-number {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .agent-step[data-status="complete"] .step-number {
+            background: #10b981;
+            color: #fff;
         }
 
         .step-name {
@@ -2862,147 +2725,68 @@
             </div>
         </div>
     </section>
-    <!-- Assessment Section -->
+    <!-- Assessment Section - Clean Enterprise Layout -->
     <section class="assessment-section" id="assessmentSection">
-        <h2 class="assessment-title">Compliance Assessment Setup</h2>
-        <div class="assessment-grid">
-            <!-- Row 1: Frameworks + Upload/Description -->
-            <div class="input-row">
-                <!-- Select Frameworks -->
-                <div class="assessment-card">
-                    <div class="card-header">
-                        <h3 class="card-title">Select Frameworks</h3>
-                        <button class="select-all-btn" id="selectAllBtn">Select All</button>
+        <div class="setup-card">
+            <div class="setup-grid">
+                <!-- Left: Frameworks -->
+                <div class="frameworks-section">
+                    <h3 class="section-title">Select Frameworks</h3>
+                    <div class="frameworks-list">
+                        <label class="framework-checkbox" data-framework="gdpr">
+                            <input type="checkbox" name="framework" value="gdpr">
+                            <span class="checkbox-custom"></span>
+                            <span class="framework-label">GDPR</span>
+                            <span class="framework-subtitle">Data Privacy</span>
+                        </label>
+                        <label class="framework-checkbox" data-framework="sox">
+                            <input type="checkbox" name="framework" value="sox">
+                            <span class="checkbox-custom"></span>
+                            <span class="framework-label">SOX</span>
+                            <span class="framework-subtitle">Financial Controls</span>
+                        </label>
+                        <label class="framework-checkbox" data-framework="euai">
+                            <input type="checkbox" name="framework" value="euai">
+                            <span class="checkbox-custom"></span>
+                            <span class="framework-label">EU AI Act</span>
+                            <span class="framework-subtitle">AI Risk Classification</span>
+                        </label>
                     </div>
-                    <div class="framework-options">
-                        <div class="framework-option" data-framework="gdpr">
-                            <div class="framework-checkbox"></div>
-                            <span class="framework-icon">🔒</span>
-                            <div class="framework-info">
-                                <div class="framework-name"><span class="tooltip" data-tooltip="General Data Protection Regulation - EU data privacy law enforced since May 2018">GDPR</span></div>
-                                <div class="framework-desc">EU data privacy</div>
-                            </div>
-                        </div>
-                        <div class="framework-option" data-framework="sox">
-                            <div class="framework-checkbox"></div>
-                            <span class="framework-icon">📊</span>
-                            <div class="framework-info">
-                                <div class="framework-name"><span class="tooltip" data-tooltip="Sarbanes-Oxley Act - US financial reporting and corporate governance law">SOX</span></div>
-                                <div class="framework-desc">Financial controls</div>
-                            </div>
-                        </div>
-                        <div class="framework-option" data-framework="euai">
-                            <div class="framework-checkbox"></div>
-                            <span class="framework-icon">🤖</span>
-                            <div class="framework-info">
-                                <div class="framework-name"><span class="tooltip" data-tooltip="European Union Artificial Intelligence Act - regulates AI systems based on risk levels">EU AI Act</span></div>
-                                <div class="framework-desc">AI risk classification</div>
-                            </div>
-                        </div>
-                    </div>
+                    <button class="select-all-btn" id="selectAllBtn">Select All</button>
                 </div>
 
-                <!-- Upload + Description -->
-                <div class="assessment-card upload-description-card">
-                    <h3 class="card-title">AI System Input</h3>
-                    <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
-                        <input type="file" id="fileInput" style="display:none" accept=".pdf,.docx,.txt">
-                        <div class="upload-icon">📄</div>
-                        <div class="upload-text">Drop file or browse</div>
-                        <div class="upload-hint">PDF, DOCX, TXT</div>
-                    </div>
-                    <div class="input-divider"><span>OR</span></div>
-                    <div class="description-input">
-                        <textarea id="systemDescription" placeholder="Describe your AI system, its data processing, decision-making logic, and deployment context..." autocomplete="off"></textarea>
-                    </div>
-                </div>
-            </div>
+                <!-- Right: Input -->
+                <div class="input-section">
+                    <h3 class="section-title">Describe AI System</h3>
+                    <textarea
+                        id="systemDescription"
+                        class="description-textarea"
+                        placeholder="Describe your AI system's data processing, decision-making logic, and deployment context..."
+                    ></textarea>
 
-            <!-- Row 2: Demo Scenarios -->
-            <div class="assessment-card demos-row">
-                <h3 class="card-title">Demo Scenarios</h3>
-
-                <!-- Standard Demos - Horizontal Grid -->
-                <div class="demos-grid">
-                    <div class="demo-scenario-card" data-scenario="bank_fraud">
-                        <div class="scenario-header">
-                            <span class="scenario-icon">🏦</span>
-                            <div class="scenario-content">
-                                <div class="scenario-title">Fraud Detection AI</div>
-                                <div class="scenario-frameworks">GDPR + SOX + EU AI Act</div>
-                            </div>
-                        </div>
-                        <button class="load-btn">Load</button>
-                    </div>
-                    <div class="demo-scenario-card" data-scenario="contract_intelligence">
-                        <div class="scenario-header">
-                            <span class="scenario-icon">📋</span>
-                            <div class="scenario-content">
-                                <div class="scenario-title">Contract Intelligence</div>
-                                <div class="scenario-frameworks">GDPR + SOX + EU AI Act</div>
-                            </div>
-                        </div>
-                        <button class="load-btn">Load</button>
-                    </div>
-                    <div class="demo-scenario-card" data-scenario="credit_scoring">
-                        <div class="scenario-header">
-                            <span class="scenario-icon">💳</span>
-                            <div class="scenario-content">
-                                <div class="scenario-title">Credit Decisioning</div>
-                                <div class="scenario-frameworks">GDPR + SOX + EU AI Act</div>
-                            </div>
-                        </div>
-                        <button class="load-btn">Load</button>
-                    </div>
-                </div>
-
-                <!-- Edge Cases Section -->
-                <div class="section-divider">
-                    <span class="edge-label">🔄 EDGE CASES</span>
-                    <span class="edge-hint">Tests reflection loop behavior</span>
-                </div>
-                <div class="demos-grid">
-                    <div class="demo-scenario-card edge-case" data-scenario="gdpr_recommendation">
-                        <div class="scenario-header">
-                            <span class="scenario-icon">🤔</span>
-                            <div class="scenario-content">
-                                <div class="scenario-title">TalentSuggest AI</div>
-                                <div class="scenario-frameworks">GDPR</div>
-                                <div class="scenario-hint">Recommendation vs automated decision</div>
-                            </div>
-                        </div>
-                        <button class="load-btn">Load</button>
-                    </div>
-                    <div class="demo-scenario-card edge-case" data-scenario="sox_partial_controls">
-                        <div class="scenario-header">
-                            <span class="scenario-icon">📊</span>
-                            <div class="scenario-content">
-                                <div class="scenario-title">AutoLedger AI</div>
-                                <div class="scenario-frameworks">SOX</div>
-                                <div class="scenario-hint">Partial audit trail requirements</div>
-                            </div>
-                        </div>
-                        <button class="load-btn">Load</button>
-                    </div>
-                    <div class="demo-scenario-card edge-case" data-scenario="euai_emotion_wellness">
-                        <div class="scenario-header">
-                            <span class="scenario-icon">🧘</span>
-                            <div class="scenario-content">
-                                <div class="scenario-title">MindfulAI Wellness</div>
-                                <div class="scenario-frameworks">EU AI Act</div>
-                                <div class="scenario-hint">Voluntary vs prohibited emotion AI</div>
-                            </div>
-                        </div>
-                        <button class="load-btn">Load</button>
+                    <div class="demo-loader">
+                        <span class="demo-label">Or load a demo:</span>
+                        <select id="demoSelect" class="demo-select" onchange="loadSelectedDemo()">
+                            <option value="">Select demo scenario</option>
+                            <optgroup label="Standard Scenarios">
+                                <option value="bank_fraud">Fraud Detection AI</option>
+                                <option value="contract_intelligence">Contract Intelligence</option>
+                                <option value="credit_scoring">Credit Decisioning</option>
+                            </optgroup>
+                            <optgroup label="Edge Cases (Tests Reflection)">
+                                <option value="gdpr_recommendation">TalentSuggest AI - GDPR Art.22</option>
+                                <option value="sox_partial_controls">AutoLedger AI - SOX Audit</option>
+                                <option value="euai_emotion_wellness">MindfulAI - EU AI Emotion</option>
+                            </optgroup>
+                        </select>
                     </div>
                 </div>
             </div>
 
             <!-- Action Button -->
-            <div class="action-row">
-                <button class="run-assessment-btn" onclick="runAssessment()">
-                    <span>🔍</span>
-                    <span>Run Compliance Assessment</span>
+            <div class="action-section">
+                <button class="run-btn" id="runBtn" onclick="runAssessment()">
+                    Run Assessment
                 </button>
             </div>
         </div>
@@ -3016,7 +2800,6 @@
                 <h2>Processing Assessment</h2>
                 <div class="header-right">
                     <div class="iteration-badge" id="iterationBadge" style="display: none;">
-                        <span>🔄</span>
                         <span id="iterationCount">Iteration 1/3</span>
                     </div>
                     <div class="pipeline-timer" id="pipelineTimer">0.0s</div>
@@ -3028,7 +2811,7 @@
                 <!-- Horizontal Agent Pipeline -->
                 <div class="agent-pipeline-horizontal">
                     <div class="agent-step" id="step-orchestrator" data-status="pending">
-                        <div class="step-icon">🎯</div>
+                        <div class="step-number">1</div>
                         <div class="step-name">Orchestrator</div>
                         <div class="step-status">
                             <span class="step-spinner"></span>
@@ -3037,7 +2820,7 @@
                     </div>
                     <div class="agent-connector"></div>
                     <div class="agent-step" id="step-researcher" data-status="pending">
-                        <div class="step-icon">📚</div>
+                        <div class="step-number">2</div>
                         <div class="step-name">Researcher</div>
                         <div class="step-status">
                             <span class="step-spinner"></span>
@@ -3046,7 +2829,7 @@
                     </div>
                     <div class="agent-connector"></div>
                     <div class="agent-step" id="step-validators" data-status="pending">
-                        <div class="step-icon">⚖️</div>
+                        <div class="step-number">3</div>
                         <div class="step-name">Validators</div>
                         <div class="step-status">
                             <span class="step-spinner"></span>
@@ -3055,7 +2838,7 @@
                     </div>
                     <div class="agent-connector"></div>
                     <div class="agent-step" id="step-synthesizer" data-status="pending">
-                        <div class="step-icon">✍️</div>
+                        <div class="step-number">4</div>
                         <div class="step-name">Synthesizer</div>
                         <div class="step-status">
                             <span class="step-spinner"></span>
@@ -3068,7 +2851,7 @@
                 <div class="validators-card" id="validatorsCard">
                     <div class="validators-header" onclick="toggleValidatorsDetail()">
                         <div class="validators-title">
-                            <span>⚖️ Validators</span>
+                            <span>Validators</span>
                             <span class="judge-count" id="judgeCount">(3 judges)</span>
                         </div>
                         <div class="validators-meta">
@@ -3864,73 +3647,96 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
         // Initialize with home view state
         history.replaceState({view: 'home'}, '', window.location.pathname);
 
-        // Framework selection
-        document.querySelectorAll('.framework-option').forEach(opt => {
-            opt.addEventListener('click', () => {
-                const fw = opt.dataset.framework;
-                if (selectedFrameworks.has(fw)) {
-                    selectedFrameworks.delete(fw);
-                    opt.classList.remove('selected');
-                } else {
+        // Framework selection - new checkbox-based structure
+        document.querySelectorAll('.framework-checkbox').forEach(label => {
+            const checkbox = label.querySelector('input[type="checkbox"]');
+            const fw = label.dataset.framework;
+
+            // Handle checkbox change
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
                     selectedFrameworks.add(fw);
-                    opt.classList.add('selected');
+                    label.classList.add('selected');
+                } else {
+                    selectedFrameworks.delete(fw);
+                    label.classList.remove('selected');
+                }
+                updateSelectAllButton();
+            });
+
+            // Also handle label click for visual feedback
+            label.addEventListener('click', (e) => {
+                if (e.target !== checkbox) {
+                    // Click was on label, not checkbox - checkbox will toggle automatically
                 }
             });
         });
 
-        // Test scenarios
-        // Demo scenario cards with Load buttons
-        document.querySelectorAll('.demo-scenario-card').forEach(card => {
-            const loadBtn = card.querySelector('.load-btn');
-            loadBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const scenarioKey = card.dataset.scenario;
-                const scenario = SCENARIOS[scenarioKey];
+        function updateSelectAllButton() {
+            const btn = document.getElementById('selectAllBtn');
+            if (selectedFrameworks.size === 3) {
+                btn.textContent = 'Deselect All';
+                btn.classList.add('all-selected');
+            } else {
+                btn.textContent = 'Select All';
+                btn.classList.remove('all-selected');
+            }
+        }
 
-                if (scenario) {
-                    // Populate textarea
-                    document.getElementById('systemDescription').value = scenario.text;
+        // Load demo from dropdown
+        function loadSelectedDemo() {
+            const select = document.getElementById('demoSelect');
+            const value = select.value;
 
-                    // Auto-select frameworks
-                    selectedFrameworks.clear();
-                    document.querySelectorAll('.framework-option').forEach(o => o.classList.remove('selected'));
+            if (!value) return;
 
-                    scenario.frameworks.forEach(fw => {
-                        const opt = document.querySelector(`[data-framework="${fw}"]`);
-                        if (opt) {
-                            opt.classList.add('selected');
-                            selectedFrameworks.add(fw);
-                        }
-                    });
+            const scenario = SCENARIOS[value];
+            if (scenario) {
+                // Populate textarea
+                document.getElementById('systemDescription').value = scenario.text;
 
-                    // Visual feedback
-                    loadBtn.textContent = 'Loaded ✓';
-                    loadBtn.classList.add('loaded');
-                    setTimeout(() => {
-                        loadBtn.textContent = 'Load';
-                        loadBtn.classList.remove('loaded');
-                    }, 2000);
-                }
-            });
-        });
+                // Auto-select frameworks
+                selectedFrameworks.clear();
+                document.querySelectorAll('.framework-checkbox').forEach(label => {
+                    const checkbox = label.querySelector('input[type="checkbox"]');
+                    const fw = label.dataset.framework;
+
+                    if (scenario.frameworks.includes(fw)) {
+                        checkbox.checked = true;
+                        label.classList.add('selected');
+                        selectedFrameworks.add(fw);
+                    } else {
+                        checkbox.checked = false;
+                        label.classList.remove('selected');
+                    }
+                });
+
+                updateSelectAllButton();
+            }
+        }
+        window.loadSelectedDemo = loadSelectedDemo;
 
         // Select All button
         document.getElementById('selectAllBtn').addEventListener('click', function() {
-            const allOptions = document.querySelectorAll('.framework-option');
+            const allCheckboxes = document.querySelectorAll('.framework-checkbox');
             const allSelected = selectedFrameworks.size === 3;
 
             if (allSelected) {
                 // Deselect all
                 selectedFrameworks.clear();
-                allOptions.forEach(opt => opt.classList.remove('selected'));
+                allCheckboxes.forEach(label => {
+                    label.classList.remove('selected');
+                    label.querySelector('input').checked = false;
+                });
                 this.textContent = 'Select All';
                 this.classList.remove('all-selected');
             } else {
                 // Select all
                 selectedFrameworks.clear();
-                allOptions.forEach(opt => {
-                    opt.classList.add('selected');
-                    selectedFrameworks.add(opt.dataset.framework);
+                allCheckboxes.forEach(label => {
+                    label.classList.add('selected');
+                    label.querySelector('input').checked = true;
+                    selectedFrameworks.add(label.dataset.framework);
                 });
                 this.textContent = 'Deselect All';
                 this.classList.add('all-selected');

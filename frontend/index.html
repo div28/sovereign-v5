@@ -2100,6 +2100,10 @@
         }
 
         /* Processing Modal */
+        /* ============================================
+           COMPACT HORIZONTAL MODAL LAYOUT
+           ============================================ */
+
         .modal {
             display: none;
             position: fixed;
@@ -2107,8 +2111,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(10, 22, 40, 0.95);
-            backdrop-filter: blur(30px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -2118,378 +2122,372 @@
             display: flex;
         }
 
-        .modal-content {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 24px;
-            padding: 3rem;
-            max-width: 700px;
+        .modal-container {
+            background: #1a1f2e;
+            border-radius: 16px;
             width: 90%;
-        }
-
-        .processing-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-        }
-
-        .processing-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .pipeline-timer {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.6);
-            font-family: monospace;
-        }
-
-        .agents-vertical {
+            max-width: 700px;
+            max-height: 80vh;
             display: flex;
             flex-direction: column;
-            gap: 0;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .agent-card {
+        /* Fixed Header */
+        .modal-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 1rem;
-            padding: 1rem 1.25rem;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 12px;
-            opacity: 1;
-            transition: all 0.3s ease;
-        }
-
-        .agent-card[data-status="active"] {
-            background: rgba(139, 92, 246, 0.08);
-            border-color: rgba(139, 92, 246, 0.3);
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
-        }
-
-        .agent-card[data-status="complete"] {
-            background: rgba(16, 185, 129, 0.05);
-            border-color: rgba(16, 185, 129, 0.2);
-        }
-
-        .agent-icon {
-            font-size: 24px;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+            padding: 16px 20px;
+            background: #252b3d;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             flex-shrink: 0;
         }
 
-        .agent-card[data-status="active"] .agent-icon {
-            background: rgba(139, 92, 246, 0.15);
-            animation: iconPulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes iconPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .agent-content {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .agent-name {
-            font-size: 15px;
-            font-weight: 600;
-            color: #f8fafc;
-            min-width: 120px;
-        }
-
-        .agent-action {
-            font-size: 13px;
-            color: #94a3b8;
-            flex: 1;
-        }
-
-        .agent-card[data-status="active"] .agent-action {
-            color: #c4b5fd;
-        }
-
-        .agent-progress {
-            position: relative;
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-        }
-
-        .progress-spinner,
-        .progress-checkmark {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .progress-spinner {
-            opacity: 0;
-        }
-
-        .agent-card[data-status="active"] .progress-spinner {
-            opacity: 1;
-        }
-
-        .progress-spinner::before {
-            content: '';
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(139, 92, 246, 0.2);
-            border-top-color: #8b5cf6;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        .progress-checkmark {
-            opacity: 0;
+        .modal-header h2 {
+            margin: 0;
             font-size: 16px;
-            color: #10b981;
-            font-weight: bold;
+            font-weight: 600;
+            color: #fff;
         }
 
-        .agent-card[data-status="complete"] .progress-checkmark {
-            opacity: 1;
-            animation: checkmarkPop 0.3s ease-out;
-        }
-
-        @keyframes checkmarkPop {
-            0% { transform: scale(0); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        .agent-time {
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
-            font-family: monospace;
-            min-width: 40px;
-            text-align: right;
-        }
-
-        .pipeline-connector {
-            width: 2px;
-            height: 12px;
-            background: rgba(255,255,255,0.1);
-            margin: 0 auto;
-            margin-left: 2.75rem;
-        }
-
-        /* Header Metrics - Iteration Badge */
-        .header-metrics {
+        .header-right {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
         }
 
         .iteration-badge {
             display: flex;
             align-items: center;
             gap: 6px;
-            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
-            color: #92400E;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            animation: pulse-iteration 2s ease-in-out infinite;
-        }
-
-        .iteration-badge.reflection-active {
-            background: linear-gradient(135deg, #FDE68A 0%, #F59E0B 100%);
-        }
-
-        @keyframes pulse-iteration {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); }
-            50% { box-shadow: 0 0 0 8px rgba(251, 191, 36, 0); }
-        }
-
-        /* Agent Metrics */
-        .agent-metrics {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: auto;
-        }
-
-        .docs-retrieved {
-            background: rgba(59, 130, 246, 0.2);
-            color: #60A5FA;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .judge-count {
-            font-weight: 400;
-            color: #94a3b8;
-            font-size: 13px;
-        }
-
-        /* Confidence Badges */
-        .confidence-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            border-radius: 12px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 16px;
             font-size: 12px;
             font-weight: 600;
+            animation: pulse-glow 2s ease-in-out infinite;
         }
 
-        .confidence-high {
-            background: rgba(16, 185, 129, 0.2);
-            color: #34D399;
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 0 10px 3px rgba(245, 158, 11, 0.2); }
         }
 
-        .confidence-medium {
-            background: rgba(251, 191, 36, 0.2);
-            color: #FBBF24;
-        }
-
-        .confidence-low {
-            background: rgba(239, 68, 68, 0.2);
-            color: #F87171;
-        }
-
-        /* Low Confidence / Retrying State */
-        .agent-card[data-status="retrying"] {
-            border-color: #F59E0B;
-            background: rgba(245, 158, 11, 0.1);
-        }
-
-        .agent-card[data-status="retrying"] .progress-spinner::before {
-            border-color: rgba(245, 158, 11, 0.2);
-            border-top-color: #F59E0B;
-        }
-
-        .retry-badge {
-            background: rgba(245, 158, 11, 0.2);
-            color: #FBBF24;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
+        .pipeline-timer {
+            font-size: 14px;
             font-weight: 600;
-            animation: pulse-retry 1.5s ease-in-out infinite;
+            color: #10b981;
+            font-family: monospace;
         }
 
-        @keyframes pulse-retry {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
+        /* Scrollable Content */
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
         }
 
-        /* Reflection Card Special Styling */
-        .reflection-card {
-            border: 2px dashed #F59E0B !important;
-            background: rgba(245, 158, 11, 0.08) !important;
-        }
-
-        .reflection-connector {
-            border-left: 2px dashed #F59E0B;
-            background: transparent !important;
-        }
-
-        /* Expand Toggle */
-        .expand-toggle {
-            width: 24px;
-            height: 24px;
+        /* Horizontal Agent Pipeline */
+        .agent-pipeline-horizontal {
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            color: #94a3b8;
+            gap: 6px;
+            padding: 14px;
+            background: #252b3d;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .agent-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: #1a1f2e;
+            border: 2px solid #3a4259;
+            min-width: 80px;
+            transition: all 0.3s ease;
+        }
+
+        .agent-step[data-status="active"] {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .agent-step[data-status="complete"] {
+            border-color: #10b981;
+        }
+
+        .agent-step[data-status="retrying"] {
+            border-color: #f59e0b;
+            animation: pulse-orange 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-orange {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 0 10px 3px rgba(245, 158, 11, 0.2); }
+        }
+
+        .step-icon {
+            font-size: 20px;
+        }
+
+        .step-name {
+            font-size: 10px;
+            color: #9ca3af;
+            text-align: center;
+        }
+
+        .step-status {
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .step-spinner {
+            display: none;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #3a4259;
+            border-top-color: #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .agent-step[data-status="active"] .step-spinner {
+            display: block;
+        }
+
+        .step-check {
+            display: none;
+            color: #10b981;
             font-size: 12px;
-            transition: transform 0.2s ease;
+            font-weight: bold;
         }
 
-        .expand-toggle:hover {
-            color: #f8fafc;
+        .agent-step[data-status="complete"] .step-check {
+            display: block;
         }
 
-        .expand-toggle.expanded {
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .agent-connector {
+            width: 20px;
+            height: 2px;
+            background: #3a4259;
+            flex-shrink: 0;
+        }
+
+        .agent-step[data-status="complete"] + .agent-connector {
+            background: #10b981;
+        }
+
+        /* Validators Card */
+        .validators-card {
+            background: #252b3d;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .validators-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .validators-header:hover {
+            background: #2d3548;
+        }
+
+        .validators-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .judge-count {
+            color: #9ca3af;
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .validators-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .confidence-badge {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .confidence-badge.high {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        .confidence-badge.medium {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .confidence-badge.low {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .expand-icon {
+            color: #9ca3af;
+            font-size: 10px;
+            transition: transform 0.2s;
+        }
+
+        .expand-icon.expanded {
             transform: rotate(180deg);
         }
 
-        /* Judge Details Grid */
-        .judge-details {
-            margin-left: 48px;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 8px;
-            margin-bottom: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        .validators-detail {
+            padding: 0 14px 14px;
         }
 
         .judge-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            gap: 6px;
         }
 
         .judge-item {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.03);
+            align-items: center;
+            padding: 8px 10px;
+            background: #1a1f2e;
             border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            font-size: 12px;
-            transition: all 0.2s ease;
+            border: 1px solid #3a4259;
+            font-size: 11px;
         }
 
         .judge-item[data-status="complete"] {
-            border-color: rgba(16, 185, 129, 0.3);
+            border-color: rgba(16, 185, 129, 0.4);
         }
 
         .judge-item[data-status="retrying"] {
-            border-color: #F59E0B;
+            border-color: #f59e0b;
             background: rgba(245, 158, 11, 0.1);
         }
 
-        .judge-item[data-status="active"] {
-            border-color: rgba(139, 92, 246, 0.3);
-            background: rgba(139, 92, 246, 0.1);
-        }
-
-        .judge-item .judge-name {
+        .judge-name {
+            color: #d1d5db;
             font-weight: 500;
-            color: #e2e8f0;
         }
 
-        .judge-item .judge-confidence {
+        .judge-confidence {
             font-weight: 600;
         }
 
-        .judge-item .judge-confidence.high { color: #34D399; }
-        .judge-item .judge-confidence.medium { color: #FBBF24; }
-        .judge-item .judge-confidence.low { color: #F87171; }
+        .judge-confidence.high { color: #34d399; }
+        .judge-confidence.medium { color: #fbbf24; }
+        .judge-confidence.low { color: #f87171; }
 
-        /* Agent Reasoning Trace */
-        .reasoning-trace {
-            margin-top: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+        /* Reflection Card */
+        .reflection-card {
+            background: rgba(245, 158, 11, 0.1);
+            border: 2px dashed #f59e0b;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+        }
+
+        .reflection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fbbf24;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .reflection-status {
+            font-size: 12px;
+            color: #fcd34d;
+        }
+
+        .reflection-badges {
+            margin-top: 8px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .retry-badge {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        /* Live Insights */
+        .live-insights-section {
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .insights-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .insight-item {
+            font-size: 12px;
+            color: #d1d5db;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Agent Trace */
+        .trace-section {
+            background: #252b3d;
+            border-radius: 10px;
             overflow: hidden;
         }
 
@@ -2497,86 +2495,67 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.03);
+            padding: 12px 14px;
             cursor: pointer;
-            user-select: none;
-            transition: background 0.2s ease;
+            color: #fff;
+            font-weight: 500;
+            font-size: 13px;
         }
 
         .trace-header:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .trace-title {
-            font-weight: 600;
-            color: #e2e8f0;
-            font-size: 14px;
-        }
-
-        .trace-toggle {
-            color: #94a3b8;
-            font-size: 12px;
-            transition: transform 0.2s ease;
+            background: #2d3548;
         }
 
         .trace-content {
-            padding: 16px;
-            max-height: 250px;
+            padding: 0 14px 14px;
+            max-height: 150px;
             overflow-y: auto;
         }
 
         .trace-timeline {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 4px;
         }
 
         .trace-item {
             display: flex;
-            gap: 12px;
-            padding: 10px 12px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 6px;
-            font-size: 13px;
-            border-left: 3px solid rgba(255, 255, 255, 0.1);
             align-items: center;
+            gap: 10px;
+            padding: 6px 10px;
+            background: #1a1f2e;
+            border-radius: 6px;
+            font-size: 11px;
+            border-left: 3px solid #3a4259;
         }
 
-        .trace-item.orchestrator { border-left-color: #8B5CF6; }
-        .trace-item.researcher { border-left-color: #3B82F6; }
-        .trace-item.validators { border-left-color: #10B981; }
-        .trace-item.reflection { border-left-color: #F59E0B; }
-        .trace-item.synthesizer { border-left-color: #EC4899; }
+        .trace-item.orchestrator { border-left-color: #8b5cf6; }
+        .trace-item.researcher { border-left-color: #3b82f6; }
+        .trace-item.validators { border-left-color: #10b981; }
+        .trace-item.reflection { border-left-color: #f59e0b; }
+        .trace-item.synthesizer { border-left-color: #ec4899; }
 
-        .trace-item .trace-agent {
-            font-weight: 600;
-            min-width: 110px;
-            color: #e2e8f0;
+        .trace-agent {
+            min-width: 90px;
+            font-weight: 500;
+            color: #d1d5db;
         }
 
-        .trace-item .trace-message {
-            color: #94a3b8;
+        .trace-message {
             flex: 1;
+            color: #9ca3af;
         }
 
-        .trace-item .trace-time {
-            color: #64748b;
-            font-size: 11px;
+        .trace-time {
+            color: #6b7280;
+            font-size: 10px;
             font-family: monospace;
-        }
-
-        .trace-item .trace-confidence {
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 11px;
         }
 
         /* Confidence Improvement Summary */
         .confidence-improvement-summary {
-            margin-top: 12px;
-            padding: 12px 16px;
+            margin-top: 10px;
+            padding: 10px 14px;
             background: rgba(16, 185, 129, 0.1);
             border-radius: 8px;
             border: 1px solid rgba(16, 185, 129, 0.3);
@@ -2586,64 +2565,46 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 500;
-            color: #34D399;
+            color: #34d399;
         }
 
-        .old-conf {
-            color: #F87171;
-            font-weight: 600;
-        }
-
-        .new-conf {
-            color: #34D399;
-            font-weight: 600;
-        }
+        .old-conf { color: #f87171; font-weight: 600; }
+        .new-conf { color: #34d399; font-weight: 600; }
 
         .improvement-delta {
-            background: #10B981;
+            background: #10b981;
             color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
         }
 
-        .live-insights {
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
+        /* Responsive */
+        @media (max-width: 600px) {
+            .modal-container {
+                width: 95%;
+                max-height: 90vh;
+            }
 
-        .insights-header {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: rgba(255,255,255,0.7);
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
+            .agent-pipeline-horizontal {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
 
-        .insights-feed {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            max-height: 150px;
-            overflow-y: auto;
-        }
+            .agent-step {
+                min-width: 70px;
+                padding: 8px 10px;
+            }
 
-        .insight-item {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.6);
-            padding: 0.5rem;
-            background: rgba(255,255,255,0.02);
-            border-radius: 6px;
-            animation: fadeIn 0.3s ease-out;
-        }
+            .agent-connector {
+                display: none;
+            }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            .judge-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
@@ -2853,133 +2814,110 @@
 
     <!-- Processing Modal -->
     <div class="modal" id="scanModal">
-        <div class="modal-content">
-            <div class="processing-header">
-                <h2 class="processing-title">Processing Assessment</h2>
-                <div class="header-metrics">
+        <div class="modal-container">
+            <!-- Fixed Header -->
+            <div class="modal-header">
+                <h2>Processing Assessment</h2>
+                <div class="header-right">
                     <div class="iteration-badge" id="iterationBadge" style="display: none;">
-                        <span class="iteration-icon">🔄</span>
+                        <span>🔄</span>
                         <span id="iterationCount">Iteration 1/3</span>
                     </div>
                     <div class="pipeline-timer" id="pipelineTimer">0.0s</div>
                 </div>
             </div>
 
-            <!-- Agent Pipeline - 5 Agents -->
-            <div class="agents-vertical" id="agentPipeline">
-                <!-- Agent 1: Orchestrator -->
-                <div class="agent-card" id="agent-orchestrator" data-status="pending">
-                    <div class="agent-icon">🎯</div>
-                    <div class="agent-content">
-                        <div class="agent-name">Orchestrator</div>
-                        <div class="agent-action" id="orchestrator-action">Planning assessment...</div>
-                        <div class="agent-progress">
-                            <div class="progress-spinner"></div>
-                            <div class="progress-checkmark">✓</div>
+            <!-- Scrollable Content -->
+            <div class="modal-body">
+                <!-- Horizontal Agent Pipeline -->
+                <div class="agent-pipeline-horizontal">
+                    <div class="agent-step" id="step-orchestrator" data-status="pending">
+                        <div class="step-icon">🎯</div>
+                        <div class="step-name">Orchestrator</div>
+                        <div class="step-status">
+                            <span class="step-spinner"></span>
+                            <span class="step-check">✓</span>
                         </div>
                     </div>
-                    <div class="agent-time" id="orchestrator-time">-</div>
-                </div>
-
-                <div class="pipeline-connector"></div>
-
-                <!-- Agent 2: Researcher -->
-                <div class="agent-card" id="agent-researcher" data-status="pending">
-                    <div class="agent-icon">📚</div>
-                    <div class="agent-content">
-                        <div class="agent-name">Researcher</div>
-                        <div class="agent-action" id="researcher-action">Waiting...</div>
-                        <div class="agent-progress">
-                            <div class="progress-spinner"></div>
-                            <div class="progress-checkmark">✓</div>
-                        </div>
-                        <div class="agent-metrics">
-                            <span class="docs-retrieved" id="researcher-docs" style="display: none;">0 docs</span>
+                    <div class="agent-connector"></div>
+                    <div class="agent-step" id="step-researcher" data-status="pending">
+                        <div class="step-icon">📚</div>
+                        <div class="step-name">Researcher</div>
+                        <div class="step-status">
+                            <span class="step-spinner"></span>
+                            <span class="step-check">✓</span>
                         </div>
                     </div>
-                    <div class="agent-time" id="researcher-time">-</div>
+                    <div class="agent-connector"></div>
+                    <div class="agent-step" id="step-validators" data-status="pending">
+                        <div class="step-icon">⚖️</div>
+                        <div class="step-name">Validators</div>
+                        <div class="step-status">
+                            <span class="step-spinner"></span>
+                            <span class="step-check">✓</span>
+                        </div>
+                    </div>
+                    <div class="agent-connector"></div>
+                    <div class="agent-step" id="step-synthesizer" data-status="pending">
+                        <div class="step-icon">✍️</div>
+                        <div class="step-name">Synthesizer</div>
+                        <div class="step-status">
+                            <span class="step-spinner"></span>
+                            <span class="step-check">✓</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="pipeline-connector"></div>
-
-                <!-- Agent 3: Validators (Judges) -->
-                <div class="agent-card expandable" id="agent-validators" data-status="pending">
-                    <div class="agent-icon">⚖️</div>
-                    <div class="agent-content">
-                        <div class="agent-name">Validators <span class="judge-count" id="judgeCount">(9 judges)</span></div>
-                        <div class="agent-action" id="validators-action">Waiting...</div>
-                        <div class="agent-progress">
-                            <div class="progress-spinner"></div>
-                            <div class="progress-checkmark">✓</div>
+                <!-- Validators Detail Card (Collapsible) -->
+                <div class="validators-card" id="validatorsCard">
+                    <div class="validators-header" onclick="toggleValidatorsDetail()">
+                        <div class="validators-title">
+                            <span>⚖️ Validators</span>
+                            <span class="judge-count" id="judgeCount">(3 judges)</span>
                         </div>
-                        <div class="agent-metrics">
-                            <span class="confidence-badge" id="validators-confidence" style="display: none;">
-                                Avg: <span id="avg-confidence">--</span>
+                        <div class="validators-meta">
+                            <span class="confidence-badge" id="avgConfidenceBadge" style="display: none;">
+                                Avg: <span id="avgConfidence">--</span>
                             </span>
+                            <span class="expand-icon" id="validatorsExpandIcon">▼</span>
                         </div>
                     </div>
-                    <div class="agent-time" id="validators-time">-</div>
-                    <div class="expand-toggle" onclick="toggleJudgeDetails()">▼</div>
+                    <div class="validators-detail" id="validatorsDetail" style="display: none;">
+                        <div class="judge-grid" id="judgeGrid">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Expandable Judge Details Grid -->
-                <div class="judge-details" id="judgeDetails" style="display: none;">
-                    <div class="judge-grid" id="judgeGrid">
+                <!-- Reflection Loop Card (shown when triggered) -->
+                <div class="reflection-card" id="reflectionCard" style="display: none;">
+                    <div class="reflection-header">
+                        <span>🔄 Reflection Loop</span>
+                        <span class="reflection-status" id="reflectionStatus">Analyzing...</span>
+                    </div>
+                    <div class="reflection-badges" id="reflectionBadges">
                         <!-- Populated dynamically -->
                     </div>
                 </div>
 
-                <div class="pipeline-connector"></div>
-
-                <!-- Agent 4: Reflection (conditional - shown when low confidence) -->
-                <div class="agent-card reflection-card" id="agent-reflection" data-status="pending" style="display: none;">
-                    <div class="agent-icon">🔄</div>
-                    <div class="agent-content">
-                        <div class="agent-name">Reflection Loop</div>
-                        <div class="agent-action" id="reflection-action">Re-evaluating low confidence findings...</div>
-                        <div class="agent-progress">
-                            <div class="progress-spinner"></div>
-                            <div class="progress-checkmark">✓</div>
-                        </div>
-                        <div class="agent-metrics">
-                            <span class="retry-badge" id="reflection-retries">Retrying 1 judge</span>
-                        </div>
-                    </div>
-                    <div class="agent-time" id="reflection-time">-</div>
-                </div>
-
-                <div class="pipeline-connector reflection-connector" id="reflection-connector" style="display: none;"></div>
-
-                <!-- Agent 5: Synthesizer -->
-                <div class="agent-card" id="agent-synthesizer" data-status="pending">
-                    <div class="agent-icon">✍️</div>
-                    <div class="agent-content">
-                        <div class="agent-name">Synthesizer</div>
-                        <div class="agent-action" id="synthesizer-action">Waiting...</div>
-                        <div class="agent-progress">
-                            <div class="progress-spinner"></div>
-                            <div class="progress-checkmark">✓</div>
-                        </div>
-                    </div>
-                    <div class="agent-time" id="synthesizer-time">-</div>
-                </div>
-            </div>
-
-            <!-- Live Insights -->
-            <div class="live-insights" id="liveInsights">
-                <div class="insights-header">Live Insights</div>
-                <div class="insights-feed" id="insightsFeed"></div>
-            </div>
-
-            <!-- Agent Reasoning Trace (Collapsible) -->
-            <div class="reasoning-trace" id="reasoningTrace" style="display: none;">
-                <div class="trace-header" onclick="toggleReasoningTrace()">
-                    <span class="trace-title">🔍 Agent Reasoning Trace</span>
-                    <span class="trace-toggle" id="traceToggle">▼</span>
-                </div>
-                <div class="trace-content" id="traceContent">
-                    <div class="trace-timeline" id="traceTimeline">
+                <!-- Live Insights -->
+                <div class="live-insights-section">
+                    <div class="section-title">Live Insights</div>
+                    <div class="insights-feed" id="insightsFeed">
                         <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Agent Reasoning Trace (Collapsible) -->
+                <div class="trace-section" id="reasoningTrace" style="display: none;">
+                    <div class="trace-header" onclick="toggleReasoningTrace()">
+                        <span>🔍 Agent Reasoning Trace</span>
+                        <span class="expand-icon" id="traceExpandIcon">▼</span>
+                    </div>
+                    <div class="trace-content" id="traceContent" style="display: none;">
+                        <div class="trace-timeline" id="traceTimeline">
+                            <!-- Populated dynamically -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3201,7 +3139,7 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
         };
 
         // ============================================
-        // MULTI-AGENT UI CONTROLLER
+        // MULTI-AGENT UI CONTROLLER (Compact Horizontal Layout)
         // ============================================
         class AgentUIController {
             constructor() {
@@ -3231,26 +3169,16 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
                 }
             }
 
-            // Update agent status
+            // Update agent status - uses step-* IDs for horizontal pipeline
             updateAgentStatus(agentId, status, action, metrics = {}) {
-                const card = document.getElementById(`agent-${agentId}`);
-                if (!card) return;
+                const step = document.getElementById(`step-${agentId}`);
+                if (step) {
+                    step.dataset.status = status;
+                }
 
-                card.dataset.status = status;
-
-                const actionEl = document.getElementById(`${agentId}-action`);
-                if (actionEl) actionEl.textContent = action;
-
-                // Update metrics if provided
+                // Update confidence badge for validators
                 if (metrics.confidence !== undefined) {
-                    this.updateConfidenceBadge(agentId, metrics.confidence);
-                }
-                if (metrics.docsRetrieved !== undefined) {
-                    this.updateDocsRetrieved(metrics.docsRetrieved);
-                }
-                if (metrics.time !== undefined) {
-                    const timeEl = document.getElementById(`${agentId}-time`);
-                    if (timeEl) timeEl.textContent = `${metrics.time}s`;
+                    this.updateConfidenceBadge(metrics.confidence);
                 }
 
                 // Add to trace
@@ -3258,45 +3186,44 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
             }
 
             // Update confidence badge with color coding
-            updateConfidenceBadge(agentId, confidence) {
-                const badge = document.getElementById(`${agentId}-confidence`);
+            updateConfidenceBadge(confidence) {
+                const badge = document.getElementById('avgConfidenceBadge');
                 if (!badge) return;
 
                 badge.style.display = 'inline-flex';
-                const confValue = document.getElementById('avg-confidence');
+                const confValue = document.getElementById('avgConfidence');
                 if (confValue) confValue.textContent = confidence.toFixed(2);
 
-                badge.classList.remove('confidence-high', 'confidence-medium', 'confidence-low');
+                badge.classList.remove('high', 'medium', 'low');
                 if (confidence >= 0.8) {
-                    badge.classList.add('confidence-high');
+                    badge.classList.add('high');
                 } else if (confidence >= 0.7) {
-                    badge.classList.add('confidence-medium');
+                    badge.classList.add('medium');
                 } else {
-                    badge.classList.add('confidence-low');
-                }
-            }
-
-            // Update docs retrieved counter
-            updateDocsRetrieved(count) {
-                const el = document.getElementById('researcher-docs');
-                if (el) {
-                    el.style.display = 'inline-block';
-                    el.textContent = `${count} docs`;
+                    badge.classList.add('low');
                 }
             }
 
             // Show/hide reflection loop card
             showReflectionLoop(show, retryingJudges = []) {
-                const card = document.getElementById('agent-reflection');
-                const connector = document.getElementById('reflection-connector');
+                const card = document.getElementById('reflectionCard');
+                if (!card) return;
 
                 if (show) {
-                    card.style.display = 'flex';
-                    connector.style.display = 'block';
-                    card.dataset.status = 'active';
+                    card.style.display = 'block';
 
-                    const retryBadge = document.getElementById('reflection-retries');
-                    retryBadge.textContent = `Retrying ${retryingJudges.length} judge${retryingJudges.length > 1 ? 's' : ''}`;
+                    const status = document.getElementById('reflectionStatus');
+                    if (status) {
+                        status.textContent = `Re-evaluating ${retryingJudges.length} judge${retryingJudges.length > 1 ? 's' : ''}...`;
+                    }
+
+                    // Add retry badges
+                    const badgesContainer = document.getElementById('reflectionBadges');
+                    if (badgesContainer) {
+                        badgesContainer.innerHTML = retryingJudges.map(j =>
+                            `<span class="retry-badge">${j}</span>`
+                        ).join('');
+                    }
 
                     // Mark retrying judges in the grid
                     retryingJudges.forEach(judgeId => {
@@ -3305,7 +3232,6 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
                     });
                 } else {
                     card.style.display = 'none';
-                    connector.style.display = 'none';
                 }
             }
 
@@ -3329,23 +3255,24 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
             // Populate judge grid based on selected frameworks
             populateJudgeGrid(frameworks) {
                 const grid = document.getElementById('judgeGrid');
+                if (!grid) return;
                 grid.innerHTML = '';
 
                 const judges = {
                     gdpr: [
-                        { id: 'gdpr_art22', name: 'GDPR Art.22' },
-                        { id: 'gdpr_art17', name: 'GDPR Art.17' },
-                        { id: 'gdpr_art32', name: 'GDPR Art.32' }
+                        { id: 'gdpr_art22', name: 'Art.22' },
+                        { id: 'gdpr_art17', name: 'Art.17' },
+                        { id: 'gdpr_art32', name: 'Art.32' }
                     ],
                     sox: [
-                        { id: 'sox_404', name: 'SOX Sec.404' },
-                        { id: 'sox_302', name: 'SOX Sec.302' },
-                        { id: 'sox_audit', name: 'SOX Audit' }
+                        { id: 'sox_404', name: 'Sec.404' },
+                        { id: 'sox_302', name: 'Sec.302' },
+                        { id: 'sox_audit', name: 'Audit' }
                     ],
                     euai: [
-                        { id: 'euai_highrisk', name: 'EU AI High-Risk' },
-                        { id: 'euai_prohibited', name: 'EU AI Prohibited' },
-                        { id: 'euai_transparency', name: 'EU AI Transparency' }
+                        { id: 'euai_highrisk', name: 'High-Risk' },
+                        { id: 'euai_prohibited', name: 'Prohibited' },
+                        { id: 'euai_transparency', name: 'Transparency' }
                     ]
                 };
 
@@ -3360,7 +3287,7 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
                         item.dataset.status = 'pending';
                         item.innerHTML = `
                             <span class="judge-name">${judge.name}</span>
-                            <span class="judge-confidence" id="conf-${judge.id}">--</span>
+                            <span class="judge-confidence">--</span>
                         `;
                         grid.appendChild(item);
                     });
@@ -3374,22 +3301,16 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
             // Add item to reasoning trace
             addTraceItem(agent, message, metrics = {}) {
                 const timeline = document.getElementById('traceTimeline');
+                if (!timeline) return;
+
                 const item = document.createElement('div');
                 item.className = `trace-item ${agent}`;
-
-                let confidenceHtml = '';
-                if (metrics.confidence !== undefined) {
-                    const confClass = metrics.confidence >= 0.8 ? 'confidence-high' :
-                                     metrics.confidence >= 0.7 ? 'confidence-medium' : 'confidence-low';
-                    confidenceHtml = `<span class="trace-confidence ${confClass}">${metrics.confidence.toFixed(2)}</span>`;
-                }
 
                 const elapsed = this.startTime ? ((Date.now() - this.startTime) / 1000).toFixed(1) : '0.0';
 
                 item.innerHTML = `
                     <span class="trace-agent">${this.getAgentDisplayName(agent)}</span>
                     <span class="trace-message">${message}</span>
-                    ${confidenceHtml}
                     <span class="trace-time">${elapsed}s</span>
                 `;
 
@@ -3413,15 +3334,17 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
                 if (!improvements || !improvements.improved) return;
 
                 const feed = document.getElementById('insightsFeed');
+                if (!feed) return;
+
                 const summary = document.createElement('div');
                 summary.className = 'confidence-improvement-summary';
                 summary.innerHTML = `
                     <div class="improvement-badge">
-                        ✨ Reflection improved confidence:
+                        ✨ Reflection improved:
                         <span class="old-conf">${improvements.initial_avg.toFixed(2)}</span>
                         →
                         <span class="new-conf">${improvements.final_avg.toFixed(2)}</span>
-                        <span class="improvement-delta">(+${(improvements.improvement * 100).toFixed(0)}%)</span>
+                        <span class="improvement-delta">+${(improvements.improvement * 100).toFixed(0)}%</span>
                     </div>
                 `;
                 feed.appendChild(summary);
@@ -3431,23 +3354,22 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
             resetAllAgents() {
                 const agents = ['orchestrator', 'researcher', 'validators', 'synthesizer'];
                 agents.forEach(agent => {
-                    const card = document.getElementById(`agent-${agent}`);
-                    if (card) {
-                        card.dataset.status = 'pending';
-                        const actionEl = document.getElementById(`${agent}-action`);
-                        if (actionEl) actionEl.textContent = 'Waiting...';
+                    const step = document.getElementById(`step-${agent}`);
+                    if (step) {
+                        step.dataset.status = 'pending';
                     }
                 });
+
                 this.showReflectionLoop(false);
-                document.getElementById('traceTimeline').innerHTML = '';
-                document.getElementById('iterationBadge').classList.remove('reflection-active');
 
-                // Reset metrics
-                const researcherDocs = document.getElementById('researcher-docs');
-                if (researcherDocs) researcherDocs.style.display = 'none';
+                const timeline = document.getElementById('traceTimeline');
+                if (timeline) timeline.innerHTML = '';
 
-                const validatorsConf = document.getElementById('validators-confidence');
-                if (validatorsConf) validatorsConf.style.display = 'none';
+                const badge = document.getElementById('iterationBadge');
+                if (badge) badge.classList.remove('reflection-active');
+
+                const confBadge = document.getElementById('avgConfidenceBadge');
+                if (confBadge) confBadge.style.display = 'none';
             }
 
             // Get elapsed time
@@ -3459,30 +3381,31 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
         // Initialize controller
         const agentUI = new AgentUIController();
 
-        // Toggle functions for UI
-        function toggleJudgeDetails() {
-            const details = document.getElementById('judgeDetails');
-            const toggle = document.querySelector('#agent-validators .expand-toggle');
+        // Toggle validators detail panel
+        function toggleValidatorsDetail() {
+            const detail = document.getElementById('validatorsDetail');
+            const icon = document.getElementById('validatorsExpandIcon');
 
-            if (details.style.display === 'none') {
-                details.style.display = 'block';
-                if (toggle) toggle.classList.add('expanded');
+            if (detail.style.display === 'none') {
+                detail.style.display = 'block';
+                if (icon) icon.classList.add('expanded');
             } else {
-                details.style.display = 'none';
-                if (toggle) toggle.classList.remove('expanded');
+                detail.style.display = 'none';
+                if (icon) icon.classList.remove('expanded');
             }
         }
 
+        // Toggle reasoning trace panel
         function toggleReasoningTrace() {
             const content = document.getElementById('traceContent');
-            const toggle = document.getElementById('traceToggle');
+            const icon = document.getElementById('traceExpandIcon');
 
             if (content.style.display === 'none') {
                 content.style.display = 'block';
-                if (toggle) toggle.textContent = '▲';
+                if (icon) icon.classList.add('expanded');
             } else {
                 content.style.display = 'none';
-                if (toggle) toggle.textContent = '▼';
+                if (icon) icon.classList.remove('expanded');
             }
         }
 

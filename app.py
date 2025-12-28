@@ -517,6 +517,37 @@ async def analyze_compliance(request: AnalyzeRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+def _run_analysis_blocking(job_id: str, description: str, frameworks: List[str]) -> Dict[str, Any]:
+    """
+    Run analysis synchronously. Called via asyncio.to_thread() to avoid blocking event loop.
+    The Anthropic SDK is synchronous, so we must run this in a thread.
+    """
+    import asyncio as _asyncio
+
+    logger.info(f"[Job {job_id}] Running in thread...")
+
+    from backend.agents import OrchestratorAgent, SharedMemory
+
+    scratchpad = SharedMemory()
+    orchestrator = OrchestratorAgent(scratchpad=scratchpad)
+
+    # Create new event loop for this thread (required for any async code inside)
+    loop = _asyncio.new_event_loop()
+    _asyncio.set_event_loop(loop)
+    try:
+        result = loop.run_until_complete(orchestrator.analyze(
+            description=description,
+            frameworks=frameworks,
+            risk_tolerance="medium",
+            include_synthesis=True
+        ))
+    finally:
+        loop.close()
+
+    logger.info(f"[Job {job_id}] Thread completed")
+    return result
+
+
 async def _run_analysis_job(
     job_id: str,
     description: str,
@@ -525,18 +556,15 @@ async def _run_analysis_job(
 ):
     """Background task to run the analysis and store results."""
     try:
-        logger.info(f"[Job {job_id}] Starting analysis...")
+        logger.info(f"[Job {job_id}] Dispatching to thread...")
 
-        from backend.agents import OrchestratorAgent, SharedMemory
-
-        scratchpad = SharedMemory()
-        orchestrator = OrchestratorAgent(scratchpad=scratchpad)
-
-        result = await orchestrator.analyze(
-            description=description,
-            frameworks=frameworks,
-            risk_tolerance="medium",
-            include_synthesis=True
+        # Run in thread to avoid blocking the event loop
+        # (Anthropic SDK is synchronous)
+        result = await asyncio.to_thread(
+            _run_analysis_blocking,
+            job_id,
+            description,
+            frameworks
         )
 
         logger.info(f"[Job {job_id}] Analysis completed, building response...")

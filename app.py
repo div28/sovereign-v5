@@ -537,12 +537,19 @@ def _run_analysis_in_thread(job_id: str, description: str, frameworks: List[str]
             orchestrator = OrchestratorAgent(scratchpad=scratchpad)
 
             logger.info(f"[Job {job_id}] Running orchestrator.analyze()...")
-            result = loop.run_until_complete(orchestrator.analyze(
-                description=description,
-                frameworks=frameworks,
-                risk_tolerance="medium",
-                include_synthesis=True
-            ))
+
+            # Add 5-minute timeout to prevent infinite hangs
+            result = loop.run_until_complete(
+                aio.wait_for(
+                    orchestrator.analyze(
+                        description=description,
+                        frameworks=frameworks,
+                        risk_tolerance="medium",
+                        include_synthesis=True
+                    ),
+                    timeout=300.0  # 5 minute timeout
+                )
+            )
             logger.info(f"[Job {job_id}] Analysis done, storing result...")
 
             # Store result

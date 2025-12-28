@@ -517,35 +517,74 @@ async def analyze_compliance(request: AnalyzeRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def _run_analysis_blocking(job_id: str, description: str, frameworks: List[str]) -> Dict[str, Any]:
+import threading
+
+def _run_analysis_in_thread(job_id: str, description: str, frameworks: List[str], include_agent_trace: bool):
     """
-    Run analysis synchronously. Called via asyncio.to_thread() to avoid blocking event loop.
-    The Anthropic SDK is synchronous, so we must run this in a thread.
+    Run analysis in a background thread. Updates job store directly when done.
     """
-    import asyncio as _asyncio
-
-    logger.info(f"[Job {job_id}] Running in thread...")
-
-    from backend.agents import OrchestratorAgent, SharedMemory
-
-    scratchpad = SharedMemory()
-    orchestrator = OrchestratorAgent(scratchpad=scratchpad)
-
-    # Create new event loop for this thread (required for any async code inside)
-    loop = _asyncio.new_event_loop()
-    _asyncio.set_event_loop(loop)
     try:
-        result = loop.run_until_complete(orchestrator.analyze(
-            description=description,
-            frameworks=frameworks,
-            risk_tolerance="medium",
-            include_synthesis=True
-        ))
-    finally:
-        loop.close()
+        logger.info(f"[Job {job_id}] Thread started")
 
-    logger.info(f"[Job {job_id}] Thread completed")
-    return result
+        # Create event loop for this thread
+        import asyncio as aio
+        loop = aio.new_event_loop()
+        aio.set_event_loop(loop)
+
+        try:
+            from backend.agents import OrchestratorAgent, SharedMemory
+            scratchpad = SharedMemory()
+            orchestrator = OrchestratorAgent(scratchpad=scratchpad)
+
+            logger.info(f"[Job {job_id}] Running orchestrator.analyze()...")
+            result = loop.run_until_complete(orchestrator.analyze(
+                description=description,
+                frameworks=frameworks,
+                risk_tolerance="medium",
+                include_synthesis=True
+            ))
+            logger.info(f"[Job {job_id}] Analysis done, storing result...")
+
+            # Store result
+            analysis_id = store_analysis_result(
+                violations=result.get("violations", []),
+                risk_score=result.get("risk_score", 0),
+                frameworks=frameworks,
+                description=description
+            )
+
+            response_data = {
+                "status": result.get("status", "success"),
+                "violations": result.get("violations", []),
+                "risk_score": result.get("risk_score", 0),
+                "frameworks_analyzed": result.get("frameworks_analyzed", frameworks),
+                "chunks_retrieved": result.get("chunks_retrieved", 0),
+                "iterations": result.get("iterations", 1),
+                "confidence": result.get("confidence", 0.0),
+                "executive_summary": result.get("executive_summary", ""),
+                "prioritized_findings": result.get("prioritized_findings", []),
+                "remediation_roadmap": result.get("remediation_roadmap", []),
+                "confidence_improvements": result.get("confidence_improvements", {}),
+                "analysis_id": analysis_id
+            }
+            if include_agent_trace:
+                response_data["agent_trace"] = result.get("agent_trace", {})
+
+            _job_store[job_id]["status"] = "complete"
+            _job_store[job_id]["result"] = response_data
+            _job_store[job_id]["completed_at"] = datetime.utcnow().isoformat()
+            logger.info(f"[Job {job_id}] SUCCESS")
+
+        finally:
+            loop.close()
+
+    except Exception as e:
+        import traceback
+        logger.error(f"[Job {job_id}] FAILED: {e}")
+        logger.error(traceback.format_exc())
+        _job_store[job_id]["status"] = "error"
+        _job_store[job_id]["error"] = str(e)
+        _job_store[job_id]["completed_at"] = datetime.utcnow().isoformat()
 
 
 async def _run_analysis_job(
@@ -554,62 +593,15 @@ async def _run_analysis_job(
     frameworks: List[str],
     include_agent_trace: bool
 ):
-    """Background task to run the analysis and store results."""
-    try:
-        logger.info(f"[Job {job_id}] Dispatching to thread...")
-
-        # Run in thread to avoid blocking the event loop
-        # (Anthropic SDK is synchronous)
-        result = await asyncio.to_thread(
-            _run_analysis_blocking,
-            job_id,
-            description,
-            frameworks
-        )
-
-        logger.info(f"[Job {job_id}] Analysis completed, building response...")
-
-        # Store result for export
-        analysis_id = store_analysis_result(
-            violations=result.get("violations", []),
-            risk_score=result.get("risk_score", 0),
-            frameworks=frameworks,
-            description=description
-        )
-
-        # Build response
-        response_data = {
-            "status": result.get("status", "success"),
-            "violations": result.get("violations", []),
-            "risk_score": result.get("risk_score", 0),
-            "frameworks_analyzed": result.get("frameworks_analyzed", frameworks),
-            "chunks_retrieved": result.get("chunks_retrieved", 0),
-            "iterations": result.get("iterations", 1),
-            "confidence": result.get("confidence", 0.0),
-            "executive_summary": result.get("executive_summary", ""),
-            "prioritized_findings": result.get("prioritized_findings", []),
-            "remediation_roadmap": result.get("remediation_roadmap", []),
-            "confidence_improvements": result.get("confidence_improvements", {}),
-            "analysis_id": analysis_id
-        }
-
-        if include_agent_trace:
-            response_data["agent_trace"] = result.get("agent_trace", {})
-
-        # Update job store with result
-        _job_store[job_id]["status"] = "complete"
-        _job_store[job_id]["result"] = response_data
-        _job_store[job_id]["completed_at"] = datetime.utcnow().isoformat()
-
-        logger.info(f"[Job {job_id}] Job completed successfully")
-
-    except Exception as e:
-        import traceback
-        logger.error(f"[Job {job_id}] Analysis failed: {e}")
-        logger.error(f"[Job {job_id}] Full traceback: {traceback.format_exc()}")
-        _job_store[job_id]["status"] = "error"
-        _job_store[job_id]["error"] = str(e)
-        _job_store[job_id]["completed_at"] = datetime.utcnow().isoformat()
+    """Start background thread for analysis."""
+    logger.info(f"[Job {job_id}] Starting background thread...")
+    thread = threading.Thread(
+        target=_run_analysis_in_thread,
+        args=(job_id, description, frameworks, include_agent_trace),
+        daemon=True
+    )
+    thread.start()
+    # Return immediately - thread will update job_store when done
 
 
 @app.post("/api/analyze/agentic", response_model=JobCreatedResponse)

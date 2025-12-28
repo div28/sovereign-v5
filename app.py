@@ -611,6 +611,40 @@ async def _run_analysis_job(
     # Return immediately - thread will update job_store when done
 
 
+@app.post("/api/analyze/sync-test")
+async def analyze_sync_test(request: AnalyzeRequest):
+    """
+    Simple synchronous test endpoint - directly calls orchestrator.analyze().
+    No threading, no job queue. Will timeout after 60s on Render but useful for testing.
+    """
+    logger.info("[SYNC-TEST] Starting synchronous analysis test...")
+
+    from backend.agents import OrchestratorAgent, SharedMemory
+
+    scratchpad = SharedMemory()
+    orchestrator = OrchestratorAgent(scratchpad=scratchpad)
+
+    frameworks = [f.lower() for f in request.frameworks]
+
+    logger.info(f"[SYNC-TEST] Calling orchestrator.analyze() with frameworks={frameworks}")
+
+    result = await orchestrator.analyze(
+        description=request.description,
+        frameworks=frameworks,
+        risk_tolerance="medium",
+        include_synthesis=True
+    )
+
+    logger.info(f"[SYNC-TEST] Analysis completed! Violations: {len(result.get('violations', []))}")
+
+    return {
+        "status": "success",
+        "violations": result.get("violations", []),
+        "risk_score": result.get("risk_score", 0),
+        "message": "Sync test completed successfully"
+    }
+
+
 @app.post("/api/analyze/agentic", response_model=JobCreatedResponse)
 async def analyze_compliance_agentic(
     request: AnalyzeRequest,

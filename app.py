@@ -527,28 +527,39 @@ def _run_analysis_sync(
     Synchronous analysis runner - runs in thread pool to avoid blocking event loop.
     """
     import asyncio
+    import traceback
 
     logger.info(f"[Job {job_id}] Starting analysis in thread pool...")
 
-    from backend.agents import OrchestratorAgent, SharedMemory
-
-    scratchpad = SharedMemory()
-    orchestrator = OrchestratorAgent(scratchpad=scratchpad)
-
-    # Create a new event loop for this thread
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
     try:
-        result = loop.run_until_complete(orchestrator.analyze(
-            description=description,
-            frameworks=frameworks,
-            risk_tolerance="medium",
-            include_synthesis=True
-        ))
-    finally:
-        loop.close()
+        from backend.agents import OrchestratorAgent, SharedMemory
 
-    return result
+        logger.info(f"[Job {job_id}] Creating orchestrator...")
+        scratchpad = SharedMemory()
+        orchestrator = OrchestratorAgent(scratchpad=scratchpad)
+
+        # Create a new event loop for this thread
+        logger.info(f"[Job {job_id}] Creating event loop...")
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            logger.info(f"[Job {job_id}] Running analysis...")
+            result = loop.run_until_complete(orchestrator.analyze(
+                description=description,
+                frameworks=frameworks,
+                risk_tolerance="medium",
+                include_synthesis=True
+            ))
+            logger.info(f"[Job {job_id}] Analysis completed successfully in thread")
+        finally:
+            loop.close()
+
+        return result
+    except Exception as e:
+        logger.error(f"[Job {job_id}] Exception in thread: {e}")
+        logger.error(f"[Job {job_id}] Traceback: {traceback.format_exc()}")
+        # Re-raise so the caller can handle it
+        raise
 
 
 async def _run_analysis_job(
@@ -609,7 +620,9 @@ async def _run_analysis_job(
         logger.info(f"[Job {job_id}] Job completed successfully")
 
     except Exception as e:
+        import traceback
         logger.error(f"[Job {job_id}] Analysis failed: {e}")
+        logger.error(f"[Job {job_id}] Full traceback: {traceback.format_exc()}")
         _job_store[job_id]["status"] = "error"
         _job_store[job_id]["error"] = str(e)
         _job_store[job_id]["completed_at"] = datetime.utcnow().isoformat()

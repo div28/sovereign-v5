@@ -517,51 +517,6 @@ async def analyze_compliance(request: AnalyzeRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def _run_analysis_sync(
-    job_id: str,
-    description: str,
-    frameworks: List[str],
-    include_agent_trace: bool
-) -> Dict[str, Any]:
-    """
-    Synchronous analysis runner - runs in thread pool to avoid blocking event loop.
-    """
-    import asyncio
-    import traceback
-
-    logger.info(f"[Job {job_id}] Starting analysis in thread pool...")
-
-    try:
-        from backend.agents import OrchestratorAgent, SharedMemory
-
-        logger.info(f"[Job {job_id}] Creating orchestrator...")
-        scratchpad = SharedMemory()
-        orchestrator = OrchestratorAgent(scratchpad=scratchpad)
-
-        # Create a new event loop for this thread
-        logger.info(f"[Job {job_id}] Creating event loop...")
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            logger.info(f"[Job {job_id}] Running analysis...")
-            result = loop.run_until_complete(orchestrator.analyze(
-                description=description,
-                frameworks=frameworks,
-                risk_tolerance="medium",
-                include_synthesis=True
-            ))
-            logger.info(f"[Job {job_id}] Analysis completed successfully in thread")
-        finally:
-            loop.close()
-
-        return result
-    except Exception as e:
-        logger.error(f"[Job {job_id}] Exception in thread: {e}")
-        logger.error(f"[Job {job_id}] Traceback: {traceback.format_exc()}")
-        # Re-raise so the caller can handle it
-        raise
-
-
 async def _run_analysis_job(
     job_id: str,
     description: str,
@@ -570,17 +525,18 @@ async def _run_analysis_job(
 ):
     """Background task to run the analysis and store results."""
     try:
-        logger.info(f"[Job {job_id}] Dispatching to thread pool...")
+        logger.info(f"[Job {job_id}] Starting analysis...")
 
-        # Run in thread pool to avoid blocking the event loop
-        loop = asyncio.get_event_loop()
-        result = await loop.run_in_executor(
-            None,  # Use default executor
-            _run_analysis_sync,
-            job_id,
-            description,
-            frameworks,
-            include_agent_trace
+        from backend.agents import OrchestratorAgent, SharedMemory
+
+        scratchpad = SharedMemory()
+        orchestrator = OrchestratorAgent(scratchpad=scratchpad)
+
+        result = await orchestrator.analyze(
+            description=description,
+            frameworks=frameworks,
+            risk_tolerance="medium",
+            include_synthesis=True
         )
 
         logger.info(f"[Job {job_id}] Analysis completed, building response...")

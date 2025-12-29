@@ -1,0 +1,24 @@
+{
+  "total": 5,
+  "correct": 0,
+  "accuracy": 0.0,
+  "confusion_matrix": {
+    "TP": 0,
+    "TN": 0,
+    "FP": 0,
+    "FN": 0
+  },
+  "precision": 0,
+  "recall": 0,
+  "f1": 0,
+  "framework_accuracy": {
+    "GDPR": 0.0
+  },
+  "error_breakdown": {
+    "POLL_ERROR": 4,
+    "SUBMIT_ERROR": 1
+  },
+  "avg_confidence": 0.0,
+  "avg_latency_ms": 152017.2700881958,
+  "avg_iterations": 0.0
+}

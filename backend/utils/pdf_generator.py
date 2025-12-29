@@ -145,12 +145,17 @@ def preprocess_violations(violations):
 
         processed.append(v_copy)
 
-    # Deduplicate by article (keep highest confidence)
+    # Deduplicate only TRUE duplicates (same article AND same description/evidence)
+    # Before: Just deduped by article, so 3 different Art.22 violations became 1
+    # After: Include description hash in key so only identical violations are deduped
     unique_violations = {}
     for v in processed:
         article = v.get('article_violated', 'Unknown')
         framework = v.get('framework', 'Unknown')
-        key = f"{framework}-{article.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')}"
+        # Include first 50 chars of description/issue to differentiate violations about same article
+        description = str(v.get('issue', v.get('description', '')))[:50]
+        evidence = str(v.get('evidence_quote', v.get('evidence', '')))[:50]
+        key = f"{framework}-{article}-{hash(description + evidence)}"
 
         conf = v.get('confidence', 0)
         if key not in unique_violations or conf > unique_violations[key].get('confidence', 0):

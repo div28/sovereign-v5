@@ -120,13 +120,17 @@ class PDFComplianceReport:
                 v['timeline'] = 'Immediate (0-14 days)'
                 logger.info(f"Overriding Article 5 violation to CRITICAL: {article}")
 
-        # Fix 2: Deduplicate by article (keep highest confidence)
+        # Fix 2: Deduplicate only TRUE duplicates (same article AND same description/evidence)
+        # Before: Just deduped by article, so 3 different Art.22 violations became 1
+        # After: Include description hash in key so only identical violations are deduped
         unique_violations = {}
         for v in violations:
             article = v.get('article_violated', 'Unknown')
             framework = v.get('framework', 'Unknown')
-            # Create key from framework + normalized article (remove special chars)
-            key = f"{framework}-{article.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')}"
+            # Include first 50 chars of description/issue to differentiate violations about same article
+            description = str(v.get('issue', v.get('description', '')))[:50]
+            evidence = str(v.get('evidence_quote', v.get('evidence', '')))[:50]
+            key = f"{framework}-{article}-{hash(description + evidence)}"
 
             if key not in unique_violations or v.get('confidence', 0) > unique_violations[key].get('confidence', 0):
                 unique_violations[key] = v

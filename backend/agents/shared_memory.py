@@ -368,6 +368,7 @@ class SharedMemory:
         Serialize entire scratchpad to dictionary.
 
         Used for agent_trace response when include_agent_trace=true.
+        WARNING: This can be very large - use to_lightweight_dict() for API responses.
         """
         with self._lock:
             return {
@@ -384,6 +385,149 @@ class SharedMemory:
                     "reflections": self._agent_reflections
                 },
                 "metrics": self.get_metrics()
+            }
+
+    def to_lightweight_dict(self, max_size_kb: int = 50) -> Dict[str, Any]:
+        """
+        Serialize scratchpad to a lightweight dictionary for API responses.
+
+        Designed to avoid memory issues on Render free tier by:
+        1. Truncating text fields to 200 chars
+        2. Skipping full RAG chunks (just show count)
+        3. Limiting total size to ~50KB
+        4. Including only essential trace info
+
+        Args:
+            max_size_kb: Maximum size in KB (default 50)
+
+        Returns:
+            Lightweight trace dict, or error dict if serialization fails.
+        """
+        try:
+            with self._lock:
+                # Helper to truncate strings
+                def truncate(text: str, max_len: int = 200) -> str:
+                    if not text or not isinstance(text, str):
+                        return str(text) if text else ""
+                    return text[:max_len] + "..." if len(text) > max_len else text
+
+                # Lightweight plan (skip description, just keep structure)
+                plan_summary = {}
+                if self._orchestrator_plan:
+                    plan_summary = {
+                        "frameworks": self._orchestrator_plan.get("frameworks_to_analyze", []),
+                        "steps": [s.get("action", "") for s in self._orchestrator_plan.get("execution_sequence", [])],
+                        "complexity": self._orchestrator_plan.get("estimated_complexity", "unknown")
+                    }
+
+                # Researcher summary (skip full chunks)
+                researcher_summary = {
+                    "total_findings": len(self._researcher_findings),
+                    "chunks_retrieved": sum(f.get("chunks_retrieved", 0) for f in self._researcher_findings),
+                    "frameworks_queried": list(set(
+                        fw for f in self._researcher_findings
+                        for fw in f.get("frameworks", [])
+                    ))
+                }
+
+                # Judge summaries (truncate reasoning)
+                judge_summaries = []
+                for judge_id, reasoning in self._judge_reasoning.items():
+                    judge_summaries.append({
+                        "judge_id": judge_id,
+                        "violation_detected": reasoning.get("violation_detected", False),
+                        "severity": reasoning.get("severity", "NONE"),
+                        "confidence": reasoning.get("confidence", 0),
+                        "article": truncate(reasoning.get("article_violated", ""), 100),
+                        "issue_summary": truncate(reasoning.get("issue", reasoning.get("description", "")), 200)
+                    })
+
+                # Low confidence flags (already small)
+                low_conf_summary = [
+                    {
+                        "judge_id": f.judge_id,
+                        "confidence": f.confidence,
+                        "reason": truncate(f.reason, 100)
+                    }
+                    for f in self._low_confidence_flags
+                ]
+
+                # Iteration history (keep key events only)
+                iteration_summary = []
+                for record in self._iteration_history[-20:]:  # Last 20 events max
+                    iteration_summary.append({
+                        "iteration": record.iteration,
+                        "agent": record.agent,
+                        "action": record.action,
+                        "timestamp": record.timestamp
+                    })
+
+                # Agent trace timeline (simplified)
+                timeline = []
+                for agent, plans in self._agent_plans.items():
+                    for plan in plans:
+                        timeline.append({
+                            "agent": agent,
+                            "phase": "plan",
+                            "steps": plan.get("steps", [])[:5],  # First 5 steps
+                            "timestamp": plan.get("created_at", "")
+                        })
+                for agent, results in self._agent_results.items():
+                    for result in results:
+                        timeline.append({
+                            "agent": agent,
+                            "phase": "act",
+                            "success": result.get("success", False),
+                            "confidence": result.get("confidence", 0),
+                            "execution_ms": result.get("execution_time_ms", 0),
+                            "timestamp": result.get("created_at", "")
+                        })
+                for agent, reflections in self._agent_reflections.items():
+                    for reflection in reflections:
+                        timeline.append({
+                            "agent": agent,
+                            "phase": "reflect",
+                            "confidence": reflection.get("confidence", 0),
+                            "needs_retry": reflection.get("needs_retry", False),
+                            "gaps_count": len(reflection.get("gaps_identified", [])),
+                            "timestamp": reflection.get("created_at", "")
+                        })
+
+                # Sort timeline by timestamp
+                timeline.sort(key=lambda x: x.get("timestamp", ""))
+
+                result = {
+                    "created_at": self._created_at,
+                    "iterations": self._current_iteration,
+                    "plan": plan_summary,
+                    "researcher": researcher_summary,
+                    "judges": judge_summaries,
+                    "low_confidence_flags": low_conf_summary,
+                    "iteration_history": iteration_summary,
+                    "timeline": timeline[:30],  # Max 30 timeline entries
+                    "metrics": self.get_metrics()
+                }
+
+                # Check size and truncate if needed
+                import json
+                result_json = json.dumps(result, default=str)
+                size_kb = len(result_json) / 1024
+
+                if size_kb > max_size_kb:
+                    # Trim timeline and iteration history
+                    result["timeline"] = timeline[:10]
+                    result["iteration_history"] = iteration_summary[:10]
+                    result["_truncated"] = True
+                    result["_original_size_kb"] = round(size_kb, 1)
+
+                return result
+
+        except Exception as e:
+            logger.error(f"Failed to create lightweight trace: {e}")
+            return {
+                "error": "trace serialization failed",
+                "reason": str(e),
+                "metrics": self.get_metrics() if hasattr(self, '_total_llm_calls') else {}
             }
 
     def to_json(self, indent: int = 2) -> str:

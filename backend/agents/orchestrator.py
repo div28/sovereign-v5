@@ -616,9 +616,11 @@ Respond with a JSON reflection:
                 response["executive_summary"] = "Unable to generate executive summary."
                 response["synthesis_error"] = str(e)
 
-        # Skip agent trace - causes memory issues on Render free tier
-        # TODO: Add back with size limits once core flow works
-        response["agent_trace"] = {"note": "Agent trace disabled to reduce memory usage"}
+        # Add lightweight agent trace (safe for Render free tier)
+        if self.scratchpad:
+            response["agent_trace"] = self.scratchpad.to_lightweight_dict(max_size_kb=50)
+        else:
+            response["agent_trace"] = {"note": "No scratchpad available"}
 
         logger.info("[ANALYZE] Returning response from analyze()")
         return response
@@ -755,7 +757,7 @@ Respond with a JSON reflection:
             "prioritized_findings": synthesis.get("prioritized_findings", []),
             "remediation_roadmap": synthesis.get("remediation_roadmap", []),
             "confidence_improvements": synthesis.get("confidence_improvements", {}),
-            "agent_trace": {"note": "Agent trace disabled to reduce memory usage"}
+            "agent_trace": self.scratchpad.to_lightweight_dict(max_size_kb=50) if self.scratchpad else {}
         }
 
     async def _run_judge_async(self, judge, submission: str, chunks: List[Dict]) -> Tuple[str, Optional[Dict]]:

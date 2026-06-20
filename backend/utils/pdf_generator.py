@@ -18,6 +18,8 @@ from reportlab.graphics.charts.piecharts import Pie
 from datetime import datetime
 from io import BytesIO
 
+from backend.utils.list_coercion import coerce_str_list
+
 
 # ============================================
 # HELPER FUNCTIONS
@@ -126,6 +128,13 @@ def preprocess_violations(violations):
     for v in violations:
         # Make a copy to avoid modifying original
         v_copy = v.copy()
+
+        # Guard: coerce list fields that may arrive as a raw string (sometimes
+        # with tool-call XML scaffolding) so downstream render loops never
+        # iterate a string character-by-character.
+        for _field in ('remediation_steps', 'risk_factors', 'dependencies'):
+            if _field in v_copy:
+                v_copy[_field] = coerce_str_list(v_copy[_field])
 
         # Fix 1: Article 5 override - ALWAYS CRITICAL
         article = str(v_copy.get('article_violated', '')).lower()

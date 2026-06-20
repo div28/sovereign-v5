@@ -13,6 +13,8 @@ from enum import Enum
 
 from anthropic import Anthropic
 
+from backend.utils.list_coercion import coerce_str_list
+
 logger = logging.getLogger(__name__)
 
 
@@ -356,6 +358,13 @@ Report any violations you detect."""
                     result["judge_id"] = self.judge_id
                     result["framework"] = self.framework
                     result["focus_area"] = self.focus_area
+
+                    # Normalize list fields the model sometimes returns as a raw
+                    # string (occasionally with tool-call XML scaffolding) so the
+                    # UI and PDF render each item as a discrete entry.
+                    for _field in ("remediation_steps", "risk_factors", "dependencies"):
+                        if _field in result:
+                            result[_field] = coerce_str_list(result[_field])
 
                     # Return None if no violation detected
                     if not result.get("violation_detected", False):

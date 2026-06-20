@@ -1342,6 +1342,24 @@
             color: #60a5fa;
         }
 
+        /* Citation badges (grounding traceability) — reuse theme green/amber */
+        .badge-grounded {
+            background: rgba(16,185,129,0.18);
+            color: #34d399;
+            text-transform: none;
+            letter-spacing: 0;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .badge-ungrounded {
+            background: rgba(234,179,8,0.18);
+            color: #eab308;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
         .violation-title {
             font-size: 16px;
             font-weight: 600;
@@ -5060,6 +5078,22 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
                 const hasValidContext = regulatoryContext && regulatoryContext.length > 0 &&
                     regulatoryContext.some(ctx => ctx.article || ctx.text);
 
+                // Citation badge from grounding fields (additive; reads response only).
+                const cs = v.clause_source;
+                let citationBadge;
+                if (v.grounded && cs && typeof cs === 'object') {
+                    const srcFile = String(cs.source || '').split('/').pop() || 'corpus';
+                    const chunkShort = String(cs.chunk_id || '').slice(0, 8);
+                    const fullCite = `Grounded — source: ${cs.source || srcFile}` +
+                        (cs.chunk_id ? ` · chunk ${cs.chunk_id}` : '');
+                    citationBadge = `<span class="badge badge-grounded" title="${escAR(fullCite)}">` +
+                        `&#128206; ${escAR(srcFile)}${chunkShort ? ' · ' + escAR(chunkShort) : ''}</span>`;
+                } else {
+                    citationBadge = `<span class="badge badge-ungrounded" ` +
+                        `title="Citation not verified against the regulatory corpus; manual review recommended.">` +
+                        `&#9888; ungrounded — review</span>`;
+                }
+
                 card.innerHTML = `
                     <div class="violation-header">
                         <div class="violation-header-left">
@@ -5069,6 +5103,7 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
                                 <div class="badges">
                                     <span class="badge ${sevClass}">${sevLabel}</span>
                                     <span class="badge badge-framework">${v.framework?.toUpperCase() || 'N/A'}</span>
+                                    ${citationBadge}
                                 </div>
                             </div>
                             <p class="violation-desc">${v.evidence_quote || v.issue || 'No description provided'}</p>

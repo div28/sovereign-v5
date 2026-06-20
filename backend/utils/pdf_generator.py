@@ -659,6 +659,20 @@ def create_violation_page(styles, violation, index, total):
     elements.append(Paragraph("<b>Evidence</b>", styles['Label']))
     elements.append(Paragraph(evidence, styles['BodyText']))
 
+    # Citation (grounding / traceability from the grounding fields; additive)
+    elements.append(Paragraph("<b>Citation</b>", styles['Label']))
+    clause_source = violation.get('clause_source')
+    if violation.get('grounded') and isinstance(clause_source, dict):
+        src = str(clause_source.get('source', '')).split('/')[-1] or 'regulatory corpus'
+        chunk = str(clause_source.get('chunk_id', ''))[:12]
+        citation_text = f"Grounded &mdash; source: {src}"
+        if chunk:
+            citation_text += f" &middot; chunk {chunk}"
+    else:
+        citation_text = ("Ungrounded &mdash; citation not verified against the regulatory "
+                         "corpus; manual review recommended.")
+    elements.append(Paragraph(citation_text, styles['BodyText']))
+
     # Business Impact
     elements.append(Paragraph("<b>Business Impact</b>", styles['Label']))
     elements.append(Paragraph(business_impact, styles['BodyText']))

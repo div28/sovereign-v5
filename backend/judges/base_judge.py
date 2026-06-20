@@ -12,8 +12,10 @@ from typing import Dict, List, Optional, Any
 from enum import Enum
 
 from anthropic import Anthropic
+from pydantic import ValidationError
 
 from backend.utils.list_coercion import coerce_str_list
+from backend.judges.finding_schema import JudgeFinding, JudgeSchemaError
 
 logger = logging.getLogger(__name__)
 
@@ -135,6 +137,11 @@ class BaseComplianceJudge(ABC):
     Each judge specializes in detecting specific types of violations
     within a regulatory framework (e.g., GDPR Article 22 violations).
     """
+
+    # When True, the model's tool output is validated against JudgeFinding and
+    # retried once before raising (never stores malformed data). Enabled
+    # per-framework during incremental rollout; see the GDPR judges.
+    enforce_strict_schema: bool = False
 
     def __init__(
         self,
@@ -274,125 +281,168 @@ compliance violations. Be thorough, precise, and cite specific regulatory requir
             logger.warning("Empty submission provided")
             return None
 
-        try:
-            # Build prompt components
-            if self.use_caching:
-                # Use prompt caching: system blocks with cache_control
-                system_prompt = self.get_system_prompt()
-                regulatory_context = self._format_chunks_for_prompt(retrieved_chunks)
+        # Invoke the model, validating + retrying once when strict schema
+        # enforcement is enabled. A malformed response is never stored: it
+        # either normalizes cleanly or raises JudgeSchemaError.
+        max_attempts = 2 if self.enforce_strict_schema else 1
+        result = None
+        for attempt in range(1, max_attempts + 1):
+            try:
+                result = self._invoke_and_extract(submission, retrieved_chunks)
+            except Exception as e:
+                logger.error(f"Evaluation failed: {e}")
+                raise
 
-                # System blocks with caching
-                system_blocks = [
-                    {
-                        "type": "text",
-                        "text": system_prompt
-                    },
-                    {
-                        "type": "text",
-                        "text": f"# Regulatory Context\n\n{regulatory_context}",
-                        "cache_control": {"type": "ephemeral"}  # Cache regulatory context
-                    }
-                ]
+            if result is None:
+                return None
 
-                # User message with submission
-                user_prompt = f"""# AI System Description to Evaluate
+            if not self.enforce_strict_schema:
+                # Defense-in-depth normalization for judges not yet on strict
+                # validation: coerce list fields that may arrive as a raw string.
+                for _field in ("remediation_steps", "risk_factors", "dependencies"):
+                    if _field in result:
+                        result[_field] = coerce_str_list(result[_field])
+                break
+
+            # Strict enforcement: validate against the finding schema. On
+            # failure, retry once; if it still fails, raise loudly.
+            try:
+                result = JudgeFinding.model_validate(result).model_dump()
+                break
+            except ValidationError as e:
+                if attempt < max_attempts:
+                    logger.warning(
+                        f"{self.judge_id}: schema validation failed "
+                        f"(attempt {attempt}/{max_attempts}), retrying: {e}"
+                    )
+                    continue
+                logger.error(
+                    f"{self.judge_id}: schema validation failed after "
+                    f"{max_attempts} attempts: {e}"
+                )
+                raise JudgeSchemaError(
+                    f"{self.judge_id} produced invalid output: {e}"
+                ) from e
+
+        # Return None if no violation detected
+        if not result.get("violation_detected", False):
+            logger.info(f"{self.judge_id}: No violation detected")
+            return None
+
+        # Add abstention logic for low-confidence verdicts
+        confidence_score = result.get("confidence", 0)
+        if confidence_score < 0.65:
+            result["abstain"] = True
+            result["abstain_reason"] = "Insufficient evidence in policy or system description to confidently assess this violation. Recommend expert human review."
+        else:
+            result["abstain"] = False
+            result["abstain_reason"] = None
+
+        logger.info(
+            f"{self.judge_id}: Violation detected - "
+            f"{result.get('severity', 'UNKNOWN')} severity, "
+            f"confidence: {confidence_score:.2f}, abstain: {result.get('abstain', False)}"
+        )
+        return result
+
+    def _invoke_and_extract(
+        self,
+        submission: str,
+        retrieved_chunks: List[Dict[str, Any]]
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Call the model once and return the raw report_violation tool input.
+
+        Returns the tool-input dict with judge metadata attached, or None if
+        the model produced no tool_use block. Raises on API errors.
+        """
+        # Build prompt components
+        if self.use_caching:
+            # Use prompt caching: system blocks with cache_control
+            system_prompt = self.get_system_prompt()
+            regulatory_context = self._format_chunks_for_prompt(retrieved_chunks)
+
+            # System blocks with caching
+            system_blocks = [
+                {
+                    "type": "text",
+                    "text": system_prompt
+                },
+                {
+                    "type": "text",
+                    "text": f"# Regulatory Context\n\n{regulatory_context}",
+                    "cache_control": {"type": "ephemeral"}  # Cache regulatory context
+                }
+            ]
+
+            # User message with submission
+            user_prompt = f"""# AI System Description to Evaluate
 
 {submission}
 
 Analyze this AI system description against the regulatory context provided above.
 Report any violations you detect."""
 
-                response = self._client.messages.create(
+            response = self._client.messages.create(
+                model=self.model,
+                max_tokens=4096,  # headroom so structured findings complete (1024 truncated trailing fields)
+                system=system_blocks,
+                messages=[{
+                    "role": "user",
+                    "content": user_prompt
+                }],
+                tools=[{
+                    "name": "report_violation",
+                    "description": "Report a compliance violation analysis result",
+                    "input_schema": VIOLATION_SCHEMA
+                }],
+                tool_choice={"type": "tool", "name": "report_violation"}
+            )
+
+        else:
+            # Traditional approach without caching
+            prompt = self.build_prompt(submission, retrieved_chunks)
+            response = self._client.messages.create(
+                model=self.model,
+                max_tokens=4096,  # headroom so structured findings complete (1024 truncated trailing fields)
+                messages=[{
+                    "role": "user",
+                    "content": prompt
+                }],
+                tools=[{
+                    "name": "report_violation",
+                    "description": "Report a compliance violation analysis result",
+                    "input_schema": VIOLATION_SCHEMA
+                }],
+                tool_choice={"type": "tool", "name": "report_violation"}
+            )
+
+        # Record usage in ModelRouter if enabled
+        if self.use_router:
+            try:
+                router = get_model_router()
+                usage = response.usage
+                router.record_usage(
                     model=self.model,
-                    max_tokens=1024,
-                    system=system_blocks,
-                    messages=[{
-                        "role": "user",
-                        "content": user_prompt
-                    }],
-                    tools=[{
-                        "name": "report_violation",
-                        "description": "Report a compliance violation analysis result",
-                        "input_schema": VIOLATION_SCHEMA
-                    }],
-                    tool_choice={"type": "tool", "name": "report_violation"}
+                    input_tokens=usage.input_tokens,
+                    output_tokens=usage.output_tokens
                 )
+            except Exception as e:
+                logger.warning(f"Failed to record usage in ModelRouter: {e}")
 
-            else:
-                # Traditional approach without caching
-                prompt = self.build_prompt(submission, retrieved_chunks)
-                response = self._client.messages.create(
-                    model=self.model,
-                    max_tokens=1024,
-                    messages=[{
-                        "role": "user",
-                        "content": prompt
-                    }],
-                    tools=[{
-                        "name": "report_violation",
-                        "description": "Report a compliance violation analysis result",
-                        "input_schema": VIOLATION_SCHEMA
-                    }],
-                    tool_choice={"type": "tool", "name": "report_violation"}
-                )
+        # Extract structured result from tool use
+        for block in response.content:
+            if block.type == "tool_use" and block.name == "report_violation":
+                result = dict(block.input)
 
-            # Record usage in ModelRouter if enabled
-            if self.use_router:
-                try:
-                    router = get_model_router()
-                    usage = response.usage
-                    router.record_usage(
-                        model=self.model,
-                        input_tokens=usage.input_tokens,
-                        output_tokens=usage.output_tokens
-                    )
-                except Exception as e:
-                    logger.warning(f"Failed to record usage in ModelRouter: {e}")
+                # Add metadata
+                result["judge_id"] = self.judge_id
+                result["framework"] = self.framework
+                result["focus_area"] = self.focus_area
+                return result
 
-            # Extract structured result from tool use
-            for block in response.content:
-                if block.type == "tool_use" and block.name == "report_violation":
-                    result = block.input
-
-                    # Add metadata
-                    result["judge_id"] = self.judge_id
-                    result["framework"] = self.framework
-                    result["focus_area"] = self.focus_area
-
-                    # Normalize list fields the model sometimes returns as a raw
-                    # string (occasionally with tool-call XML scaffolding) so the
-                    # UI and PDF render each item as a discrete entry.
-                    for _field in ("remediation_steps", "risk_factors", "dependencies"):
-                        if _field in result:
-                            result[_field] = coerce_str_list(result[_field])
-
-                    # Return None if no violation detected
-                    if not result.get("violation_detected", False):
-                        logger.info(f"{self.judge_id}: No violation detected")
-                        return None
-
-                    # Add abstention logic for low-confidence verdicts
-                    confidence_score = result.get("confidence", 0)
-                    if confidence_score < 0.65:
-                        result["abstain"] = True
-                        result["abstain_reason"] = "Insufficient evidence in policy or system description to confidently assess this violation. Recommend expert human review."
-                    else:
-                        result["abstain"] = False
-                        result["abstain_reason"] = None
-
-                    logger.info(
-                        f"{self.judge_id}: Violation detected - "
-                        f"{result.get('severity', 'UNKNOWN')} severity, "
-                        f"confidence: {confidence_score:.2f}, abstain: {result.get('abstain', False)}"
-                    )
-                    return result
-
-            logger.error("No tool use in response")
-            return None
-
-        except Exception as e:
-            logger.error(f"Evaluation failed: {e}")
-            raise
+        logger.error("No tool use in response")
+        return None
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(framework='{self.framework}', focus='{self.focus_area}')"

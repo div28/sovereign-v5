@@ -27,6 +27,9 @@ class GDPRArticle22Judge(BaseComplianceJudge):
     - Lack of meaningful information about decision logic
     """
 
+    # Pilot: enforce strict schema validation on judge output (GDPR only).
+    enforce_strict_schema = True
+
     EVALUATION_PROMPT = """You are a GDPR compliance expert specializing in Article 22 (Automated Decision-Making).
 
 ## CRITICAL INSTRUCTION: CHECK SAFE CONDITIONS FIRST
@@ -157,6 +160,9 @@ class GDPRArticle17Judge(BaseComplianceJudge):
     - Failure to notify third parties of erasure requests
     """
 
+    # Pilot: enforce strict schema validation on judge output (GDPR only).
+    enforce_strict_schema = True
+
     EVALUATION_PROMPT = """You are a GDPR compliance expert specializing in Article 17 (Right to Erasure).
 
 ## CRITICAL INSTRUCTION: CHECK SAFE CONDITIONS FIRST
@@ -272,6 +278,9 @@ class GDPRArticle32Judge(BaseComplianceJudge):
     - Lack of encryption or pseudonymization
     - No process for testing security effectiveness
     """
+
+    # Pilot: enforce strict schema validation on judge output (GDPR only).
+    enforce_strict_schema = True
 
     EVALUATION_PROMPT = """You are a GDPR compliance expert specializing in Article 32 (Security of Processing).
 

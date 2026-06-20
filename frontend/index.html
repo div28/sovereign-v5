@@ -1078,6 +1078,23 @@
             margin-bottom: 20px;
         }
 
+        /* Agent Reasoning panel — layout glue only; all visuals reuse existing
+           theme classes (.violation-card, .badge, .detail-section, .metric-*). */
+        .ar-flow {
+            display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+        }
+        .ar-stage {
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
+            padding: 8px 12px; background: rgba(255,255,255,0.03); min-width: 0;
+        }
+        .ar-arrow { color: rgba(255,255,255,0.35); font-size: 13px; }
+        .ar-scroll {
+            max-height: 160px; overflow-y: auto;
+            overflow-wrap: anywhere; word-break: break-word;
+        }
+        .ar-agent { margin-bottom: 16px; }
+        .ar-agent:last-child { margin-bottom: 0; }
+
         .section-title {
             font-size: 16px;
             font-weight: 700;
@@ -3210,6 +3227,25 @@
                 <div class="violation-cards" id="violationCards"></div>
             </div>
 
+            <!-- Agent Reasoning (additive, collapsible — reuses violation-card styling) -->
+            <div class="violations-overview">
+                <div class="violation-cards">
+                    <div class="violation-card" id="agentReasoning" style="display:none;">
+                        <div class="violation-header" onclick="toggleAgentReasoning()">
+                            <div class="violation-header-left">
+                                <div class="article-label">Multi-Agent Analysis</div>
+                                <div class="violation-title-row">
+                                    <h3 class="violation-title">Agent Reasoning</h3>
+                                </div>
+                                <p class="violation-desc" id="agentReasoningSub" style="margin-bottom:0;"></p>
+                            </div>
+                            <span class="expand-icon">▼</span>
+                        </div>
+                        <div class="violation-details" id="agentReasoningBody"></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 
@@ -4988,6 +5024,134 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
             });
 
             // Global tabs removed - tabs now inside each violation card
+
+            // Additive: populate the Agent Reasoning panel from real response data.
+            renderAgentReasoning(data);
+        }
+
+        // Agent Reasoning panel — renders ONLY real fields from the response.
+        // No fabricated routing/reasoning; honest about single-pass runs.
+        // Markup reuses existing theme classes; reuses the violation-card expand.
+        function toggleAgentReasoning() {
+            const card = document.getElementById('agentReasoning');
+            if (card) card.classList.toggle('expanded');
+        }
+
+        function escAR(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function renderAgentReasoning(data) {
+            const panel = document.getElementById('agentReasoning');
+            const body = document.getElementById('agentReasoningBody');
+            const sub = document.getElementById('agentReasoningSub');
+            if (!panel || !body) return;
+
+            const violations = Array.isArray(data.violations) ? data.violations : [];
+            // Only show the panel for agentic runs that carry real agent signals.
+            const hasAgentData = ('iterations' in data) || ('confidence' in data) ||
+                ('confidence_improvements' in data) || violations.some(v => v.judge_id || v.reasoning);
+            if (!hasAgentData) { panel.style.display = 'none'; return; }
+            panel.style.display = 'block';
+
+            const chunks = Number.isFinite(data.chunks_retrieved) ? data.chunks_retrieved : null;
+            const iterations = Number.isFinite(data.iterations) ? data.iterations : null;
+            const avgConf = (typeof data.confidence === 'number') ? Math.round(data.confidence * 100) : null;
+            const ci = data.confidence_improvements || {};
+            const frameworks = Array.isArray(data.frameworks_analyzed) ? data.frameworks_analyzed : [];
+
+            // One entry per judge/validator agent that actually produced a finding.
+            const agents = violations
+                .filter(v => v.violation_detected !== false)
+                .map(v => ({
+                    name: v.focus_area || v.judge_id || 'judge',
+                    framework: (v.framework || '').toString().toUpperCase(),
+                    confidence: (typeof v.confidence === 'number') ? Math.round(v.confidence * 100) : null,
+                    abstain: v.abstain === true,
+                    abstainReason: v.abstain_reason || '',
+                    reasoning: v.reasoning || '',
+                    article: v.article_violated || '',
+                    grounding: (typeof v.grounding_confidence === 'number') ? Math.round(v.grounding_confidence * 100) : null,
+                    grounded: v.grounded === true
+                }));
+
+            sub.textContent = `${agents.length} judge${agents.length === 1 ? '' : 's'} ran`
+                + (iterations != null ? ` • ${iterations} iteration${iterations === 1 ? '' : 's'}` : '')
+                + (avgConf != null ? ` • ${avgConf}% avg confidence` : '');
+
+            // 1) Agent flow — real participants only. Stages reuse .metric-value/.metric-label.
+            const flowStages = [];
+            flowStages.push({ name: 'Orchestrator', meta: frameworks.length ? frameworks.map(f => f.toUpperCase()).join(', ') : 'routing' });
+            if (chunks != null) flowStages.push({ name: 'Researcher', meta: `${chunks} chunks` });
+            flowStages.push({ name: `${agents.length} Judge${agents.length === 1 ? '' : 's'}`, meta: 'evaluation' });
+            if (iterations != null) flowStages.push({ name: 'Reflection', meta: `${iterations} pass${iterations === 1 ? '' : 'es'}` });
+            if (data.executive_summary) flowStages.push({ name: 'Synthesizer', meta: 'summary + roadmap' });
+
+            const flowHtml = flowStages.map((s, i) =>
+                `${i ? '<span class="ar-arrow">&rarr;</span>' : ''}` +
+                `<div class="ar-stage"><div class="metric-value">${escAR(s.name)}</div>` +
+                `<div class="metric-label">${escAR(s.meta)}</div></div>`
+            ).join('');
+
+            // 2) Per-agent reasoning + confidence (real). Reuses badges + detail-content.
+            const agentsHtml = agents.map(a => `
+                <div class="ar-agent">
+                    <div class="violation-title-row" style="margin-bottom:8px;">
+                        <span class="metric-value">${escAR(a.name)}</span>
+                        <div class="badges">
+                            ${a.framework ? `<span class="badge badge-framework">${escAR(a.framework)}</span>` : ''}
+                            ${a.confidence != null ? `<span class="badge badge-framework">${a.confidence}% confidence</span>` : ''}
+                            ${a.abstain ? `<span class="badge badge-major">ABSTAINED</span>` : ''}
+                        </div>
+                    </div>
+                    ${a.reasoning ? `<div class="detail-content ar-scroll">${escAR(a.reasoning)}</div>` : ''}
+                    ${a.abstain && a.abstainReason ? `<div class="detail-content">${escAR(a.abstainReason)}</div>` : ''}
+                </div>
+            `).join('');
+
+            // 3) Reflection loop — honest about single-pass. Reuses .regulatory-context box.
+            let reflectText;
+            if (iterations != null && iterations <= 1) {
+                reflectText = `Single pass — all judges met the confidence threshold; no low-confidence re-run was triggered`
+                    + (ci && ci.improved === false ? ` (confidence_improvements.improved = false).` : `.`);
+            } else if (iterations != null) {
+                reflectText = `${iterations} iterations — a low-confidence reflection loop re-ran judge(s)`
+                    + (ci && ci.improved === true ? ` and improved confidence.` : `.`);
+            } else {
+                reflectText = `Iteration data not reported for this run.`;
+            }
+            const reflectHtml = `<div class="regulatory-context"><div class="detail-content">${escAR(reflectText)}</div></div>`;
+
+            // 4) Per-finding confidence + grounding (real). One .violation-metrics row each.
+            const findingsHtml = agents.map(a => `
+                <div class="violation-metrics">
+                    <div class="metric-item"><div class="metric-label">Finding</div><div class="metric-value">${escAR(a.article || a.name)}</div></div>
+                    <div class="metric-item"><div class="metric-label">Agent</div><div class="metric-value">${escAR(a.name)}</div></div>
+                    <div class="metric-item"><div class="metric-label">Confidence</div><div class="metric-value">${a.confidence != null ? a.confidence + '%' : '—'}</div></div>
+                    <div class="metric-item"><div class="metric-label">Grounding</div><div class="metric-value">${a.grounding != null ? a.grounding + '%' : '—'}</div></div>
+                    <div class="metric-item"><div class="metric-label">Status</div><div class="metric-value ${a.grounded ? 'low' : 'medium'}">${a.grounded ? '✓ grounded' : '⚠ ungrounded'}</div></div>
+                </div>
+            `).join('');
+
+            body.innerHTML = `
+                <div class="detail-section">
+                    <div class="detail-section-title">Agent flow</div>
+                    <div class="ar-flow">${flowHtml}</div>
+                </div>
+                <div class="detail-section">
+                    <div class="detail-section-title">Per-agent decision &amp; confidence</div>
+                    ${agentsHtml || '<div class="detail-content">No judge findings to show.</div>'}
+                </div>
+                <div class="detail-section">
+                    <div class="detail-section-title">Reflection loop</div>
+                    ${reflectHtml}
+                </div>
+                <div class="detail-section">
+                    <div class="detail-section-title">Per-finding confidence &amp; grounding</div>
+                    ${findingsHtml || '<div class="detail-content">—</div>'}
+                </div>
+            `;
         }
 
         // Filter tab handlers

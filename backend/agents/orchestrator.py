@@ -643,6 +643,26 @@ Respond with a JSON reflection:
                 response["executive_summary"] = "Unable to generate executive summary."
                 response["synthesis_error"] = str(e)
 
+        # Cross-regulation conflict detection (additive). Runs only when 2+
+        # frameworks were assessed and findings exist; otherwise stays empty.
+        # Never alters detection or existing fields.
+        response["cross_regulation_conflicts"] = []
+        try:
+            if len(frameworks) >= 2 and violations:
+                from .conflict_analyst import ConflictAnalystAgent
+                analyst = ConflictAnalystAgent()
+                response["cross_regulation_conflicts"] = analyst.analyze_conflicts(
+                    violations=violations,
+                    frameworks=frameworks,
+                )
+                logger.info(
+                    "[ANALYZE] Conflict analysis: %d conflict(s)",
+                    len(response["cross_regulation_conflicts"])
+                )
+        except Exception as e:
+            logger.error(f"Conflict analysis failed: {e}")
+            response["cross_regulation_conflicts"] = []
+
         # Skip agent trace - lightweight version still causes memory issues
         # TODO: Debug to_lightweight_dict() method
         response["agent_trace"] = {"note": "Agent trace disabled to reduce memory usage"}

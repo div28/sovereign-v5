@@ -583,6 +583,7 @@ def _run_analysis_in_thread(job_id: str, description: str, frameworks: List[str]
                 "prioritized_findings": result.get("prioritized_findings", []),
                 "remediation_roadmap": result.get("remediation_roadmap", []),
                 "confidence_improvements": result.get("confidence_improvements", {}),
+                "cross_regulation_conflicts": result.get("cross_regulation_conflicts", []),
                 "analysis_id": analysis_id
             }
             if include_agent_trace:

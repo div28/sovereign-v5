@@ -255,7 +255,7 @@ def run_judge(
     judge,
     submission: str,
     chunks: List[Dict[str, Any]]
-) -> Tuple[str, Optional[Dict[str, Any]]]:
+) -> Tuple[str, Optional[Dict[str, Any]], Optional[str]]:
     """
     Run a single judge evaluation.
 
@@ -265,7 +265,7 @@ def run_judge(
         chunks: Retrieved regulatory context.
 
     Returns:
-        Tuple of (judge_id, violation_result or None)
+        Tuple of (judge_id, violation_result or None, error_message or None)
     """
     try:
         result = judge.evaluate(
@@ -283,10 +283,11 @@ def run_judge(
                 }
                 for chunk in chunks[:3]  # Top 3 most relevant
             ] if chunks else []
-        return (judge.judge_id, result)
+        return (judge.judge_id, result, None)
     except Exception as e:
-        logger.error(f"Judge {judge.judge_id} failed: {e}")
-        return (judge.judge_id, None)
+        error_msg = str(e)
+        logger.error(f"Judge {judge.judge_id} failed: {error_msg}")
+        return (judge.judge_id, None, error_msg)
 
 
 def store_analysis_result(
@@ -436,9 +437,21 @@ async def analyze_compliance(request: AnalyzeRequest):
             futures.append(future)
 
         # Collect results as they complete
+        failed_judges = []
+        successful_judges = 0
+
         for future in as_completed(futures):
             try:
-                judge_id, result = future.result()
+                judge_id, result, error_msg = future.result()
+
+                # Track failed judges
+                if error_msg:
+                    failed_judges.append({"judge_id": judge_id, "error": error_msg})
+                    logger.error(f"Judge {judge_id} failed with error: {error_msg}")
+                    continue
+
+                successful_judges += 1
+
                 if result and result.get("violation_detected"):
                     violations.append(result)
                     logger.info(f"Violation detected by {judge_id}")
@@ -464,25 +477,20 @@ async def analyze_compliance(request: AnalyzeRequest):
                         except Exception as log_err:
                             logger.error(f"Failed to log low-confidence error: {log_err}")
             except Exception as e:
-                logger.error(f"Judge {judge_id if 'judge_id' in locals() else 'unknown'} failed: {e}")
+                logger.error(f"Future execution failed: {e}")
+                failed_judges.append({"judge_id": "unknown", "error": str(e)})
 
-                # Log judge exceptions for debugging
-                try:
-                    from backend.improvement.error_logger import get_error_logger
-                    error_logger = get_error_logger()
-                    error_logger.log_error(
-                        judge_id=judge_id if 'judge_id' in locals() else 'unknown',
-                        framework="unknown",
-                        test_case_id="production",
-                        error_type="exception",
-                        expected_outcome=False,
-                        actual_outcome=False,
-                        submission_text=request.description[:500],
-                        error_details=str(e),
-                        confidence=None
-                    )
-                except Exception as log_err:
-                    logger.error(f"Failed to log exception: {log_err}")
+        # If ALL judges failed, raise an error instead of returning empty results
+        if failed_judges and successful_judges == 0:
+            error_summary = "; ".join([f"{j['judge_id']}: {j['error']}" for j in failed_judges[:3]])
+            raise HTTPException(
+                status_code=503,
+                detail=f"All compliance judges failed. This may indicate an API issue. Errors: {error_summary}"
+            )
+
+        # Log warning if some judges failed
+        if failed_judges:
+            logger.warning(f"{len(failed_judges)} judges failed, {successful_judges} succeeded")
 
         # Calculate risk score
         risk_score = calculate_risk_score(violations)
@@ -505,7 +513,10 @@ async def analyze_compliance(request: AnalyzeRequest):
             "risk_score": risk_score,
             "frameworks_analyzed": frameworks,
             "chunks_retrieved": len(retrieved_chunks),
-            "analysis_id": analysis_id
+            "analysis_id": analysis_id,
+            "judges_succeeded": successful_judges,
+            "judges_failed": len(failed_judges),
+            "failed_judges": failed_judges if failed_judges else None
         }
 
         return response_data

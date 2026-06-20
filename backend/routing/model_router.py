@@ -17,10 +17,10 @@ from threading import Lock
 logger = logging.getLogger(__name__)
 
 
-# Anthropic pricing (as of December 2024)
+# Anthropic pricing (as of June 2026)
 # Prices per million tokens
 PRICING = {
-    "claude-3-5-sonnet-20241022": {
+    "claude-sonnet-4-20250514": {
         "input": 3.00,   # $3 per million input tokens
         "output": 15.00  # $15 per million output tokens
     },
@@ -58,11 +58,11 @@ class ModelRouter:
     - EU AI Act: Sonnet (complex AI governance reasoning)
     """
 
-    # Framework to model mapping - ALL USE HAIKU FOR COST SAVINGS
+    # Framework to model mapping - ALL USE SONNET 4 FOR BETTER ACCURACY
     FRAMEWORK_MODEL_MAP = {
-        "gdpr": "claude-3-5-haiku-20241022",
-        "sox": "claude-3-5-haiku-20241022",
-        "euai": "claude-3-5-haiku-20241022"  # Changed from Sonnet to save 3x cost
+        "gdpr": "claude-sonnet-4-20250514",
+        "sox": "claude-sonnet-4-20250514",
+        "euai": "claude-sonnet-4-20250514"
     }
 
     def __init__(self):
@@ -86,7 +86,7 @@ class ModelRouter:
         # Get model from mapping
         model = self.FRAMEWORK_MODEL_MAP.get(
             framework_lower,
-            "claude-3-5-haiku-20241022"  # Default to Haiku
+            "claude-sonnet-4-20250514"  # Default to Sonnet 4
         )
 
         # Provide reasoning for the routing decision
@@ -214,7 +214,7 @@ class ModelRouter:
             )
 
             # Calculate baseline cost (if everything used Sonnet)
-            sonnet_model = "claude-3-5-sonnet-20241022"
+            sonnet_model = "claude-sonnet-4-20250514"
             baseline_input_cost = (total_input_tokens / 1_000_000) * PRICING[sonnet_model]["input"]
             baseline_output_cost = (total_output_tokens / 1_000_000) * PRICING[sonnet_model]["output"]
             baseline_cost = baseline_input_cost + baseline_output_cost

@@ -355,10 +355,11 @@ Respond with a JSON reflection:
                         submission=submission,
                         retrieved_chunks=chunks
                     )
-                    return (judge.judge_id, result)
+                    return (judge.judge_id, result, None)
                 except Exception as e:
-                    logger.error(f"Judge {judge.judge_id} failed: {e}")
-                    return (judge.judge_id, None)
+                    error_msg = str(e)
+                    logger.error(f"Judge {judge.judge_id} failed: {error_msg}")
+                    return (judge.judge_id, None, error_msg)
 
             # Run all judges concurrently
             logger.info(f"[ACT] Running {len(judge_tasks)} judge tasks in parallel...")
@@ -370,12 +371,25 @@ Respond with a JSON reflection:
             logger.info(f"[ACT] All {len(tasks)} judge tasks completed")
 
             # Process results
+            failed_judges = []
+            successful_judges = 0
+
             for item in results:
                 if isinstance(item, Exception):
                     errors.append(str(item))
+                    failed_judges.append({"judge_id": "unknown", "error": str(item)})
                     continue
 
-                judge_id, result = item
+                judge_id, result, error_msg = item
+
+                # Track failed judges
+                if error_msg:
+                    failed_judges.append({"judge_id": judge_id, "error": error_msg})
+                    errors.append(f"{judge_id}: {error_msg}")
+                    continue
+
+                successful_judges += 1
+
                 if result:
                     # Store reasoning in scratchpad
                     if self.scratchpad:
@@ -396,27 +410,40 @@ Respond with a JSON reflection:
                                     context_needed=[f"Additional context for {result.get('article_violated', 'unknown')}"]
                                 )
 
+            # If ALL judges failed, mark as failure
+            all_judges_failed = failed_judges and successful_judges == 0
+
             # Calculate overall confidence
             if violations:
                 avg_confidence = sum(v.get("confidence", 0) for v in violations) / len(violations)
+            elif all_judges_failed:
+                avg_confidence = 0.0  # All judges failed = no confidence
             else:
-                avg_confidence = 1.0  # No violations = high confidence in clean result
+                avg_confidence = 1.0  # No violations and judges succeeded = high confidence in clean result
 
             execution_time = (time.time() - start_time) * 1000
 
             logger.info(
                 f"Execution complete: {len(violations)} violations, "
+                f"{successful_judges} judges succeeded, {len(failed_judges)} failed, "
                 f"avg confidence: {avg_confidence:.2f}, "
                 f"time: {execution_time:.0f}ms"
             )
 
+            # Log warning if some judges failed
+            if failed_judges:
+                logger.warning(f"Failed judges: {[j['judge_id'] for j in failed_judges]}")
+
             return AgentResult(
                 agent_name=self.name,
-                success=True,
+                success=not all_judges_failed,  # Fail if ALL judges failed
                 data={
                     "violations": violations,
                     "chunks_retrieved": len(retrieved_chunks),
                     "judges_run": len(judge_tasks),
+                    "judges_succeeded": successful_judges,
+                    "judges_failed": len(failed_judges),
+                    "failed_judges": failed_judges if failed_judges else None,
                     "frameworks_analyzed": frameworks
                 },
                 confidence=avg_confidence,

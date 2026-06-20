@@ -29,6 +29,8 @@ class GDPRArticle22Judge(BaseComplianceJudge):
 
     # Pilot: enforce strict schema validation on judge output (GDPR only).
     enforce_strict_schema = True
+    # Pilot: attach grounding/traceability metadata to findings (GDPR only).
+    ground_findings = True
 
     EVALUATION_PROMPT = """You are a GDPR compliance expert specializing in Article 22 (Automated Decision-Making).
 
@@ -162,6 +164,8 @@ class GDPRArticle17Judge(BaseComplianceJudge):
 
     # Pilot: enforce strict schema validation on judge output (GDPR only).
     enforce_strict_schema = True
+    # Pilot: attach grounding/traceability metadata to findings (GDPR only).
+    ground_findings = True
 
     EVALUATION_PROMPT = """You are a GDPR compliance expert specializing in Article 17 (Right to Erasure).
 
@@ -281,6 +285,8 @@ class GDPRArticle32Judge(BaseComplianceJudge):
 
     # Pilot: enforce strict schema validation on judge output (GDPR only).
     enforce_strict_schema = True
+    # Pilot: attach grounding/traceability metadata to findings (GDPR only).
+    ground_findings = True
 
     EVALUATION_PROMPT = """You are a GDPR compliance expert specializing in Article 32 (Security of Processing).
 

@@ -16,6 +16,7 @@ from pydantic import ValidationError
 
 from backend.utils.list_coercion import coerce_str_list
 from backend.judges.finding_schema import JudgeFinding, JudgeSchemaError
+from backend.judges.grounding import ground_finding
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +83,7 @@ VIOLATION_SCHEMA = {
         },
         "evidence_quote": {
             "type": "string",
-            "description": "Direct quote from submission showing the violation"
+            "description": "Copy a verbatim span exactly from the submission, character-for-character, that shows the violation. Do not paraphrase, summarize, or alter wording."
         },
         "remediation_steps": {
             "type": "array",
@@ -142,6 +143,11 @@ class BaseComplianceJudge(ABC):
     # retried once before raising (never stores malformed data). Enabled
     # per-framework during incremental rollout; see the GDPR judges.
     enforce_strict_schema: bool = False
+
+    # When True, attach grounding/traceability metadata to each detected
+    # violation (flag-only; never drops a finding). Enabled per-framework
+    # during incremental rollout; see the GDPR judges.
+    ground_findings: bool = False
 
     def __init__(
         self,
@@ -343,6 +349,12 @@ compliance violations. Be thorough, precise, and cite specific regulatory requir
             f"{result.get('severity', 'UNKNOWN')} severity, "
             f"confidence: {confidence_score:.2f}, abstain: {result.get('abstain', False)}"
         )
+
+        # Attach grounding/traceability metadata. Flag-only: this NEVER drops or
+        # suppresses a detected violation — recall is the priority.
+        if self.ground_findings:
+            ground_finding(result, submission, retrieved_chunks)
+
         return result
 
     def _invoke_and_extract(

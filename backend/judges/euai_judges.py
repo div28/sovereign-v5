@@ -27,6 +27,8 @@ class EUAIHighRiskJudge(BaseComplianceJudge):
 
     # Strict schema validation enabled after the GDPR pilot passed.
     enforce_strict_schema = True
+    # Grounding/traceability enabled after the GDPR grounding pilot passed.
+    ground_findings = True
 
     EVALUATION_PROMPT = """You are an EU AI Act compliance expert specializing in High-Risk AI Systems.
 
@@ -120,6 +122,8 @@ class EUAIProhibitedPracticesJudge(BaseComplianceJudge):
 
     # Strict schema validation enabled after the GDPR pilot passed.
     enforce_strict_schema = True
+    # Grounding/traceability enabled after the GDPR grounding pilot passed.
+    ground_findings = True
 
     EVALUATION_PROMPT = """You are an EU AI Act compliance expert specializing in Prohibited AI Practices.
 
@@ -210,6 +214,8 @@ class EUAITransparencyJudge(BaseComplianceJudge):
 
     # Strict schema validation enabled after the GDPR pilot passed.
     enforce_strict_schema = True
+    # Grounding/traceability enabled after the GDPR grounding pilot passed.
+    ground_findings = True
 
     EVALUATION_PROMPT = """You are an EU AI Act compliance expert specializing in Transparency Requirements.
 

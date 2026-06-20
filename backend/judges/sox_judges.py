@@ -29,6 +29,8 @@ class SOXSection404Judge(BaseComplianceJudge):
 
     # Strict schema validation enabled after the GDPR pilot passed.
     enforce_strict_schema = True
+    # Grounding/traceability enabled after the GDPR grounding pilot passed.
+    ground_findings = True
 
     EVALUATION_PROMPT = """You are a SOX compliance expert specializing in Section 404 (Internal Control Assessment).
 
@@ -172,6 +174,8 @@ class SOXSection302Judge(BaseComplianceJudge):
 
     # Strict schema validation enabled after the GDPR pilot passed.
     enforce_strict_schema = True
+    # Grounding/traceability enabled after the GDPR grounding pilot passed.
+    ground_findings = True
 
     EVALUATION_PROMPT = """You are a SOX compliance expert specializing in Section 302 (Corporate Responsibility).
 
@@ -291,6 +295,8 @@ class SOXAuditTrailJudge(BaseComplianceJudge):
 
     # Strict schema validation enabled after the GDPR pilot passed.
     enforce_strict_schema = True
+    # Grounding/traceability enabled after the GDPR grounding pilot passed.
+    ground_findings = True
 
     EVALUATION_PROMPT = """You are a SOX compliance expert specializing in Audit Trail requirements.
 

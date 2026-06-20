@@ -25,6 +25,9 @@ class EUAIHighRiskJudge(BaseComplianceJudge):
     - Missing technical documentation
     """
 
+    # Strict schema validation enabled after the GDPR pilot passed.
+    enforce_strict_schema = True
+
     EVALUATION_PROMPT = """You are an EU AI Act compliance expert specializing in High-Risk AI Systems.
 
 ## EU AI Act High-Risk Requirements (Article 6, Annex III)
@@ -115,6 +118,9 @@ class EUAIProhibitedPracticesJudge(BaseComplianceJudge):
     - Real-time biometric identification
     """
 
+    # Strict schema validation enabled after the GDPR pilot passed.
+    enforce_strict_schema = True
+
     EVALUATION_PROMPT = """You are an EU AI Act compliance expert specializing in Prohibited AI Practices.
 
 ## EU AI Act Prohibited Practices (Article 5)
@@ -201,6 +207,9 @@ class EUAITransparencyJudge(BaseComplianceJudge):
     - Emotion recognition disclosure
     - Content generation transparency
     """
+
+    # Strict schema validation enabled after the GDPR pilot passed.
+    enforce_strict_schema = True
 
     EVALUATION_PROMPT = """You are an EU AI Act compliance expert specializing in Transparency Requirements.
 

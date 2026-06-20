@@ -27,6 +27,9 @@ class SOXSection404Judge(BaseComplianceJudge):
     - Missing management assessment of controls
     """
 
+    # Strict schema validation enabled after the GDPR pilot passed.
+    enforce_strict_schema = True
+
     EVALUATION_PROMPT = """You are a SOX compliance expert specializing in Section 404 (Internal Control Assessment).
 
 ## CRITICAL INSTRUCTION: CHECK SAFE CONDITIONS FIRST
@@ -167,6 +170,9 @@ class SOXSection302Judge(BaseComplianceJudge):
     - Significant changes in internal controls
     """
 
+    # Strict schema validation enabled after the GDPR pilot passed.
+    enforce_strict_schema = True
+
     EVALUATION_PROMPT = """You are a SOX compliance expert specializing in Section 302 (Corporate Responsibility).
 
 ## CRITICAL INSTRUCTION: CHECK SAFE CONDITIONS FIRST
@@ -282,6 +288,9 @@ class SOXAuditTrailJudge(BaseComplianceJudge):
     - Tamperable audit records
     - Incomplete transaction histories
     """
+
+    # Strict schema validation enabled after the GDPR pilot passed.
+    enforce_strict_schema = True
 
     EVALUATION_PROMPT = """You are a SOX compliance expert specializing in Audit Trail requirements.
 

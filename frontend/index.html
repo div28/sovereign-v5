@@ -1202,8 +1202,7 @@
         }
 
         /* Per-finding fixed-column table */
-        .finding-scroll { overflow-x: auto; }
-        .finding-table { min-width: 460px; }
+        .finding-table { width: 100%; }
         .finding-row {
             display: grid;
             grid-template-columns: minmax(0,2fr) minmax(0,1.7fr) 70px 70px 104px;
@@ -1212,6 +1211,14 @@
             padding: 9px 0;
             border-top: 1px solid rgba(255,255,255,0.06);
             font-size: 12px;
+        }
+        /* Narrow widths: fold Agent + Grounding%, keep Status (the grounding signal). */
+        @media (max-width: 560px) {
+            .finding-row {
+                grid-template-columns: minmax(0,1fr) 64px 96px;
+            }
+            .finding-row .col-agent,
+            .finding-row .col-ground { display: none; }
         }
         .finding-row.head {
             border-top: none;
@@ -5283,11 +5290,11 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
             // Per-finding fixed-column table.
             const findingRows = agents.map(a => `
                 <div class="finding-row">
-                    <div class="finding-cell" title="${escAR(a.article || a.name)}">${escAR(a.article || a.name)}</div>
-                    <div class="finding-cell" title="${escAR(a.name)}">${escAR(a.name)}</div>
-                    <div class="finding-cell num">${a.confidence != null ? a.confidence + '%' : '—'}</div>
-                    <div class="finding-cell num">${a.grounding != null ? a.grounding + '%' : '—'}</div>
-                    <div class="finding-cell ${a.grounded ? 'ground-ok' : 'ground-warn'}">${a.grounded ? '✓ grounded' : '⚠ ungrounded'}</div>
+                    <div class="finding-cell col-finding" title="${escAR(a.article || a.name)}">${escAR(a.article || a.name)}</div>
+                    <div class="finding-cell col-agent" title="${escAR(a.name)}">${escAR(a.name)}</div>
+                    <div class="finding-cell num col-conf">${a.confidence != null ? a.confidence + '%' : '—'}</div>
+                    <div class="finding-cell num col-ground">${a.grounding != null ? a.grounding + '%' : '—'}</div>
+                    <div class="finding-cell col-status ${a.grounded ? 'ground-ok' : 'ground-warn'}">${a.grounded ? '✓ grounded' : '⚠ ungrounded'}</div>
                 </div>
             `).join('');
 
@@ -5302,17 +5309,15 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
 
                 <div class="detail-section">
                     <div class="detail-section-title">Per-finding confidence &amp; grounding</div>
-                    <div class="finding-scroll">
-                        <div class="finding-table">
-                            <div class="finding-row head">
-                                <div class="finding-cell">Finding</div>
-                                <div class="finding-cell">Agent</div>
-                                <div class="finding-cell">Conf.</div>
-                                <div class="finding-cell">Ground.</div>
-                                <div class="finding-cell">Status</div>
-                            </div>
-                            ${findingRows || '<div class="finding-row"><div class="finding-cell">—</div></div>'}
+                    <div class="finding-table">
+                        <div class="finding-row head">
+                            <div class="finding-cell col-finding">Finding</div>
+                            <div class="finding-cell col-agent">Agent</div>
+                            <div class="finding-cell col-conf">Conf.</div>
+                            <div class="finding-cell col-ground">Ground.</div>
+                            <div class="finding-cell col-status">Status</div>
                         </div>
+                        ${findingRows || '<div class="finding-row"><div class="finding-cell">—</div></div>'}
                     </div>
                 </div>
             `;

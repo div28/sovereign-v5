@@ -1078,22 +1078,172 @@
             margin-bottom: 20px;
         }
 
-        /* Agent Reasoning panel — layout glue only; all visuals reuse existing
-           theme classes (.violation-card, .badge, .detail-section, .metric-*). */
-        .ar-flow {
-            display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+        /* Agent Reasoning panel — inherits existing dark theme tokens only
+           (bg #0a0f1a, white-alpha surfaces/borders, accent #60a5fa). */
+        .agent-panel { margin-bottom: 16px; }
+
+        /* Collapsed slim bar */
+        .agent-bar {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s ease, border-color 0.15s ease;
         }
+        .agent-bar:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(96,165,250,0.35);
+        }
+        .agent-bar-label { font-size: 13px; font-weight: 700; white-space: nowrap; }
+        .agent-bar-summary {
+            font-size: 12px;
+            color: rgba(255,255,255,0.55);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+        }
+        .agent-bar-summary::before {
+            content: "—";
+            margin-right: 8px;
+            color: rgba(255,255,255,0.3);
+        }
+        .agent-bar-chevron {
+            margin-left: auto;
+            flex-shrink: 0;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            transition: transform 0.2s ease;
+        }
+        .agent-bar[aria-expanded="true"] {
+            border-radius: 8px 8px 0 0;
+            border-bottom-color: transparent;
+        }
+        .agent-bar[aria-expanded="true"] .agent-bar-chevron { transform: rotate(180deg); }
+
+        /* Expanded body */
+        .agent-body {
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 16px;
+            background: rgba(255,255,255,0.02);
+        }
+        .agent-hero-summary {
+            font-size: 12px;
+            color: rgba(255,255,255,0.55);
+            margin: 10px 0 18px;
+        }
+
+        /* Hero: agent flow */
+        .ar-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
         .ar-stage {
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
-            padding: 8px 12px; background: rgba(255,255,255,0.03); min-width: 0;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.03);
+            min-width: 0;
         }
         .ar-arrow { color: rgba(255,255,255,0.35); font-size: 13px; }
-        .ar-scroll {
-            max-height: 160px; overflow-y: auto;
-            overflow-wrap: anywhere; word-break: break-word;
+
+        /* Per-agent one-line rows (progressive disclosure) */
+        .agent-item { border-top: 1px solid rgba(255,255,255,0.06); }
+        .agent-item:first-of-type { border-top: none; }
+        .agent-row {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            background: none;
+            border: none;
+            color: #fff;
+            font-family: inherit;
+            cursor: pointer;
+            text-align: left;
         }
-        .ar-agent { margin-bottom: 16px; }
-        .ar-agent:last-child { margin-bottom: 0; }
+        .agent-row-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+        }
+        .agent-row-conf {
+            flex-shrink: 0;
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
+            font-variant-numeric: tabular-nums;
+        }
+        .agent-row-toggle {
+            flex-shrink: 0;
+            margin-left: auto;
+            font-size: 11px;
+            color: #60a5fa;
+            white-space: nowrap;
+        }
+        .agent-reasoning-full {
+            font-size: 13px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.6;
+            padding: 0 0 12px;
+            overflow-wrap: anywhere;
+        }
+
+        /* Per-finding fixed-column table */
+        .finding-scroll { overflow-x: auto; }
+        .finding-table { min-width: 460px; }
+        .finding-row {
+            display: grid;
+            grid-template-columns: minmax(0,2fr) minmax(0,1.7fr) 70px 70px 104px;
+            gap: 12px;
+            align-items: center;
+            padding: 9px 0;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            font-size: 12px;
+        }
+        .finding-row.head {
+            border-top: none;
+            color: rgba(255,255,255,0.45);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        /* Keyboard focus + hover states (match existing accent) */
+        .agent-bar:focus-visible,
+        .agent-row:focus-visible {
+            outline: 2px solid rgba(96,165,250,0.6);
+            outline-offset: 2px;
+            border-radius: 6px;
+        }
+        .agent-row:hover .agent-row-name { color: #fff; }
+        .agent-row:hover .agent-row-toggle { text-decoration: underline; }
+        @media (prefers-reduced-motion: reduce) {
+            .agent-bar, .agent-bar-chevron { transition: none; }
+        }
+        .finding-cell {
+            color: rgba(255,255,255,0.8);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+        }
+        .finding-cell.num { font-variant-numeric: tabular-nums; }
+        .finding-cell.ground-ok { color: #10b981; }
+        .finding-cell.ground-warn { color: #eab308; }
 
         .section-title {
             font-size: 16px;
@@ -3224,26 +3374,18 @@
                         <button class="filter-tab-btn" data-filter="minor">Minor (<span id="filterMinor">0</span>)</button>
                     </div>
                 </div>
-                <div class="violation-cards" id="violationCards"></div>
-            </div>
 
-            <!-- Agent Reasoning (additive, collapsible — reuses violation-card styling) -->
-            <div class="violations-overview">
-                <div class="violation-cards">
-                    <div class="violation-card" id="agentReasoning" style="display:none;">
-                        <div class="violation-header" onclick="toggleAgentReasoning()">
-                            <div class="violation-header-left">
-                                <div class="article-label">Multi-Agent Analysis</div>
-                                <div class="violation-title-row">
-                                    <h3 class="violation-title">Agent Reasoning</h3>
-                                </div>
-                                <p class="violation-desc" id="agentReasoningSub" style="margin-bottom:0;"></p>
-                            </div>
-                            <span class="expand-icon">▼</span>
-                        </div>
-                        <div class="violation-details" id="agentReasoningBody"></div>
-                    </div>
+                <!-- Agent Reasoning (additive, collapsible slim bar — directly under the summary) -->
+                <div class="agent-panel" id="agentReasoning" style="display:none;">
+                    <button class="agent-bar" type="button" aria-expanded="false" onclick="toggleAgentReasoning()">
+                        <span class="agent-bar-label">Multi-Agent Analysis</span>
+                        <span class="agent-bar-summary" id="agentReasoningSub"></span>
+                        <span class="agent-bar-chevron">▾</span>
+                    </button>
+                    <div class="agent-body" id="agentReasoningBody" hidden></div>
                 </div>
+
+                <div class="violation-cards" id="violationCards"></div>
             </div>
 
         </div>
@@ -5033,13 +5175,34 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
         // No fabricated routing/reasoning; honest about single-pass runs.
         // Markup reuses existing theme classes; reuses the violation-card expand.
         function toggleAgentReasoning() {
-            const card = document.getElementById('agentReasoning');
-            if (card) card.classList.toggle('expanded');
+            const bar = document.querySelector('#agentReasoning .agent-bar');
+            const body = document.getElementById('agentReasoningBody');
+            if (!bar || !body) return;
+            const open = bar.getAttribute('aria-expanded') === 'true';
+            bar.setAttribute('aria-expanded', String(!open));
+            body.hidden = open;
+        }
+
+        function toggleAgentRow(btn) {
+            const full = btn.parentElement.querySelector('.agent-reasoning-full');
+            if (!full) return;
+            const open = btn.getAttribute('aria-expanded') === 'true';
+            btn.setAttribute('aria-expanded', String(!open));
+            full.hidden = open;
+            const toggle = btn.querySelector('.agent-row-toggle');
+            if (toggle) toggle.textContent = open ? 'show reasoning' : 'hide reasoning';
         }
 
         function escAR(s) {
             return String(s == null ? '' : s)
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // Title-case a focus-area label: "automated decision-making" -> "Automated Decision-Making".
+        function titleCaseAR(s) {
+            return String(s == null ? '' : s)
+                .toLowerCase()
+                .replace(/\b[a-z]/g, c => c.toUpperCase());
         }
 
         function renderAgentReasoning(data) {
@@ -5058,29 +5221,28 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
             const chunks = Number.isFinite(data.chunks_retrieved) ? data.chunks_retrieved : null;
             const iterations = Number.isFinite(data.iterations) ? data.iterations : null;
             const avgConf = (typeof data.confidence === 'number') ? Math.round(data.confidence * 100) : null;
-            const ci = data.confidence_improvements || {};
             const frameworks = Array.isArray(data.frameworks_analyzed) ? data.frameworks_analyzed : [];
 
             // One entry per judge/validator agent that actually produced a finding.
             const agents = violations
                 .filter(v => v.violation_detected !== false)
                 .map(v => ({
-                    name: v.focus_area || v.judge_id || 'judge',
+                    name: titleCaseAR(v.focus_area || v.judge_id || 'judge'),
                     framework: (v.framework || '').toString().toUpperCase(),
                     confidence: (typeof v.confidence === 'number') ? Math.round(v.confidence * 100) : null,
                     abstain: v.abstain === true,
-                    abstainReason: v.abstain_reason || '',
-                    reasoning: v.reasoning || '',
+                    reasoning: v.reasoning || (v.abstain ? (v.abstain_reason || '') : ''),
                     article: v.article_violated || '',
                     grounding: (typeof v.grounding_confidence === 'number') ? Math.round(v.grounding_confidence * 100) : null,
                     grounded: v.grounded === true
                 }));
 
-            sub.textContent = `${agents.length} judge${agents.length === 1 ? '' : 's'} ran`
+            // Slim-bar summary line (always visible).
+            sub.textContent = `${agents.length} judge${agents.length === 1 ? '' : 's'}`
                 + (iterations != null ? ` • ${iterations} iteration${iterations === 1 ? '' : 's'}` : '')
                 + (avgConf != null ? ` • ${avgConf}% avg confidence` : '');
 
-            // 1) Agent flow — real participants only. Stages reuse .metric-value/.metric-label.
+            // Hero — agent flow (real participants only).
             const flowStages = [];
             flowStages.push({ name: 'Orchestrator', meta: frameworks.length ? frameworks.map(f => f.toUpperCase()).join(', ') : 'routing' });
             if (chunks != null) flowStages.push({ name: 'Researcher', meta: `${chunks} chunks` });
@@ -5094,62 +5256,64 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
                 `<div class="metric-label">${escAR(s.meta)}</div></div>`
             ).join('');
 
-            // 2) Per-agent reasoning + confidence (real). Reuses badges + detail-content.
+            // Hero summary line: honest reflection state.
+            let reflectText;
+            if (iterations != null && iterations <= 1) {
+                reflectText = 'Single pass — all judges met the confidence threshold; no low-confidence re-run was triggered.';
+            } else if (iterations != null) {
+                reflectText = `${iterations} iterations — a low-confidence reflection loop re-ran judge(s).`;
+            } else {
+                reflectText = 'Iteration data not reported for this run.';
+            }
+
+            // Per-agent rows: one line each, reasoning behind a per-agent toggle.
             const agentsHtml = agents.map(a => `
-                <div class="ar-agent">
-                    <div class="violation-title-row" style="margin-bottom:8px;">
-                        <span class="metric-value">${escAR(a.name)}</span>
-                        <div class="badges">
-                            ${a.framework ? `<span class="badge badge-framework">${escAR(a.framework)}</span>` : ''}
-                            ${a.confidence != null ? `<span class="badge badge-framework">${a.confidence}% confidence</span>` : ''}
-                            ${a.abstain ? `<span class="badge badge-major">ABSTAINED</span>` : ''}
-                        </div>
-                    </div>
-                    ${a.reasoning ? `<div class="detail-content ar-scroll">${escAR(a.reasoning)}</div>` : ''}
-                    ${a.abstain && a.abstainReason ? `<div class="detail-content">${escAR(a.abstainReason)}</div>` : ''}
+                <div class="agent-item">
+                    <button class="agent-row" type="button" aria-expanded="false" onclick="toggleAgentRow(this)">
+                        <span class="agent-row-name">${escAR(a.name)}</span>
+                        ${a.framework ? `<span class="badge badge-framework">${escAR(a.framework)}</span>` : ''}
+                        ${a.abstain ? `<span class="badge badge-major">ABSTAINED</span>` : ''}
+                        ${a.confidence != null ? `<span class="agent-row-conf">${a.confidence}%</span>` : ''}
+                        ${a.reasoning ? `<span class="agent-row-toggle">show reasoning</span>` : ''}
+                    </button>
+                    ${a.reasoning ? `<div class="agent-reasoning-full" hidden>${escAR(a.reasoning)}</div>` : ''}
                 </div>
             `).join('');
 
-            // 3) Reflection loop — honest about single-pass. Reuses .regulatory-context box.
-            let reflectText;
-            if (iterations != null && iterations <= 1) {
-                reflectText = `Single pass — all judges met the confidence threshold; no low-confidence re-run was triggered`
-                    + (ci && ci.improved === false ? ` (confidence_improvements.improved = false).` : `.`);
-            } else if (iterations != null) {
-                reflectText = `${iterations} iterations — a low-confidence reflection loop re-ran judge(s)`
-                    + (ci && ci.improved === true ? ` and improved confidence.` : `.`);
-            } else {
-                reflectText = `Iteration data not reported for this run.`;
-            }
-            const reflectHtml = `<div class="regulatory-context"><div class="detail-content">${escAR(reflectText)}</div></div>`;
-
-            // 4) Per-finding confidence + grounding (real). One .violation-metrics row each.
-            const findingsHtml = agents.map(a => `
-                <div class="violation-metrics">
-                    <div class="metric-item"><div class="metric-label">Finding</div><div class="metric-value">${escAR(a.article || a.name)}</div></div>
-                    <div class="metric-item"><div class="metric-label">Agent</div><div class="metric-value">${escAR(a.name)}</div></div>
-                    <div class="metric-item"><div class="metric-label">Confidence</div><div class="metric-value">${a.confidence != null ? a.confidence + '%' : '—'}</div></div>
-                    <div class="metric-item"><div class="metric-label">Grounding</div><div class="metric-value">${a.grounding != null ? a.grounding + '%' : '—'}</div></div>
-                    <div class="metric-item"><div class="metric-label">Status</div><div class="metric-value ${a.grounded ? 'low' : 'medium'}">${a.grounded ? '✓ grounded' : '⚠ ungrounded'}</div></div>
+            // Per-finding fixed-column table.
+            const findingRows = agents.map(a => `
+                <div class="finding-row">
+                    <div class="finding-cell" title="${escAR(a.article || a.name)}">${escAR(a.article || a.name)}</div>
+                    <div class="finding-cell" title="${escAR(a.name)}">${escAR(a.name)}</div>
+                    <div class="finding-cell num">${a.confidence != null ? a.confidence + '%' : '—'}</div>
+                    <div class="finding-cell num">${a.grounding != null ? a.grounding + '%' : '—'}</div>
+                    <div class="finding-cell ${a.grounded ? 'ground-ok' : 'ground-warn'}">${a.grounded ? '✓ grounded' : '⚠ ungrounded'}</div>
                 </div>
             `).join('');
 
             body.innerHTML = `
-                <div class="detail-section">
-                    <div class="detail-section-title">Agent flow</div>
-                    <div class="ar-flow">${flowHtml}</div>
-                </div>
+                <div class="ar-flow">${flowHtml}</div>
+                <div class="agent-hero-summary">${escAR(reflectText)}</div>
+
                 <div class="detail-section">
                     <div class="detail-section-title">Per-agent decision &amp; confidence</div>
                     ${agentsHtml || '<div class="detail-content">No judge findings to show.</div>'}
                 </div>
-                <div class="detail-section">
-                    <div class="detail-section-title">Reflection loop</div>
-                    ${reflectHtml}
-                </div>
+
                 <div class="detail-section">
                     <div class="detail-section-title">Per-finding confidence &amp; grounding</div>
-                    ${findingsHtml || '<div class="detail-content">—</div>'}
+                    <div class="finding-scroll">
+                        <div class="finding-table">
+                            <div class="finding-row head">
+                                <div class="finding-cell">Finding</div>
+                                <div class="finding-cell">Agent</div>
+                                <div class="finding-cell">Conf.</div>
+                                <div class="finding-cell">Ground.</div>
+                                <div class="finding-cell">Status</div>
+                            </div>
+                            ${findingRows || '<div class="finding-row"><div class="finding-cell">—</div></div>'}
+                        </div>
+                    </div>
                 </div>
             `;
         }

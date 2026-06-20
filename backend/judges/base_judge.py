@@ -167,7 +167,7 @@ class BaseComplianceJudge(ABC):
             self.model = router.get_model_for_framework(framework.lower())
             logger.info(f"ModelRouter selected {self.model} for {framework}")
         else:
-            self.model = "claude-sonnet-4-20250514"
+            self.model = "claude-sonnet-4-6"
 
         self.api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
         if not self.api_key:

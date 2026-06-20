@@ -58,7 +58,7 @@ class ValidatorAgent(Agent):
         framework: str,
         focus_area: str,
         scratchpad: Optional[SharedMemory] = None,
-        model: str = "claude-3-5-haiku-20241022",
+        model: str = "claude-haiku-4-5",
         confidence_threshold: Optional[float] = None,
         api_key: Optional[str] = None
     ):

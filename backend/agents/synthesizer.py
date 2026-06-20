@@ -105,7 +105,7 @@ IMPORTANT:
         import httpx
         http_client = httpx.Client(proxy=None)
         self._client = Anthropic(api_key=self.api_key, http_client=http_client)
-        self.model = "claude-3-5-haiku-20241022"
+        self.model = "claude-haiku-4-5"
 
         logger.info("SynthesisAgent initialized")
 

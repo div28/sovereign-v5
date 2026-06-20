@@ -136,7 +136,7 @@ Keep the same structure with {{regulatory_context}} and {{submission}} placehold
         try:
             # Use Claude Sonnet for prompt refinement
             response = self._client.messages.create(
-                model="claude-3-5-haiku-20241022",  # Changed to Haiku for cost savings
+                model="claude-haiku-4-5",  # Changed to Haiku for cost savings
                 max_tokens=4096,
                 messages=[{
                     "role": "user",

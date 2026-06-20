@@ -139,7 +139,7 @@ ELSE:
         super().__init__(
             framework="SOX",
             focus_area="internal control assessment",
-            model="claude-3-5-haiku-20241022",
+            model="claude-haiku-4-5",
             api_key=api_key
         )
 
@@ -255,7 +255,7 @@ ELSE:
         super().__init__(
             framework="SOX",
             focus_area="corporate responsibility",
-            model="claude-3-5-haiku-20241022",
+            model="claude-haiku-4-5",
             api_key=api_key
         )
 
@@ -391,7 +391,7 @@ ELSE:
         super().__init__(
             framework="SOX",
             focus_area="audit trail requirements",
-            model="claude-3-5-haiku-20241022",
+            model="claude-haiku-4-5",
             api_key=api_key
         )
 

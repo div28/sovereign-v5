@@ -20,11 +20,11 @@ logger = logging.getLogger(__name__)
 # Anthropic pricing (as of June 2026)
 # Prices per million tokens
 PRICING = {
-    "claude-sonnet-4-20250514": {
+    "claude-sonnet-4-6": {
         "input": 3.00,   # $3 per million input tokens
         "output": 15.00  # $15 per million output tokens
     },
-    "claude-3-5-haiku-20241022": {
+    "claude-haiku-4-5": {
         "input": 1.00,   # $1 per million input tokens
         "output": 5.00   # $5 per million output tokens
     }
@@ -60,9 +60,9 @@ class ModelRouter:
 
     # Framework to model mapping - ALL USE SONNET 4 FOR BETTER ACCURACY
     FRAMEWORK_MODEL_MAP = {
-        "gdpr": "claude-sonnet-4-20250514",
-        "sox": "claude-sonnet-4-20250514",
-        "euai": "claude-sonnet-4-20250514"
+        "gdpr": "claude-sonnet-4-6",
+        "sox": "claude-sonnet-4-6",
+        "euai": "claude-sonnet-4-6"
     }
 
     def __init__(self):
@@ -86,7 +86,7 @@ class ModelRouter:
         # Get model from mapping
         model = self.FRAMEWORK_MODEL_MAP.get(
             framework_lower,
-            "claude-sonnet-4-20250514"  # Default to Sonnet 4
+            "claude-sonnet-4-6"  # Default to Sonnet 4
         )
 
         # Provide reasoning for the routing decision
@@ -214,7 +214,7 @@ class ModelRouter:
             )
 
             # Calculate baseline cost (if everything used Sonnet)
-            sonnet_model = "claude-sonnet-4-20250514"
+            sonnet_model = "claude-sonnet-4-6"
             baseline_input_cost = (total_input_tokens / 1_000_000) * PRICING[sonnet_model]["input"]
             baseline_output_cost = (total_output_tokens / 1_000_000) * PRICING[sonnet_model]["output"]
             baseline_cost = baseline_input_cost + baseline_output_cost

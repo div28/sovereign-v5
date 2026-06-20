@@ -130,7 +130,7 @@ ELSE:
         super().__init__(
             framework="GDPR",
             focus_area="automated decision-making",
-            model="claude-3-5-haiku-20241022",
+            model="claude-haiku-4-5",
             api_key=api_key
         )
 
@@ -245,7 +245,7 @@ ELSE:
         super().__init__(
             framework="GDPR",
             focus_area="right to erasure",
-            model="claude-3-5-haiku-20241022",
+            model="claude-haiku-4-5",
             api_key=api_key
         )
 
@@ -346,7 +346,7 @@ ELSE:
         super().__init__(
             framework="GDPR",
             focus_area="security of processing",
-            model="claude-3-5-haiku-20241022",
+            model="claude-haiku-4-5",
             api_key=api_key
         )
 

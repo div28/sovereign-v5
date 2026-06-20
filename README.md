@@ -4,7 +4,7 @@
 > defensible, evidence-linked compliance assessment in under 20 seconds — replacing
 > a review cycle that normally takes 2–6 weeks.
 
-**[🔗 Live demo](https://sovereign-compliance.netlify.app/)** · **[📄 Product Requirements Doc](https://github.com/div28/sovereign-v5/blob/ddd8467e239ddba4d958a910dbaf8b1f87b0f287/Sovereign%20Latest%20_%20Multi-Framework%20AI%20Compliance%20Platform%20%E2%80%93%20Product%20Requirements%20Document%20%28PRD%29.docx)** · **[🏗 Architecture](docs/architecture.png)**
+**[🔗 Live demo](https://sovereign-compliance.netlify.app/)** · **[📄 Product Requirements Doc](docs/PRD.pdf)** · **[🏗 Architecture](docs/architecture.png)**
 
 ---
 

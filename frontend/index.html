@@ -1360,6 +1360,32 @@
             letter-spacing: 0;
         }
 
+        /* Cross-regulation conflict cards — reuse violation-card + theme tokens */
+        .conflict-cards { display: flex; flex-direction: column; gap: 12px; }
+        .conflict-card { margin-bottom: 0; }
+        .conflict-head {
+            display: flex; align-items: center; gap: 8px;
+            flex-wrap: wrap; margin-bottom: 14px;
+        }
+        .conflict-vs { color: rgba(255,255,255,0.45); font-size: 14px; }
+        .conflict-clauses {
+            display: flex; flex-direction: column; gap: 8px;
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 6px;
+        }
+        .conflict-clause {
+            display: flex; align-items: flex-start; gap: 8px;
+            font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.5;
+        }
+        .conflict-clause .badge { flex-shrink: 0; margin-top: 1px; }
+        .conflict-card .detail-section-title { margin-bottom: 8px; }
+        .badge.ll-high { background: rgba(239,68,68,0.18); color: #f87171; text-transform: none; letter-spacing: 0; }
+        .badge.ll-medium { background: rgba(234,179,8,0.18); color: #eab308; text-transform: none; letter-spacing: 0; }
+        .badge.ll-low { background: rgba(16,185,129,0.18); color: #34d399; text-transform: none; letter-spacing: 0; }
+        .badge.badge-legal { background: rgba(167,139,250,0.18); color: #a78bfa; text-transform: none; letter-spacing: 0; }
+
         .violation-title {
             font-size: 16px;
             font-weight: 600;
@@ -3413,6 +3439,12 @@
                 <div class="violation-cards" id="violationCards"></div>
             </div>
 
+            <!-- Cross-Regulation Conflicts (additive; rendered only when conflicts exist) -->
+            <div class="violations-overview" id="conflictsSection" style="display:none;">
+                <div class="section-title">Cross-Regulation Conflicts</div>
+                <div class="conflict-cards" id="conflictCards"></div>
+            </div>
+
         </div>
     </section>
 
@@ -5211,6 +5243,55 @@ Does EU AI Act prohibition on workplace emotion AI apply to voluntary wellness t
 
             // Additive: populate the Agent Reasoning panel from real response data.
             renderAgentReasoning(data);
+
+            // Additive: render cross-regulation conflicts (nothing if none).
+            renderConflicts(data);
+        }
+
+        // Cross-regulation conflicts — renders ONLY the response field; nothing
+        // if there are no conflicts. Reuses violation-card + theme classes.
+        function renderConflicts(data) {
+            const section = document.getElementById('conflictsSection');
+            const wrap = document.getElementById('conflictCards');
+            if (!section || !wrap) return;
+
+            const conflicts = Array.isArray(data.cross_regulation_conflicts) ? data.cross_regulation_conflicts : [];
+            if (conflicts.length === 0) {
+                section.style.display = 'none';
+                wrap.innerHTML = '';
+                return;
+            }
+            section.style.display = 'block';
+
+            wrap.innerHTML = conflicts.map(c => {
+                const fw = Array.isArray(c.frameworks) ? c.frameworks : [];
+                const clauses = Array.isArray(c.clauses) ? c.clauses : [];
+                const findings = Array.isArray(c.findings) && c.findings.length
+                    ? c.findings
+                    : clauses.map((cl, i) => ({ framework: fw[i] || '', clause: cl, issue: '' }));
+                const ll = String(c.likelihood || '').toUpperCase();
+                const llClass = ll === 'HIGH' ? 'll-high' : ll === 'LOW' ? 'll-low' : 'll-medium';
+                const conf = (typeof c.confidence === 'number') ? Math.round(c.confidence * 100) + '%' : '';
+
+                const clauseRows = findings.map(f =>
+                    `<div class="conflict-clause">` +
+                    `${f.framework ? `<span class="badge badge-framework">${escAR(f.framework)}</span>` : ''}` +
+                    `<span>${escAR(f.clause || '')}</span></div>`
+                ).join('');
+
+                return `<div class="violation-card conflict-card">
+                    <div class="conflict-head">
+                        ${fw[0] ? `<span class="badge badge-framework">${escAR(fw[0])}</span>` : ''}
+                        <span class="conflict-vs">&#8644;</span>
+                        ${fw[1] ? `<span class="badge badge-framework">${escAR(fw[1])}</span>` : ''}
+                        ${ll ? `<span class="badge ${llClass}">${escAR(ll)} likelihood${conf ? ' &middot; ' + conf : ''}</span>` : ''}
+                        ${c.requires_legal_review ? `<span class="badge badge-legal">&#9878; legal review</span>` : ''}
+                    </div>
+                    <div class="conflict-clauses">${clauseRows}</div>
+                    ${c.description ? `<div class="detail-section-title">Why they conflict</div><div class="detail-content">${escAR(c.description)}</div>` : ''}
+                    ${c.reconciliation ? `<div class="detail-section-title" style="margin-top:14px;">Reconciliation</div><div class="detail-content">${escAR(c.reconciliation)}</div>` : ''}
+                </div>`;
+            }).join('');
         }
 
         // Agent Reasoning panel — renders ONLY real fields from the response.

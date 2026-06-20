@@ -92,4 +92,4 @@ Against a manual baseline (~$8.5K and 4 weeks per assessment), Sovereign's per-s
 
 ---
 
-*Built by Divya Nag*
+*Built by Divya Nag — [LinkedIn](https://www.linkedin.com/in/divyanag/)*
